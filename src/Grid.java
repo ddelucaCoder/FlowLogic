@@ -5,7 +5,7 @@ public class Grid {
     private int numRows;
     private int numColumns;
 
-    private GridObjects[][] grid;
+    private GridObject[][] grid;
 
     public Grid(int numRows, int numColumns) {
         this.numRows = numRows;
@@ -23,6 +23,13 @@ public class Grid {
 
     public void resize(int newXSize, int newYSize) {
 
+    }
+
+    public void addObject(GridObject newObject, int rowNum, int colNum) {
+        if (grid[rowNum][colNum] != null) {
+            return;
+        }
+        grid[rowNum][colNum] = newObject;
     }
 
 }
