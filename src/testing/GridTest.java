@@ -1,11 +1,14 @@
+package testing;
+
+import com.FlowLogic.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-@Suite
-@SuiteDisplayName("Grid Tests")
-class GridTest {
+public class GridTest {
     private Grid grid;
     private int numCols = 10;
     private int numRows = 10;
@@ -46,13 +49,13 @@ class GridTest {
 
     @Test
     void testAddObject() {
-        GridObject object = new GridObject(); 
+        GridObject object = new Building(1, 1, 15);
         int row = 2;
         int col = 3;
         
         grid.addObject(object, row, col);
         
-        assertEquals(getAtSpot(row, col), object);
+        assertEquals(grid.getAtSpot(row, col), object);
 
     }
 
@@ -66,7 +69,7 @@ class GridTest {
         grid.addObject(obj1, row, col);
         grid.addObject(obj2, row, col);
 
-        assertEquals(grid.getAtSpot(row, col), obj1)
+        assertEquals(grid.getAtSpot(row, col), obj1);
         
     }
 }

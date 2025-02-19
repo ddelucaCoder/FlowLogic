@@ -1,7 +1,7 @@
-import GridObject;
+package com.FlowLogic;
 
 /**
- * This class represents the grid that holds all of the "GridObjects," 
+ * This class represents the grid that holds all of the "GridObjects"
  * which includes roads and buildings.
  */
 
@@ -15,7 +15,7 @@ public class Grid {
     public Grid(int numRows, int numColumns) {
         this.numRows = numRows;
         this.numColumns = numColumns;
-        grid = new GridObjects[numRows][numColumns];
+        grid = new GridObject[numRows][numColumns];
     }
 
     public Grid(String filename) {
@@ -33,10 +33,11 @@ public class Grid {
     public void resize(int newNumRows, int newNumCols) {
         // create new 
         GridObject[][] newGrid = new GridObject[newNumRows][newNumCols];
-        
+        int leastRows = Math.min(numRows, newNumRows);
+        int leastCols = Math.min(numColumns, newNumCols);
         // iterate
-        for (int i = 0; i < numRows; i++) {
-            for (int k = 0; k < numColumns; k++) {
+        for (int i = 0; i < leastRows; i++) {
+            for (int k = 0; k < leastCols; k++) {
                 // copy objects from old grid to new one
                 newGrid[i][k] = grid[i][k];
             }
@@ -62,7 +63,7 @@ public class Grid {
     }
 
     public GridObject getAtSpot(int rowNum, int colNum) {
-        return grid[rowNum][colNum]
+        return grid[rowNum][colNum];
     }
 
 }
