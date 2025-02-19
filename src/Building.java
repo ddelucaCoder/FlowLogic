@@ -7,6 +7,8 @@
  * @version February 18, 2025
  */
 public class Building implements GridObject {
+    int rowNum;
+    int coNum;
     int xLength, yLength, dailyPopulation;
     public Building(int xLength, int yLength, int dailyPopulation) {
         this.xLength = xLength;

@@ -61,4 +61,8 @@ public class Grid {
         grid[rowNum][colNum] = newObject;
     }
 
+    public GridObject getAtSpot(int rowNum, int colNum) {
+        return grid[rowNum][colNum]
+    }
+
 }
