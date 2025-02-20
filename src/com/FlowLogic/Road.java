@@ -1,0 +1,98 @@
+package com.FlowLogic;
+
+
+/**
+ * This class is a Grid Object for a road. The road will connect
+ * buildings and cars will drive on them. They are placed on the grid
+ * by the user.
+ */
+public class Road implements GridObject {
+
+    private int orientation;
+    private int speedLimit;
+    private int length;
+    private boolean isInRoad;
+    private int inCars;
+    private String imageFile;
+    private int rowNum;
+    private int colNum;
+
+    public Road (int orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum) {
+        this.orientation = orientation;
+        this.speedLimit = speedLimit;
+        this.isInRoad = isInRoad;
+        this.inCars = inCars;
+        this.rowNum = rowNum;
+        this.colNum = colNum;
+
+
+    }
+
+    @Override
+    public int getRowNum() {
+        return rowNum;
+    }
+
+    @Override
+    public int getColNum() {
+        return colNum;
+    }
+
+    @Override
+    public void setRowNum(int row) {
+        this.rowNum = row;
+    }
+
+    @Override
+    public void setColNum(int col) {
+        this.colNum = col;
+    }
+
+    public int getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(int orientation) {
+        this.orientation = orientation;
+    }
+
+    public int getSpeedLimit() {
+        return speedLimit;
+    }
+
+    public void setSpeedLimit(int speedLimit) {
+        this.speedLimit = speedLimit;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
+    }
+
+    public boolean isInRoad() {
+        return isInRoad;
+    }
+
+    public void setInRoad(boolean inRoad) {
+        isInRoad = inRoad;
+    }
+
+    public int getInCars() {
+        return inCars;
+    }
+
+    public void setInCars(int inCars) {
+        this.inCars = inCars;
+    }
+
+    public String getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(String imageFile) {
+        this.imageFile = imageFile;
+    }
+}
