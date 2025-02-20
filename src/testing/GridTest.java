@@ -56,7 +56,6 @@ public class GridTest {
         grid.addObject(object, row, col);
         
         assertEquals(grid.getAtSpot(row, col), object);
-
     }
 
     @Test

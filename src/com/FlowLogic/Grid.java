@@ -7,9 +7,13 @@ package com.FlowLogic;
 
 public class Grid {
 
+    // The number of rows in the grid
     private int numRows;
+
+    // The number of columns in the grid
     private int numColumns;
 
+    // The grid where objects are stored
     private GridObject[][] grid;
 
     public Grid(int numRows, int numColumns) {
@@ -30,6 +34,17 @@ public class Grid {
         return this.numColumns;
     }
 
+    public GridObject[][] getGrid() {
+        return this.grid;
+    }
+
+    /**
+     * Resizes the grid from its current size to newNumRows X newNumCols. If
+     * the grid shrinks, and there are grid objects in the part of the grid
+     * that is being removed, those objects will be removed with it.
+     * @param newNumRows - the number of rows for the new grid size
+     * @param newNumCols - the number of columns for the new grid size
+     */
     public void resize(int newNumRows, int newNumCols) {
         // create new 
         GridObject[][] newGrid = new GridObject[newNumRows][newNumCols];
@@ -50,8 +65,11 @@ public class Grid {
     }
 
     /**
-     * This method adds a grid object, newObject, to the grid at (rowNum, colNum). 
+     * This method adds a grid object, newObject, to the grid at (rowNum, colNum).
      * If there is already something in the spot, then it will do nothing.
+     * @param newObject - the object to place in the grid
+     * @param rowNum - the row number to place the object at
+     * @param colNum - the column number to place the object at
      */
     public void addObject(GridObject newObject, int rowNum, int colNum) {
         // if the spot is already full then do nothing
@@ -62,6 +80,12 @@ public class Grid {
         grid[rowNum][colNum] = newObject;
     }
 
+    /**
+     * This gets the object at (rowNum, colNum) on the grid.
+     * @param rowNum - The row number to get at
+     * @param colNum - The column number to get at
+     * @return the GridObject at (rowNum, colNum)
+     */
     public GridObject getAtSpot(int rowNum, int colNum) {
         return grid[rowNum][colNum];
     }
