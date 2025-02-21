@@ -3,7 +3,7 @@ How To Setup JavaFX:
 Step 1: Ensure You are using Java 17
 This can be done if you go to File -> Project Structure -> Project. The SDK should say Java 17
 
-Step 2: Add jar files to module
+Step 2: Add jar files to module (Potentially Not Needed)
 To do this simply go to File -> Project Structure -> Modules -> Dependencies
 Click on the plus arrow and select JARs
 Go into this project file -> lib -> javafx-sdk-17.0.14 -> lib and select all the .jar files then click apply
