@@ -1,10 +1,8 @@
 package com.FlowLogic;
 
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
@@ -19,8 +17,8 @@ public class UserInterface extends Application {
     private static final int SCREEN_HEIGHT = 900;     // Height of the screen
 
     private static final int CELL_SIZE = 32;          // Fixed cell size of 32x32
-    private static final int GRID_ROWS = 100;         // Number of rows in the grid
-    private static final int GRID_COLS = 100;         // Number of columns in the grid
+    private static final int GRID_ROWS = 10;         // Number of rows in the grid
+    private static final int GRID_COLS = 10;         // Number of columns in the grid
 
     // Variables to track zoom and pan offsets
     private double offsetX = 0;
@@ -32,6 +30,9 @@ public class UserInterface extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        //Stops user from resizing the window
+        primaryStage.setResizable(false);
+
         // Create an AnchorPane to contain everything
         AnchorPane root = new AnchorPane();
         root.setStyle("-fx-background-color: lightgray;");
@@ -43,16 +44,15 @@ public class UserInterface extends Application {
         gridContainer.getChildren().add(gridGroup);
         root.getChildren().add(gridContainer);
 
-        // Define grid container size (80% width, 95% height)
-        double gridViewWidth = SCREEN_WIDTH * 0.80;
-        double gridViewHeight = SCREEN_HEIGHT * 0.95;
+        // Define grid container size such that the grid is a Square
+        double gridViewWidth = SCREEN_WIDTH * 0.5625;
+        double gridViewHeight = SCREEN_HEIGHT * 1.00;
 
         gridContainer.setPrefSize(gridViewWidth, gridViewHeight);
 
         Rectangle clip = new Rectangle(gridViewWidth, gridViewHeight);
         gridContainer.setClip(clip);
 
-        AnchorPane.setTopAnchor(gridContainer, 20.0);
         AnchorPane.setLeftAnchor(gridContainer, (SCREEN_WIDTH - gridViewWidth) / 2);
         AnchorPane.setRightAnchor(gridContainer, (SCREEN_WIDTH - gridViewWidth) / 2);
 
@@ -85,7 +85,25 @@ public class UserInterface extends Application {
             double deltaY = event.getSceneY() - mousePos[1];
             offsetX += deltaX;
             offsetY += deltaY;
-            System.out.println(offsetX);
+
+            double gridContainerWidth = gridContainer.getPrefWidth();
+            double gridContainerHeight = gridContainer.getPrefHeight();
+            double gridGroupWidth = gridGroup.getBoundsInLocal().getWidth();
+            double gridGroupHeight = gridGroup.getBoundsInLocal().getHeight();
+
+            if (offsetX > 0) {
+                offsetX = 0; // Prevent panning to the right
+            }
+            if (offsetX < gridContainerWidth - gridGroupWidth) {
+                offsetX = gridContainerWidth - gridGroupWidth; // Prevent panning to the left
+            }
+            if (offsetY > 0) {
+                offsetY = 0; // Prevent panning down
+            }
+            if (offsetY < gridContainerHeight - gridGroupHeight) {
+                offsetY = gridContainerHeight - gridGroupHeight; // Prevent panning up
+            }
+
             gridGroup.setTranslateX(offsetX);
             gridGroup.setTranslateY(offsetY);
             mousePos[0] = event.getSceneX();
