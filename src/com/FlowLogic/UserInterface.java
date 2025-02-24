@@ -15,8 +15,9 @@ import javafx.stage.Stage;
 public class UserInterface extends Application {
 
     // Global constants for screen width, height, and grid dimensions
-    private static final int SCREEN_WIDTH = 800;      // Width of the screen
-    private static final int SCREEN_HEIGHT = 600;     // Height of the screen
+    private static final int SCREEN_WIDTH = 1600;      // Width of the screen
+    private static final int SCREEN_HEIGHT = 900;     // Height of the screen
+
     private static final int CELL_SIZE = 32;          // Fixed cell size of 32x32
     private static final int GRID_ROWS = 100;         // Number of rows in the grid
     private static final int GRID_COLS = 100;         // Number of columns in the grid
@@ -24,6 +25,7 @@ public class UserInterface extends Application {
     // Variables to track zoom and pan offsets
     private double offsetX = 0;
     private double offsetY = 0;
+    private double scaleFactor = 1.0; // Track zoom level
 
     // Tracks if the User is Panning the screen disables clicking events
     private boolean pan = false;
@@ -32,12 +34,28 @@ public class UserInterface extends Application {
     public void start(Stage primaryStage) {
         // Create an AnchorPane to contain everything
         AnchorPane root = new AnchorPane();
+        root.setStyle("-fx-background-color: lightgray;");
 
-        // Create a Group to hold the grid
+        Pane gridContainer = new Pane();
+        gridContainer.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
+
         Group gridGroup = new Group();
+        gridContainer.getChildren().add(gridGroup);
+        root.getChildren().add(gridContainer);
 
-        // Add the grid group to the root
-        root.getChildren().add(gridGroup);
+        // Define grid container size (80% width, 95% height)
+        double gridViewWidth = SCREEN_WIDTH * 0.80;
+        double gridViewHeight = SCREEN_HEIGHT * 0.95;
+
+        gridContainer.setPrefSize(gridViewWidth, gridViewHeight);
+
+        Rectangle clip = new Rectangle(gridViewWidth, gridViewHeight);
+        gridContainer.setClip(clip);
+
+        AnchorPane.setTopAnchor(gridContainer, 20.0);
+        AnchorPane.setLeftAnchor(gridContainer, (SCREEN_WIDTH - gridViewWidth) / 2);
+        AnchorPane.setRightAnchor(gridContainer, (SCREEN_WIDTH - gridViewWidth) / 2);
+
 
         // Create the zoom and pan functionality
         final Scale scale = new Scale();
@@ -60,7 +78,6 @@ public class UserInterface extends Application {
         gridGroup.setOnMousePressed(event -> {
             mousePos[0] = event.getSceneX();
             mousePos[1] = event.getSceneY();
-            System.out.println(mousePos[0] + "X," + mousePos[1] + "y");
         });
 
         gridGroup.setOnMouseDragged(event -> {
@@ -68,6 +85,7 @@ public class UserInterface extends Application {
             double deltaY = event.getSceneY() - mousePos[1];
             offsetX += deltaX;
             offsetY += deltaY;
+            System.out.println(offsetX);
             gridGroup.setTranslateX(offsetX);
             gridGroup.setTranslateY(offsetY);
             mousePos[0] = event.getSceneX();
