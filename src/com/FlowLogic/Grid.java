@@ -112,8 +112,8 @@ public class Grid {
     /**
      * This function takes coordinates from the UI and translates
      * them into grid coordinates
-     * @param x - the x coordinate from the ui
-     * @param y - the y coordinate from the ui
+     * @param x - the x coordinate from the ui.
+     * @param y - the y coordinate from the ui.
      * @return an array of integers formatted [col, row]
      */
     public int[] coordinateToGrid(int x, int y) {
