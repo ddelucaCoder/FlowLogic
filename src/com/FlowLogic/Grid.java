@@ -16,6 +16,8 @@ public class Grid {
     // The grid where objects are stored
     private GridObject[][] grid;
 
+    public static int GRID_SIZE;
+
     public Grid(int numRows, int numColumns) {
         this.numRows = numRows;
         this.numColumns = numColumns;
@@ -88,6 +90,44 @@ public class Grid {
      */
     public GridObject getAtSpot(int rowNum, int colNum) {
         return grid[rowNum][colNum];
+    }
+
+    /**
+     * This function takes a row and column number and turns it
+     * into a coordinate on the UI screen
+     * @param row - row number to translate
+     * @param col - col number to translate
+     * @return array of ints formatted (x, y)
+     */
+    public int[] gridToCoordinate(int row, int col) {
+        int[] answer = new int[2];
+
+        // top left = 0, 0
+        answer[1] = (numRows - row) * GRID_SIZE;
+        answer[0] = (numColumns - col) * GRID_SIZE;
+
+        return answer;
+    }
+
+    /**
+     * This function takes coordinates from the UI and translates
+     * them into grid coordinates
+     * @param x - the x coordinate from the ui.
+     * @param y - the y coordinate from the ui.
+     * @return an array of integers formatted [col, row]
+     */
+    public int[] coordinateToGrid(int x, int y) {
+        int[] answer = new int[2];
+
+        // round the numbers down to nearest GRID SIZE
+        x -= (x % GRID_SIZE);
+        y -= (y % GRID_SIZE);
+
+        //translate to grid coords
+        answer[0] = x / GRID_SIZE;
+        answer[1] = y / GRID_SIZE;
+
+        return answer;
     }
 
 }
