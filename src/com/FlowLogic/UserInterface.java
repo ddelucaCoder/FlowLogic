@@ -143,7 +143,7 @@ public class UserInterface extends Application {
                         if (cell.getX() <= x && cell.getX() + CELL_SIZE > x && cell.getY() <= y && cell.getY() + CELL_SIZE > y) {
                             // Change the color of the clicked cell
                             System.out.println("Current working directory: " + System.getProperty("user.dir"));
-                            Image img = new Image("file:Images/Penguin.png");
+                            Image img = new Image("file:Images/RoadImage.png");
                             cell.setFill(new ImagePattern(img));
                             break;
                         }
