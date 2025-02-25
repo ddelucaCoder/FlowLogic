@@ -55,8 +55,6 @@ public class StopLight extends Intersection{
                 lightTwoColor = GREEN;
             }
         }
-
-
         return true;
     }
 
