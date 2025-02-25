@@ -1,29 +1,52 @@
 package com.FlowLogic;
 
-public class Intersection {
-    // the first road that intersects in the intersection
-    Road roadOne;
-    // the second road that intersects in the intersection
-    Road roadTwo;
+public class Intersection implements GridObject {
 
-    public Intersection(Road roadOne, Road roadTwo) {
-        this.roadOne = roadOne;
-        this.roadTwo = roadTwo;
+    Road[] roadList;
+    int rowNum;
+    int colNum;
+
+    public Intersection(int rowNum, int colNum, Road[] roadList) {
+        this.rowNum = rowNum;
+        this.colNum = colNum;
+        this.roadList = roadList;
     }
 
-    public Road getRoadOne() {
-        return roadOne;
+    @Override
+    public int getColNum() {
+        return colNum;
     }
 
-    public void setRoadOne(Road roadOne) {
-        this.roadOne = roadOne;
+    @Override
+    public void setColNum(int colNum) {
+        this.colNum = colNum;
     }
 
-    public Road getRoadTwo() {
-        return roadTwo;
+    @Override
+    public int getRowNum() {
+        return rowNum;
     }
 
-    public void setRoadTwo(Road roadTwo) {
-        this.roadTwo = roadTwo;
+
+    @Override
+    public void setRowNum(int rowNum) {
+        this.rowNum = rowNum;
+    }
+
+    public void addRoad(Road road) {
+        for (int i = 0; i < 4; i++) {
+            if (roadList[i] != null) {
+                roadList[i] = road;
+                return;
+            }
+        }
+    }
+
+    public Road[] getRoadList() {
+        return roadList;
+    }
+
+    public void setRoadList(Road[] roadList) {
+        this.roadList = roadList;
     }
 }
