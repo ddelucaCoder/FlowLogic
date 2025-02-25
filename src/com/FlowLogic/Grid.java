@@ -97,14 +97,15 @@ public class Grid {
      * into a coordinate on the UI screen
      * @param row - row number to translate
      * @param col - col number to translate
-     * @return array of ints formatted (x, y)
+     * @return array of ints formatted (x, y), the bottom left of (row, col) grid spot
      */
     public int[] gridToCoordinate(int row, int col) {
         int[] answer = new int[2];
 
         // top left = 0, 0
-        answer[1] = (numRows - row) * GRID_SIZE;
-        answer[0] = (numColumns - col) * GRID_SIZE;
+        answer[1] = (numRows - row - 1) * GRID_SIZE;
+        // cols already line up
+        answer[0] = col * GRID_SIZE;
 
         return answer;
     }
@@ -114,7 +115,7 @@ public class Grid {
      * them into grid coordinates
      * @param x - the x coordinate from the ui.
      * @param y - the y coordinate from the ui.
-     * @return an array of integers formatted [col, row]
+     * @return an array of integers formatted [row, col]
      */
     public int[] coordinateToGrid(int x, int y) {
         int[] answer = new int[2];
@@ -123,9 +124,9 @@ public class Grid {
         x -= (x % GRID_SIZE);
         y -= (y % GRID_SIZE);
 
-        //translate to grid coords
-        answer[0] = x / GRID_SIZE;
-        answer[1] = y / GRID_SIZE;
+        //translate to grid coords, reversing the y for rows
+        answer[0] = numRows - 1 - (y / GRID_SIZE);
+        answer[1] = x / GRID_SIZE;
 
         return answer;
     }
