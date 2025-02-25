@@ -32,6 +32,8 @@ public class UserInterface extends Application {
     private double offsetY = 0;
     private double scaleFactor = 1.0; // Track zoom level
 
+    public static Grid grid;
+
     // Tracks if the User is Panning the screen disables clicking events
     private boolean pan = false;
 
@@ -136,19 +138,8 @@ public class UserInterface extends Application {
                 System.out.println("Grid position: (" + row + ", " + col + ")");
 
                 // Get the clicked cell (rectangle) and change its color
-                for (Object node : gridGroup.getChildren()) {
-                    if (node instanceof Rectangle) {
-                        Rectangle cell = (Rectangle) node;
-                        // Check if the clicked position is within the bounds of this cell
-                        if (cell.getX() <= x && cell.getX() + CELL_SIZE > x && cell.getY() <= y && cell.getY() + CELL_SIZE > y) {
-                            // Change the color of the clicked cell
-                            System.out.println("Current working directory: " + System.getProperty("user.dir"));
-                            Image img = new Image("file:Images/RoadImage.png");
-                            cell.setFill(new ImagePattern(img));
-                            break;
-                        }
-                    }
-                }
+                Image img = new Image("file:Images/Penguin.png");
+                grid.getFrontGrid()[row][col].setFill(new ImagePattern(img));
             }
             pan = false;
         });
@@ -166,6 +157,7 @@ public class UserInterface extends Application {
             for (int col = 0; col < GRID_COLS; col++) {
                 // Create each cell as a rectangle
                 Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE);
+                grid.getFrontGrid()[row][col] = cell;
                 cell.setFill(Color.LIGHTGRAY);
                 cell.setStroke(Color.BLACK);
                 cell.setX(col * CELL_SIZE);
@@ -178,6 +170,7 @@ public class UserInterface extends Application {
     }
 
     public static void main(String[] args) {
+        grid = new Grid(GRID_ROWS,GRID_COLS);
         launch(args);
     }
 }
