@@ -5,20 +5,27 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+
+import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
 
 
 public class UserInterface extends Application {
 
     // Global constants for screen width, height, and grid dimensions
-    private static final int SCREEN_WIDTH = 1600;      // Width of the screen
-    private static final int SCREEN_HEIGHT = 900;     // Height of the screen
+    private static final int SCREEN_WIDTH = 1280;      // Width of the screen
+    private static final int SCREEN_HEIGHT = 720;     // Height of the screen
 
     private static final int CELL_SIZE = 32;          // Fixed cell size of 32x32
-    private static final int GRID_ROWS = 10;         // Number of rows in the grid
-    private static final int GRID_COLS = 10;         // Number of columns in the grid
+    private static final int GRID_ROWS = 100;         // Number of rows in the grid
+    private static final int GRID_COLS = 100;         // Number of columns in the grid
 
     // Variables to track zoom and pan offsets
     private double offsetX = 0;
@@ -29,7 +36,7 @@ public class UserInterface extends Application {
     private boolean pan = false;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Error{
         //Stops user from resizing the window
         primaryStage.setResizable(false);
 
@@ -45,7 +52,7 @@ public class UserInterface extends Application {
         root.getChildren().add(gridContainer);
 
         // Define grid container size such that the grid is a Square
-        double gridViewWidth = SCREEN_WIDTH * 0.5625;
+        double gridViewWidth = SCREEN_WIDTH * ((SCREEN_HEIGHT * 1.0) / SCREEN_WIDTH);
         double gridViewHeight = SCREEN_HEIGHT * 1.00;
 
         gridContainer.setPrefSize(gridViewWidth, gridViewHeight);
@@ -119,6 +126,7 @@ public class UserInterface extends Application {
                 // Get the mouse click coordinates
                 double x = event.getX();
                 double y = event.getY();
+                System.out.println(x + "X," + y + "Y");
 
                 // Calculate the grid position (row, column)
                 int row = (int) (y / CELL_SIZE);
@@ -134,7 +142,9 @@ public class UserInterface extends Application {
                         // Check if the clicked position is within the bounds of this cell
                         if (cell.getX() <= x && cell.getX() + CELL_SIZE > x && cell.getY() <= y && cell.getY() + CELL_SIZE > y) {
                             // Change the color of the clicked cell
-                            cell.setFill(Color.BLUE);
+                            System.out.println("Current working directory: " + System.getProperty("user.dir"));
+                            Image img = new Image("file:Images/Penguin.png");
+                            cell.setFill(new ImagePattern(img));
                             break;
                         }
                     }
