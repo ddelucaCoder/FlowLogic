@@ -8,11 +8,13 @@ import java.util.ArrayList;
  * It allows cars to only go one way on it, with all lanes going
  * in one direction.
  */
-public class OneWayRoad extends Road{
+public class OneWayRoad extends Road implements GridObject {
 
     private int direction;
     private int numLanes;
     private ArrayList<Vehicle> vehicleList;
+    private int rowNum;
+    private int colNum;
 
     public OneWayRoad(int orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum, int direction, int numLanes, ArrayList<Vehicle> vehicleList) {
         super(orientation, speedLimit, isInRoad, inCars, rowNum, colNum);
@@ -30,7 +32,7 @@ public class OneWayRoad extends Road{
         return true;
     }
 
-    public boolean addCar (Vehicle car) {
+    public boolean addCar(Vehicle car) {
         if (car == null) {
             System.out.println("Cannot add null car\n");
             return false;
@@ -66,5 +68,21 @@ public class OneWayRoad extends Road{
         this.vehicleList = vehicleList;
     }
 
+    public int getRowNum() {
+        return rowNum;
+    }
+
+    public int getColNum() {
+        return colNum;
+    }
+
+    public void setColNum(int newCol) {
+        this.colNum = newCol;
+    }
+
+    public void setRowNum(int newRow) {
+        this.rowNum = newRow;
+
+    }
 
 }
