@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Implemented switchLights in the stop light class" />
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Added Road and intersection images" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,6 +39,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "isaac-dev",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -184,6 +185,7 @@
     <MESSAGE value="Implemented the stop sign class" />
     <MESSAGE value="Implemented the stop light class" />
     <MESSAGE value="Implemented switchLights in the stop light class" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented switchLights in the stop light class" />
+    <MESSAGE value="Added Road and intersection images" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Road and intersection images" />
   </component>
 </project>
