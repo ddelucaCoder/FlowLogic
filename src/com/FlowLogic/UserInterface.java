@@ -138,8 +138,10 @@ public class UserInterface extends Application {
                 System.out.println("Grid position: (" + row + ", " + col + ")");
 
                 // Get the clicked cell (rectangle) and change its color
+
                 Image img = new Image("file:Images/Penguin.png");
                 grid.getFrontGrid()[row][col].setFill(new ImagePattern(img));
+
             }
             pan = false;
         });
