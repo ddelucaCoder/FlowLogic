@@ -8,3 +8,5 @@
 /dataSources.local.xml
 /flowlogic.iml
 /.idea/*
+/out/production/FlowLogic/com/FlowLogic/*.class
+*.jar
