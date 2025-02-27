@@ -74,6 +74,85 @@ public class Grid {
         this.grid = newGrid;
     }
 
+    private void setIntersectionAt(int rowNum, int colNum, Road newRoad) {
+        if (grid[rowNum][colNum] instanceof Intersection) {
+            // add the new road to the intersection
+            Intersection current = ((Intersection) grid[rowNum][colNum]);
+            current.addRoad(newRoad);
+        } else {
+            Intersection newIntersection = new Intersection(rowNum, colNum, new Road[4]);
+            int orientation = ((Road) grid[rowNum][colNum]).getOrientation();
+            // add all roads around to this intersection
+            if ((rowNum - 1 >= 0) && (grid[rowNum - 1][colNum] instanceof Road) &&
+                (((Road) grid[rowNum - 1][colNum]).getOrientation() != orientation)) {
+                newIntersection.addRoad((Road) grid[rowNum - 1][colNum]);
+            }
+            if ((colNum - 1 >= 0) && (grid[rowNum][colNum - 1] instanceof Road) &&
+                (((Road) grid[rowNum][colNum - 1]).getOrientation() != orientation)) {
+                newIntersection.addRoad((Road) grid[rowNum][colNum - 1]);
+            }
+            if ((rowNum + 1 < numRows) && (grid[rowNum + 1][colNum] instanceof Road) &&
+                (((Road) grid[rowNum + 1][colNum]).getOrientation() != orientation)) {
+                newIntersection.addRoad((Road) grid[rowNum + 1][colNum]);
+            }
+            if ((colNum + 1 < numColumns) && (grid[rowNum][colNum + 1] instanceof Road) &&
+                (((Road) grid[rowNum][colNum + 1]).getOrientation() != orientation)) {
+                newIntersection.addRoad((Road) grid[rowNum][colNum + 1]);
+            }
+        }
+    }
+
+    private void checkIntersectionNeeded(int rowNum, int colNum, Road newRoad) {
+        // make sure road that were checking is in bounds
+        if ((rowNum < 0) || (colNum < 0) ||
+            (rowNum >= numRows) || (colNum >= numColumns)) {
+            return;
+        }
+        if (grid[rowNum][colNum] instanceof Intersection) {
+            setIntersectionAt(rowNum, colNum, newRoad);
+        } else if (!(grid[rowNum][colNum] instanceof Road)) {
+            return;
+        }
+        // get this roads orientation
+        int orientation = ((Road) grid[rowNum][colNum]).getOrientation();
+        // check area around for any different roads
+        if ((rowNum - 1 >= 0) && (grid[rowNum - 1][colNum] instanceof Road) &&
+            (((Road) grid[rowNum - 1][colNum]).getOrientation() != orientation)) {
+            setIntersectionAt(rowNum, colNum, newRoad);
+        } else if ((colNum - 1 >= 0) && (grid[rowNum][colNum - 1] instanceof Road) &&
+            (((Road) grid[rowNum][colNum - 1]).getOrientation() != orientation)) {
+            setIntersectionAt(rowNum, colNum, newRoad);
+        } else if ((rowNum + 1 < numRows) && (grid[rowNum + 1][colNum] instanceof Road) &&
+            (((Road) grid[rowNum + 1][colNum]).getOrientation() != orientation)) {
+            setIntersectionAt(rowNum, colNum, newRoad);
+        } else if ((colNum + 1 < numColumns) && (grid[rowNum][colNum + 1] instanceof Road) &&
+            (((Road) grid[rowNum][colNum + 1]).getOrientation() != orientation)) {
+            setIntersectionAt(rowNum, colNum, newRoad);
+        }
+    }
+
+    /**
+     *  This function works together with checkIntersectionNeeded and setIntersection to
+     *  automatically snap together
+     * @param rowNum - the new road location row
+     * @param colNum - the new road location column
+     * @param newRoad - the new road object
+     */
+
+    private void updateIntersections(int rowNum, int colNum, Road newRoad) {
+        // check our current road
+        checkIntersectionNeeded(rowNum, colNum, newRoad);
+        // check all the roads around us
+        // ABOVE
+        checkIntersectionNeeded(rowNum - 1, colNum, newRoad);
+        // LEFT
+        checkIntersectionNeeded(rowNum, colNum - 1, newRoad);
+        // BELOW
+        checkIntersectionNeeded(rowNum + 1, colNum, newRoad);
+        // RIGHT
+        checkIntersectionNeeded(rowNum, colNum + 1, newRoad);
+    }
+
     /**
      * This method adds a grid object, newObject, to the grid at (rowNum, colNum).
      * If there is already something in the spot, then it will do nothing.
@@ -88,6 +167,11 @@ public class Grid {
         }
         // add object to grid
         grid[rowNum][colNum] = newObject;
+        // automatically snap new roads into intersections
+        if (newObject instanceof Road) {
+            updateIntersections(rowNum, colNum, (Road) newObject);
+        }
+
     }
 
     /**
