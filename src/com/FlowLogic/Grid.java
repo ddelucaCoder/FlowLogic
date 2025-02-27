@@ -81,7 +81,7 @@ public class Grid {
             current.addRoad(newRoad);
         } else {
             Intersection newIntersection = new Intersection(rowNum, colNum, new Road[4]);
-            int orientation = ((Road) grid[rowNum][colNum]).getOrientation();
+            Orientation orientation = ((Road) grid[rowNum][colNum]).getOrientation();
             // add all roads around to this intersection
             if ((rowNum - 1 >= 0) && (grid[rowNum - 1][colNum] instanceof Road) &&
                 (((Road) grid[rowNum - 1][colNum]).getOrientation() != orientation)) {
@@ -114,7 +114,7 @@ public class Grid {
             return;
         }
         // get this roads orientation
-        int orientation = ((Road) grid[rowNum][colNum]).getOrientation();
+        Orientation orientation = ((Road) grid[rowNum][colNum]).getOrientation();
         // check area around for any different roads
         if ((rowNum - 1 >= 0) && (grid[rowNum - 1][colNum] instanceof Road) &&
             (((Road) grid[rowNum - 1][colNum]).getOrientation() != orientation)) {
@@ -167,6 +167,7 @@ public class Grid {
         }
         // add object to grid
         grid[rowNum][colNum] = newObject;
+
         // automatically snap new roads into intersections
         if (newObject instanceof Road) {
             updateIntersections(rowNum, colNum, (Road) newObject);

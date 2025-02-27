@@ -8,7 +8,7 @@ package com.FlowLogic;
  */
 public class Road implements GridObject {
 
-    private int orientation;
+    private Orientation orientation;
     private int speedLimit;
     private int length;
     private boolean isInRoad;
@@ -17,7 +17,7 @@ public class Road implements GridObject {
     private int rowNum;
     private int colNum;
 
-    public Road (int orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum) {
+    public Road (Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum) {
         this.orientation = orientation;
         this.speedLimit = speedLimit;
         this.isInRoad = isInRoad;
@@ -48,11 +48,11 @@ public class Road implements GridObject {
         this.colNum = col;
     }
 
-    public int getOrientation() {
+    public Orientation getOrientation() {
         return orientation;
     }
 
-    public void setOrientation(int orientation) {
+    public void setOrientation(Orientation orientation) {
         this.orientation = orientation;
     }
 
