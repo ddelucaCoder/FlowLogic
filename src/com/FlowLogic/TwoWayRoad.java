@@ -7,6 +7,7 @@ public class TwoWayRoad extends Road {
     private int rowNum;
     private int colNum;
 
+
     public TwoWayRoad(Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum, OneWayRoad left, OneWayRoad right) {
         super(orientation, speedLimit, isInRoad, inCars, rowNum, colNum);
         this.left = left;

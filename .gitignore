@@ -9,4 +9,5 @@
 /flowlogic.iml
 /.idea/*
 /out/production/FlowLogic/com/FlowLogic/*.class
+*.class
 *.jar
