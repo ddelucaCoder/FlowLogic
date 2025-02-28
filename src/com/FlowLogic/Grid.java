@@ -67,61 +67,75 @@ public class Grid {
     }
 
     private void setIntersectionAt(int rowNum, int colNum, Road newRoad) {
+        // if is intersection, just add the newRoad
         if (grid[rowNum][colNum] instanceof Intersection) {
-            // add the new road to the intersection
-            Intersection current = ((Intersection) grid[rowNum][colNum]);
-            current.addRoad(newRoad);
+            ((Intersection) grid[rowNum][colNum]).addRoad(newRoad);
+        }
+
+        Intersection newIntersection = new Intersection(rowNum, colNum, new Road[4]);
+
+        // check the sides
+        if (colNum > 0 && grid[rowNum][colNum - 1] instanceof Road &&
+            ((Road) grid[rowNum][colNum - 1]).getOrientation() == Orientation.HORIZONTAL) {
+            newIntersection.addRoad((Road) grid[rowNum][colNum - 1]);
+        }
+        if (colNum < numColumns - 1 && grid[rowNum][colNum + 1] instanceof Road &&
+            ((Road) grid[rowNum][colNum + 1]).getOrientation() == Orientation.HORIZONTAL) {
+            newIntersection.addRoad((Road) grid[rowNum][colNum + 1]);
+        }
+        if (rowNum > 0 && grid[rowNum - 1][colNum] instanceof Road &&
+            ((Road) grid[rowNum - 1][colNum]).getOrientation() == Orientation.VERTICAL) {
+            newIntersection.addRoad((Road) grid[rowNum - 1][colNum]);
+        }
+        if (rowNum < numRows - 1 && grid[rowNum + 1][colNum] instanceof Road &&
+            ((Road) grid[rowNum + 1][colNum]).getOrientation() == Orientation.VERTICAL) {
+            newIntersection.addRoad((Road) grid[rowNum + 1][colNum]);
+        }
+
+        grid[rowNum][colNum] = newIntersection;
+
+
+    }
+
+    private void checkIntersectionNeeded(int rowNum, int colNum, Road newRoad) {
+        if (rowNum < 0 || colNum < 0 || rowNum >= numRows || colNum >= numColumns) {
+            return;
+        }
+        if (grid[rowNum][colNum] instanceof Intersection) {
+            setIntersectionAt(rowNum, colNum, newRoad);
+        }
+        if (!(grid[rowNum][colNum] instanceof Road)) {
+            return;
+        }
+
+        Road checkRoad = (Road) grid[rowNum][colNum];
+        if (checkRoad.getOrientation() == Orientation.VERTICAL) {
+            // check the sides
+            if (colNum > 0 && grid[rowNum][colNum - 1] instanceof Road &&
+                ((Road) grid[rowNum][colNum - 1]).getOrientation() == Orientation.HORIZONTAL) {
+                setIntersectionAt(rowNum, colNum, newRoad);
+                return;
+            }
+            if (colNum < numColumns - 1 && grid[rowNum][colNum + 1] instanceof Road &&
+                ((Road) grid[rowNum][colNum + 1]).getOrientation() == Orientation.HORIZONTAL) {
+                setIntersectionAt(rowNum, colNum, newRoad);
+                return;
+            }
         } else {
-            Intersection newIntersection = new Intersection(rowNum, colNum, new Road[4]);
-            Orientation orientation = ((Road) grid[rowNum][colNum]).getOrientation();
-            // add all roads around to this intersection
-            if ((rowNum - 1 >= 0) && (grid[rowNum - 1][colNum] instanceof Road) &&
-                (((Road) grid[rowNum - 1][colNum]).getOrientation() != orientation)) {
-                newIntersection.addRoad((Road) grid[rowNum - 1][colNum]);
+            // check the top and bottom
+            if (rowNum > 0 && grid[rowNum - 1][colNum] instanceof Road &&
+                ((Road) grid[rowNum - 1][colNum]).getOrientation() == Orientation.VERTICAL) {
+                setIntersectionAt(rowNum, colNum, newRoad);
+                return;
             }
-            if ((colNum - 1 >= 0) && (grid[rowNum][colNum - 1] instanceof Road) &&
-                (((Road) grid[rowNum][colNum - 1]).getOrientation() != orientation)) {
-                newIntersection.addRoad((Road) grid[rowNum][colNum - 1]);
-            }
-            if ((rowNum + 1 < numRows) && (grid[rowNum + 1][colNum] instanceof Road) &&
-                (((Road) grid[rowNum + 1][colNum]).getOrientation() != orientation)) {
-                newIntersection.addRoad((Road) grid[rowNum + 1][colNum]);
-            }
-            if ((colNum + 1 < numColumns) && (grid[rowNum][colNum + 1] instanceof Road) &&
-                (((Road) grid[rowNum][colNum + 1]).getOrientation() != orientation)) {
-                newIntersection.addRoad((Road) grid[rowNum][colNum + 1]);
+            if (rowNum < numRows - 1 && grid[rowNum + 1][colNum] instanceof Road &&
+                ((Road) grid[rowNum + 1][colNum]).getOrientation() == Orientation.VERTICAL) {
+                setIntersectionAt(rowNum, colNum, newRoad);
+                return;
             }
         }
     }
 
-    private void checkIntersectionNeeded(int rowNum, int colNum, Road newRoad) {
-        // make sure road that were checking is in bounds
-        if ((rowNum < 0) || (colNum < 0) ||
-            (rowNum >= numRows) || (colNum >= numColumns)) {
-            return;
-        }
-        if (grid[rowNum][colNum] instanceof Intersection) {
-            setIntersectionAt(rowNum, colNum, newRoad);
-        } else if (!(grid[rowNum][colNum] instanceof Road)) {
-            return;
-        }
-        // get this roads orientation
-        Orientation orientation = ((Road) grid[rowNum][colNum]).getOrientation();
-        // check area around for any different roads
-        if ((rowNum - 1 >= 0) && (grid[rowNum - 1][colNum] instanceof Road) &&
-            (((Road) grid[rowNum - 1][colNum]).getOrientation() != orientation)) {
-            setIntersectionAt(rowNum, colNum, newRoad);
-        } else if ((colNum - 1 >= 0) && (grid[rowNum][colNum - 1] instanceof Road) &&
-            (((Road) grid[rowNum][colNum - 1]).getOrientation() != orientation)) {
-            setIntersectionAt(rowNum, colNum, newRoad);
-        } else if ((rowNum + 1 < numRows) && (grid[rowNum + 1][colNum] instanceof Road) &&
-            (((Road) grid[rowNum + 1][colNum]).getOrientation() != orientation)) {
-            setIntersectionAt(rowNum, colNum, newRoad);
-        } else if ((colNum + 1 < numColumns) && (grid[rowNum][colNum + 1] instanceof Road) &&
-            (((Road) grid[rowNum][colNum + 1]).getOrientation() != orientation)) {
-            setIntersectionAt(rowNum, colNum, newRoad);
-        }
-    }
 
     /**
      *  This function works together with checkIntersectionNeeded and setIntersection to

@@ -4,6 +4,10 @@ import com.FlowLogic.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
+import static com.FlowLogic.Orientation.HORIZONTAL;
+import static com.FlowLogic.Orientation.VERTICAL;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -117,7 +121,6 @@ public class GridTest {
         int[] response = {0, 0};
         assertArrayEquals(grid.coordinateToGrid(4, 296), response);
 
-
         response[0] = 6;
         response[1] = 3;
         assertArrayEquals(grid.coordinateToGrid(100, 100), response);
@@ -129,6 +132,71 @@ public class GridTest {
         response[0] = 9;
         response[1] = 9;
         assertArrayEquals(grid.coordinateToGrid(300, 10), response);
+    }
 
+    @Test
+    void testIntersectionSnapping() {
+        grid.resize(3, 3);
+
+        // place roads around
+        Road road1 = new Road(VERTICAL, 25, false, 0, 0, 1);
+        Road road2 = new Road(HORIZONTAL, 25, false, 0, 1, 2);
+        Road road3 = new Road(VERTICAL, 25, false, 0, 2, 1);
+        Road road4 = new Road(HORIZONTAL, 25, false, 0, 1, 0);
+        Road[] allRoads = {road1, road2, road3, road4};
+
+        for (Road r : allRoads) {
+            grid.addObject(r, r.getRowNum(), r.getColNum());
+        }
+
+        // place new road
+        grid.addObject(new Road(VERTICAL, 25, false, 0, 1, 1), 1, 1);
+
+        assertTrue(grid.getAtSpot(1, 1) instanceof Intersection);
+
+        // parallel roads should not form an intersection:
+        grid = new Grid(3, 3);
+
+        allRoads[0] = new Road(VERTICAL, 25, false, 0, 1, 0);
+        allRoads[1] = new Road(VERTICAL, 25, false, 0, 1, 1);
+        allRoads[2] = new Road(VERTICAL, 25, false, 0, 1, 2);
+        allRoads[3] = null;
+        for (Road r : allRoads) {
+            if (r == null) {
+                continue;
+            }
+            grid.addObject(r, r.getRowNum(), r.getColNum());
+        }
+        assertFalse(grid.getAtSpot(1, 0) instanceof Intersection);
+        assertFalse(grid.getAtSpot(1, 1) instanceof Intersection);
+        assertFalse(grid.getAtSpot(1, 2) instanceof Intersection);
+
+        // but just one road different should:
+        grid = new Grid(3, 3);
+
+        allRoads[0] = new Road(HORIZONTAL, 25, false, 0, 1, 0);
+        for (Road r : allRoads) {
+            if (r == null) {
+                continue;
+            }
+            grid.addObject(r, r.getRowNum(), r.getColNum());
+        }
+        assertFalse(grid.getAtSpot(1, 0) instanceof Intersection);
+        assertTrue(grid.getAtSpot(1, 1) instanceof Intersection);
+        assertFalse(grid.getAtSpot(1, 2) instanceof Intersection);
+
+        grid = new Grid(3, 3);
+
+        allRoads[0] = new Road(VERTICAL, 25, false, 0, 1, 0);
+        allRoads[1] = new Road(HORIZONTAL, 25, false, 0, 1, 1);
+        for (Road r : allRoads) {
+            if (r == null) {
+                continue;
+            }
+            grid.addObject(r, r.getRowNum(), r.getColNum());
+        }
+        assertTrue(grid.getAtSpot(1, 0) instanceof Intersection);
+        assertFalse(grid.getAtSpot(1, 1) instanceof Intersection);
+        assertTrue(grid.getAtSpot(1, 2) instanceof Intersection);
     }
 }

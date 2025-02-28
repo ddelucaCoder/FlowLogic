@@ -14,7 +14,8 @@ public class OneWayRoad extends Road{
     private int numLanes;
     private ArrayList<Vehicle> vehicleList;
 
-    public OneWayRoad(int orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum, int direction, int numLanes, ArrayList<Vehicle> vehicleList) {
+    public OneWayRoad(Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum,
+                      int direction, int numLanes, ArrayList<Vehicle> vehicleList) {
         super(orientation, speedLimit, isInRoad, inCars, rowNum, colNum);
         this.direction = direction;
         this.numLanes = numLanes;
