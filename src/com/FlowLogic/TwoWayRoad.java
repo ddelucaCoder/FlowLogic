@@ -1,5 +1,7 @@
 package com.FlowLogic;
 
+import javafx.scene.image.Image;
+
 public class TwoWayRoad extends Road {
 
     private OneWayRoad left;
@@ -12,7 +14,32 @@ public class TwoWayRoad extends Road {
         super(orientation, speedLimit, isInRoad, inCars, rowNum, colNum);
         this.left = left;
         this.right = right;
+        left.updateGraphic();
+        right.updateGraphic();
     }
+
+    public void updateGraphic() {
+        left.updateGraphic();
+        right.updateGraphic();
+    }
+
+    public void rotateRoad(Direction direction) {
+        if (direction == Direction.UP) {
+            left.rotateRoad(Direction.DOWN);
+            right.rotateRoad(Direction.UP);
+        } else if (direction == Direction.DOWN) {
+            left.rotateRoad(Direction.UP);
+            right.rotateRoad(Direction.DOWN);
+        } else if (direction == Direction.RIGHT) {
+            left.rotateRoad(Direction.LEFT);
+            right.rotateRoad(Direction.RIGHT);
+        } else if (direction == Direction.LEFT) {
+            left.rotateRoad(Direction.RIGHT);
+            right.rotateRoad(Direction.LEFT);
+        }
+    }
+
+
 
     public OneWayRoad getLeft() {
         return left;
