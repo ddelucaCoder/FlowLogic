@@ -1,5 +1,7 @@
 package com.FlowLogic;
 
+import javafx.scene.shape.Rectangle;
+
 /**
  * This class represents the grid that holds all of the "GridObjects"
  * which includes roads and buildings.
@@ -15,6 +17,7 @@ public class Grid {
 
     // The grid where objects are stored
     private GridObject[][] grid;
+    private Rectangle[][] frontGrid;
 
     public static int GRID_SIZE;
 
@@ -22,6 +25,7 @@ public class Grid {
         this.numRows = numRows;
         this.numColumns = numColumns;
         grid = new GridObject[numRows][numColumns];
+        frontGrid = new Rectangle[numRows][numColumns];
     }
 
     public Grid(String filename) {
@@ -38,6 +42,10 @@ public class Grid {
 
     public GridObject[][] getGrid() {
         return this.grid;
+    }
+
+    public Rectangle[][] getFrontGrid() {
+        return frontGrid;
     }
 
     /**

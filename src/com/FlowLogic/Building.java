@@ -38,6 +38,8 @@ public class Building implements GridObject {
         this.colNum = newCol;
     }
 
+    @Override
+
     public void setRowNum(int newRow) {
         this.rowNum = newRow;
     }
