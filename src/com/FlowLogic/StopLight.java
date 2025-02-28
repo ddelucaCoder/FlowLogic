@@ -1,5 +1,7 @@
 package com.FlowLogic;
 
+import javafx.scene.image.Image;
+
 public class StopLight extends Intersection implements GridObject {
     private int timingOne;
     private int timingTwo;
@@ -11,12 +13,19 @@ public class StopLight extends Intersection implements GridObject {
     private int rowNum;
     private int colNum;
 
-    public StopLight(Road roadOne, Road roadTwo, int timingOne, int timingTwo, int lightOneColor, int lightTwoColor) {
-        super(roadOne, roadTwo);
+
+
+    private Image redGreen4WayImage;
+    private Image redYellow4WayImage;
+
+    public StopLight(Road roadOne, Road roadTwo, int timingOne, int timingTwo, int lightOneColor, int lightTwoColor, Road[] roadList, int rowNum, int colNum) {
+        super(rowNum, colNum, roadList);
         this.lightOneColor = lightOneColor;
         this.lightTwoColor = lightTwoColor;
         this.timingOne = timingOne;
         this.timingTwo = timingTwo;
+        this.redGreen4WayImage = new Image("file:Images/RedGreen4WayStopLight.png");
+        this.redYellow4WayImage = new Image("file:Images/RedYellow4WayStopLight.png");
     }
 
 
@@ -110,5 +119,20 @@ public class StopLight extends Intersection implements GridObject {
     public void setRowNum(int newRow) {
         this.rowNum = newRow;
 
+    }
+    public Image getRedGreen4WayImage() {
+        return redGreen4WayImage;
+    }
+
+    public void setRedGreen4WayImage(Image redGreen4WayImage) {
+        this.redGreen4WayImage = redGreen4WayImage;
+    }
+
+    public Image getRedYellow4WayImage() {
+        return redYellow4WayImage;
+    }
+
+    public void setRedYellow4WayImage(Image redYellow4WayImage) {
+        this.redYellow4WayImage = redYellow4WayImage;
     }
 }

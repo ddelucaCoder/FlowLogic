@@ -1,15 +1,19 @@
 package com.FlowLogic;
 
+import javafx.scene.image.Image;
+
 public class Intersection implements GridObject {
 
-    Road[] roadList;
-    int rowNum;
-    int colNum;
+    private Road[] roadList;
+    private int rowNum;
+    private int colNum;
+    private Image imageFile;
 
     public Intersection(int rowNum, int colNum, Road[] roadList) {
         this.rowNum = rowNum;
         this.colNum = colNum;
         this.roadList = roadList;
+        this.imageFile = new Image("file:Images/BasicIntersection.png");
     }
 
     @Override
@@ -48,5 +52,14 @@ public class Intersection implements GridObject {
 
     public void setRoadList(Road[] roadList) {
         this.roadList = roadList;
+    }
+
+
+    public Image getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(Image imageFile) {
+        this.imageFile = imageFile;
     }
 }

@@ -1,6 +1,8 @@
 package com.FlowLogic;
 
 
+import javafx.scene.image.Image;
+
 /**
  * This class is a Grid Object for a road. The road will connect
  * buildings and cars will drive on them. They are placed on the grid
@@ -13,7 +15,7 @@ public class Road implements GridObject {
     private int length;
     private boolean isInRoad;
     private int inCars;
-    private String imageFile;
+    private Image imageFile;
     private int rowNum;
     private int colNum;
 
@@ -24,6 +26,7 @@ public class Road implements GridObject {
         this.inCars = inCars;
         this.rowNum = rowNum;
         this.colNum = colNum;
+        this.imageFile = new Image("file:Images/RoadImage.png");
 
 
     }
@@ -88,11 +91,11 @@ public class Road implements GridObject {
         this.inCars = inCars;
     }
 
-    public String getImageFile() {
+    public Image getImageFile() {
         return imageFile;
     }
 
-    public void setImageFile(String imageFile) {
+    public void setImageFile(Image imageFile) {
         this.imageFile = imageFile;
     }
 }
