@@ -12,22 +12,34 @@ public class StopLight extends Intersection implements GridObject {
     final int GREEN = 2;
     private int rowNum;
     private int colNum;
-
-
-
+    private Image imageFile;
     private Image redGreen4WayImage;
     private Image redYellow4WayImage;
+    private Image greenRed4WayImage;
+    private Image yellowRed4WayImage;
+    private Image allRed4WayImage;
 
     public StopLight(Road roadOne, Road roadTwo, int timingOne, int timingTwo, int lightOneColor, int lightTwoColor, Road[] roadList, int rowNum, int colNum) {
         super(rowNum, colNum, roadList);
-        this.lightOneColor = lightOneColor;
-        this.lightTwoColor = lightTwoColor;
+        this.lightOneColor = lightOneColor; // Vertical Light
+        this.lightTwoColor = lightTwoColor; // Horizontal Light
         this.timingOne = timingOne;
         this.timingTwo = timingTwo;
         this.redGreen4WayImage = new Image("file:Images/RedGreen4WayStopLight.png");
         this.redYellow4WayImage = new Image("file:Images/RedYellow4WayStopLight.png");
+        this.greenRed4WayImage = new Image("file:Images/GreenRed4WayStopLight.png");
+        this.yellowRed4WayImage = new Image("file:Images/YellowRed4WayStopLight.png");
+        this.allRed4WayImage = new Image("file:Images/AllRed4WayStopLight.png");
     }
 
+
+    public void initializeStopLightGraphics() {
+        if (lightOneColor == RED) {
+            imageFile = redGreen4WayImage;
+        } else if (lightOneColor == GREEN) {
+            imageFile = greenRed4WayImage;
+        }
+    }
 
     /**
      * This functions switches the stop lights by one instance
@@ -39,39 +51,54 @@ public class StopLight extends Intersection implements GridObject {
     public boolean switchLights() {
         if (lightOneColor == RED) {
             lightTwoColor = YELLOW;
+            imageFile = redYellow4WayImage;
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             lightTwoColor = RED;
+            imageFile = allRed4WayImage;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             lightOneColor = GREEN;
+            imageFile = greenRed4WayImage;
         } else {
             if (lightOneColor == GREEN) {
                 lightOneColor = YELLOW;
+                imageFile = yellowRed4WayImage;
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 lightOneColor = RED;
+                imageFile = allRed4WayImage;
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 lightTwoColor = GREEN;
+                imageFile = redGreen4WayImage;
             }
         }
         return true;
     }
 
     // getters and setters
+    @Override
+    public Image getImageFile() {
+        return imageFile;
+    }
+
+    @Override
+    public void setImageFile(Image imageFile) {
+        this.imageFile = imageFile;
+    }
     public int getTimingOne() {
         return timingOne;
     }
