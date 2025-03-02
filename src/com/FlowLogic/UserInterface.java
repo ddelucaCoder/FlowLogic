@@ -30,8 +30,6 @@ public class UserInterface extends Application {
     // Variables to track zoom and pan offsets
     private double offsetX = 0;
     private double offsetY = 0;
-    private double scaleFactor = 1.0; // Track zoom level
-
     public static Grid grid;
 
     // Tracks if the User is Panning the screen disables clicking events
@@ -70,6 +68,10 @@ public class UserInterface extends Application {
         final Scale scale = new Scale();
         gridGroup.getTransforms().add(scale);
 
+        double maxZoom = SCREEN_HEIGHT/(32 * grid.getNumColumns() * 1.0);
+        scale.setY(maxZoom);
+        scale.setX(maxZoom);
+
         // Zoom in/out using mouse wheel
         root.setOnScroll(event -> {
             if (event.getDeltaY() > 0) {
@@ -78,6 +80,11 @@ public class UserInterface extends Application {
             } else {
                 scale.setX(scale.getX() / 1.1);
                 scale.setY(scale.getY() / 1.1);
+            }
+            System.out.println(scale.getX());
+            if (scale.getX() < maxZoom || scale.getY() < maxZoom) {
+                scale.setX(maxZoom);
+                scale.setY(maxZoom);
             }
             event.consume();
         });
@@ -128,16 +135,10 @@ public class UserInterface extends Application {
                 // Get the mouse click coordinates
                 double x = event.getX();
                 double y = event.getY();
-                System.out.println(x + "X," + y + "Y");
 
                 // Calculate the grid position (row, column)
                 int row = (int) (y / CELL_SIZE);
                 int col = (int) (x / CELL_SIZE);
-
-                // Print the grid position
-                System.out.println("Grid position: (" + row + ", " + col + ")");
-
-                // Get the clicked cell (rectangle) and change its color
 
                 Image img = new Image("file:Images/Penguin.png");
                 grid.getFrontGrid()[row][col].setFill(new ImagePattern(img));

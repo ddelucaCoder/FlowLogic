@@ -5,8 +5,8 @@ public class StopSign extends Intersection {
     private int rowNum;
     private int colNum;
 
-    public StopSign(Road roadOne, Road roadTwo) {
-        super(roadOne, roadTwo);
+    public StopSign(int rowNum, int colNum, OneWayRoad one, OneWayRoad two) {
+        super(rowNum, colNum,new Road[]{one, two});// Idk if this is right but whatever was already here was wrong
     }
 
 

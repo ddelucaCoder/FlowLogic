@@ -10,6 +10,7 @@
       <root url="jar://$PROJECT_DIR$/lib/junit-platform-commons-1.8.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/junit-jupiter-params-5.8.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/junit-platform-engine-1.8.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/json-20230618.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
