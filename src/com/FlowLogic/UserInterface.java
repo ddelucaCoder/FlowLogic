@@ -11,8 +11,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
+import org.w3c.dom.events.Event;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -81,12 +81,15 @@ public class UserInterface extends Application {
                 scale.setX(scale.getX() / 1.1);
                 scale.setY(scale.getY() / 1.1);
             }
-            System.out.println(scale.getX());
             if (scale.getX() < maxZoom || scale.getY() < maxZoom) {
                 scale.setX(maxZoom);
                 scale.setY(maxZoom);
             }
-            event.consume();
+
+            ensureXY(gridContainer, scale);
+
+            gridGroup.setTranslateX(offsetX);
+            gridGroup.setTranslateY(offsetY);
         });
 
         // Panning functionality (dragging the grid)
@@ -102,23 +105,7 @@ public class UserInterface extends Application {
             offsetX += deltaX;
             offsetY += deltaY;
 
-            double gridContainerWidth = gridContainer.getPrefWidth();
-            double gridContainerHeight = gridContainer.getPrefHeight();
-            double gridGroupWidth = gridGroup.getBoundsInLocal().getWidth();
-            double gridGroupHeight = gridGroup.getBoundsInLocal().getHeight();
-
-            if (offsetX > 0) {
-                offsetX = 0; // Prevent panning to the right
-            }
-            if (offsetX < gridContainerWidth - gridGroupWidth) {
-                offsetX = gridContainerWidth - gridGroupWidth; // Prevent panning to the left
-            }
-            if (offsetY > 0) {
-                offsetY = 0; // Prevent panning down
-            }
-            if (offsetY < gridContainerHeight - gridGroupHeight) {
-                offsetY = gridContainerHeight - gridGroupHeight; // Prevent panning up
-            }
+            ensureXY(gridContainer, scale);
 
             gridGroup.setTranslateX(offsetX);
             gridGroup.setTranslateY(offsetY);
@@ -169,6 +156,31 @@ public class UserInterface extends Application {
                 // Add the cell to the grid group
                 gridGroup.getChildren().add(cell);
             }
+        }
+    }
+
+    private void ensureXY(Pane gridContainer, Scale scale){
+        double scaleFactor = scale.getX(); // Get current scale
+        double gridWidth = GRID_COLS * CELL_SIZE * scaleFactor; // Scaled grid width
+        double gridHeight = GRID_ROWS * CELL_SIZE * scaleFactor; // Scaled grid height
+        double gridContainerWidth = gridContainer.getPrefWidth();
+        double gridContainerHeight = gridContainer.getPrefHeight();
+
+        // Ensure grid stays within visible bounds
+        double minX = gridContainerWidth - gridWidth;
+        double minY = gridContainerHeight - gridHeight;
+
+        if (offsetX > 0) {
+            offsetX = 0; // Prevent panning right
+        }
+        if (offsetX < minX) {
+            offsetX = minX; // Prevent panning left
+        }
+        if (offsetY > 0) {
+            offsetY = 0; // Prevent panning down
+        }
+        if (offsetY < minY) {
+            offsetY = minY; // Prevent panning up
         }
     }
 
