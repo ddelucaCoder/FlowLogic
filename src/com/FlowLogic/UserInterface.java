@@ -4,6 +4,10 @@ import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
@@ -133,7 +137,7 @@ public class UserInterface extends Application {
             pan = false;
         });
 
-        VBox left = new VBox();
+        GridPane left = new GridPane();
         left.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
         left.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
         left.setStyle("-fx-background-color: #D3D3D3;");
@@ -142,6 +146,7 @@ public class UserInterface extends Application {
         AnchorPane.setTopAnchor(left, 0.0);     // Set top anchor
         AnchorPane.setBottomAnchor(left, 0.0);  // Set bottom anchor
         root.getChildren().add(left);
+        addDraggableImages(left, 3);
 
         VBox right = new VBox();
         right.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
@@ -154,7 +159,7 @@ public class UserInterface extends Application {
         root.getChildren().add(right);
 
         // Add the save button to the bottom right of the grid
-        saveGridButton(root, grid);
+        saveGridButton(right, grid);
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -206,6 +211,32 @@ public class UserInterface extends Application {
         }
     }
 
+    private void addDraggableImages(GridPane left, int numColumns) {
+        File dir = new File("Images");
+        int count = 0;
+        if (dir.exists() && dir.isDirectory()) {
+            for (File file : dir.listFiles()) {
+                Image img = new Image(file.toURI().toString());
+                ImageView imageView = new ImageView(img);
+                imageView.setFitWidth(64);
+                imageView.setFitHeight(64);
+                int row = count / numColumns;
+                int col = count % numColumns;
+                count++;
+
+                // Enable dragging
+                imageView.setOnDragDetected(event -> {
+                    Dragboard db = imageView.startDragAndDrop(TransferMode.COPY);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putImage(img);
+                    db.setContent(content);
+                });
+
+                left.add(imageView, col, row);
+            }
+        }
+    }
+
     /**
      * This method will add a save grid button to the bottom right of the application
      * It will be connected to Grid.java's saveGridState function
@@ -213,17 +244,17 @@ public class UserInterface extends Application {
      * @param mainLayout The main BorderPane layout
      * @param grid The Grid object containing the grid data to save
      */
-    public void saveGridButton(AnchorPane mainLayout, Grid grid) {
+    public void saveGridButton(VBox mainLayout, Grid grid) {
         // Create the button (100 x 30)
         Button saveButton = new Button("Save Current Layout");
-        saveButton.setPrefSize(125, 30);
+        saveButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
 
         // Add the button to the AnchorPane
         mainLayout.getChildren().add(saveButton);
 
         // Anchor the button in the bottom right corner
-        AnchorPane.setBottomAnchor(saveButton, 10.0);
-        AnchorPane.setRightAnchor(saveButton, 10.0);
+        //AnchorPane.setBottomAnchor(saveButton, 10.0);
+        //AnchorPane.setRightAnchor(saveButton, 10.0);
 
         saveButton.setOnAction(event -> {
             // Create a file chooser dialog - select where to save it
