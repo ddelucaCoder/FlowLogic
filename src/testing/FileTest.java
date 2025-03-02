@@ -7,10 +7,8 @@ import org.json.JSONArray;
 import com.FlowLogic.*;
 
 import java.io.File;
-import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -145,18 +143,18 @@ public class FileTest {
     }
 
     /**
-     * Test Saving a Grid with a parking in it
+     * Test Saving a Grid with a parking lot in it
      */
     @Test
     public void testSaveGridWithParking() {
-        // Add a parking to the grid
+        // Add a parking lot to the grid
         Parking parking = new Parking(3, 4, 50, 10);
         grid.addObject(parking, 7, 7);
 
         // Save the grid
         assertTrue(grid.saveGridState(TEST_FILE));
 
-        // Verify parking was saved correctly
+        // Verify parking lot was saved correctly
         try {
             String content = new String(Files.readAllBytes(Paths.get(TEST_FILE)));
             JSONObject gridJson = new JSONObject(content);

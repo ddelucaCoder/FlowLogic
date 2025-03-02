@@ -3,18 +3,17 @@ package com.FlowLogic;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
-import org.w3c.dom.events.Event;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 
 public class UserInterface extends Application {
@@ -154,6 +153,8 @@ public class UserInterface extends Application {
         AnchorPane.setBottomAnchor(right, 0.0);  // Set bottom anchor
         root.getChildren().add(right);
 
+        // Add the save button to the bottom right of the grid
+        saveGridButton(root, grid);
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -203,6 +204,51 @@ public class UserInterface extends Application {
         if (offsetY < minY) {
             offsetY = minY; // Prevent panning up
         }
+    }
+
+    /**
+     * This method will add a save grid button to the bottom right of the application
+     * It will be connected to Grid.java's saveGridState function
+     *
+     * @param mainLayout The main BorderPane layout
+     * @param grid The Grid object containing the grid data to save
+     */
+    public void saveGridButton(AnchorPane mainLayout, Grid grid) {
+        // Create the button (100 x 30)
+        Button saveButton = new Button("Save Current Layout");
+        saveButton.setPrefSize(125, 30);
+
+        // Add the button to the AnchorPane
+        mainLayout.getChildren().add(saveButton);
+
+        // Anchor the button in the bottom right corner
+        AnchorPane.setBottomAnchor(saveButton, 10.0);
+        AnchorPane.setRightAnchor(saveButton, 10.0);
+
+        saveButton.setOnAction(event -> {
+            // Create a file chooser dialog - select where to save it
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Current Layout");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("JSON Files", "*.json")
+            );
+
+            // Show the save dialog
+            File file = fileChooser.showSaveDialog(mainLayout.getScene().getWindow());
+
+            if (file != null) {
+                // Call the grid's saveGridState method with the selected file path
+                boolean saveSuccessful = grid.saveGridState(file.getAbsolutePath());
+
+                if (saveSuccessful) {
+                    // Insert any additional success logic here (popup?)
+                    System.out.println("Grid saved successfully to " + file.getName());
+                } else {
+                    // Insert any additional error logic here (popup?)
+                    System.out.println("Failed to save grid to " + file.getName());
+                }
+            }
+        });
     }
 
     public static void main(String[] args) {
