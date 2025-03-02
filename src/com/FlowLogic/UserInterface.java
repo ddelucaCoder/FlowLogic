@@ -134,6 +134,27 @@ public class UserInterface extends Application {
             pan = false;
         });
 
+        VBox left = new VBox();
+        left.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
+        left.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
+        left.setStyle("-fx-background-color: #D3D3D3;");
+
+        AnchorPane.setLeftAnchor(left, 0.0);
+        AnchorPane.setTopAnchor(left, 0.0);     // Set top anchor
+        AnchorPane.setBottomAnchor(left, 0.0);  // Set bottom anchor
+        root.getChildren().add(left);
+
+        VBox right = new VBox();
+        right.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
+        right.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
+        right.setStyle("-fx-background-color: #D3D3D3;");
+
+        AnchorPane.setRightAnchor(right, 0.0);
+        AnchorPane.setTopAnchor(right, 0.0);     // Set top anchor
+        AnchorPane.setBottomAnchor(right, 0.0);  // Set bottom anchor
+        root.getChildren().add(right);
+
+
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         primaryStage.setScene(scene);
