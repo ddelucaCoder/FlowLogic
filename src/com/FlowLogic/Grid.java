@@ -2,6 +2,11 @@ package com.FlowLogic;
 
 import javafx.scene.shape.Rectangle;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /**
  * This class represents the grid that holds all of the "GridObjects"
  * which includes roads and buildings.
@@ -29,7 +34,98 @@ public class Grid {
     }
 
     public Grid(String filename) {
-        // TODO: implement grid loading from file 
+        // TODO: implement grid loading from file
+    }
+
+    /**
+     * This method saves the current grid state to a JSON file.
+     * The JSON structure contains the grid dimensions and all grid objects.
+     *
+     * @param filename The name of the file to save the grid state to
+     * @return boolean indicating if the save was successful
+     */
+    public boolean saveGridState(String filename) {
+        JSONObject gridJson = new JSONObject();
+
+        // Save the grid dimensions
+        gridJson.put("numRows", this.numRows);
+        gridJson.put("numColumns", this.numColumns);
+        gridJson.put("gridSize", GRID_SIZE);
+
+        // Create an array for the objects
+        JSONArray gridObjectsArray = new JSONArray();
+
+        for (int row = 0; row < numRows; row++) {
+            for (int col = 0; col < numColumns; col++) {
+                GridObject obj = grid[row][col];
+                if (obj != null) {
+                    JSONObject cellJson = new JSONObject();
+                    cellJson.put("row", row);
+                    cellJson.put("column", col);
+                    cellJson.put("type", obj.getClass().getSimpleName());
+
+                    // Store type-specific properties
+                    JSONObject properties = new JSONObject();
+
+                    // Add different properties based on object type
+                    if (obj instanceof Road) {
+                        Road road = (Road) obj;
+                        properties.put("orientation", road.getOrientation());
+                        properties.put("speedLimit", road.getSpeedLimit());
+                        properties.put("length", road.getLength());
+                        properties.put("isInRoad", road.isInRoad());
+                        properties.put("inCars", road.getInCars());
+                    } else if (obj instanceof Intersection intersection) {
+
+                        // Save the connected roads as an array of references
+                        JSONArray connectedRoads = new JSONArray();
+                        Road[] roadList = intersection.getRoadList();
+
+                        if (roadList != null) {
+                            for (Road road : roadList) {
+                                if (road != null) {
+                                    JSONObject roadRef = new JSONObject();
+                                    roadRef.put("row", road.getRowNum());
+                                    roadRef.put("column", road.getColNum());
+                                    roadRef.put("orientation", road.getOrientation());
+                                    connectedRoads.put(roadRef);
+                                }
+                            }
+                        }
+                        properties.put("connectedRoads", connectedRoads);
+                    }
+                    else if (obj instanceof Building building) {
+                        properties.put("xLength", building.getxLength());
+                        properties.put("yLength", building.getyLength());
+                        properties.put("dailyPopulation", building.getDailyPopulation());
+                    }
+                    else if (obj instanceof Parking parking) {
+                        properties.put("xLength", parking.getxLength());
+                        properties.put("yLength", parking.getyLength());
+                        properties.put("parkingCapacity", parking.getParkingCapacity());
+                        properties.put("numCars", parking.getNumCars());
+                    }
+
+                    cellJson.put("properties", properties);
+                    gridObjectsArray.put(cellJson);
+                }
+            }
+        }
+
+        gridJson.put("objects", gridObjectsArray);
+
+        // Write to file
+        try (FileWriter file = new FileWriter(filename)) {
+            file.write(gridJson.toString());
+            file.flush();
+            System.out.println("Successfully saved grid to " + filename);
+            return true;
+        } catch (IOException e) {
+            // Insert additional error logic here if needed
+            System.err.println("Error saving grid to file: " + e.getMessage());
+            return false;
+        }
+
     }
 
     public int getNumRows() {
