@@ -1,5 +1,7 @@
 package com.FlowLogic;
 
+import javafx.scene.image.Image;
+
 import java.util.ArrayList;
 
 
@@ -10,18 +12,20 @@ import java.util.ArrayList;
  */
 public class OneWayRoad extends Road implements GridObject {
 
-    private int direction;
+    private Direction direction;
     private int numLanes;
     private ArrayList<Vehicle> vehicleList;
     private int rowNum;
     private int colNum;
+    private Image imageFile;
 
 
-    public OneWayRoad(Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum, int direction, int numLanes, ArrayList<Vehicle> vehicleList) {
+    public OneWayRoad(Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum, Direction direction, int numLanes, ArrayList<Vehicle> vehicleList) {
         super(orientation, speedLimit, isInRoad, inCars, rowNum, colNum);
         this.direction = direction;
         this.numLanes = numLanes;
         this.vehicleList = vehicleList;
+        updateGraphic();
     }
 
     public boolean addCar(ArrayList<Vehicle> addCarList) {
@@ -42,14 +46,31 @@ public class OneWayRoad extends Road implements GridObject {
         return true;
     }
 
+    public void updateGraphic() {
+        if (this.getDirection() == Direction.UP) {
+            this.imageFile = new Image("file:Images/RoadImage.png");
+        } else if (this.getDirection() == Direction.LEFT) {
+            this.imageFile = new Image("file:Images/RoadImageLeft");
+        } else if (this.getDirection() == Direction.DOWN) {
+            this.imageFile = new Image("file:Images/RoadImageDown");
+        } else if (this.getDirection() == Direction.RIGHT) {
+            this.imageFile = new Image("file:Images/RoadImageRight");
+        }
+    }
+
+   public void rotateRoad(Direction direction) {
+        this.direction = direction;
+        updateGraphic();
+   }
+
 
     /* Getters and setters */
 
-    public int getDirection() {
+    public Direction getDirection() {
         return direction;
     }
 
-    public void setDirection(int direction) {
+    public void setDirection(Direction direction) {
         this.direction = direction;
     }
 
@@ -84,6 +105,16 @@ public class OneWayRoad extends Road implements GridObject {
     public void setRowNum(int newRow) {
         this.rowNum = newRow;
 
+    }
+
+    @Override
+    public Image getImageFile() {
+        return imageFile;
+    }
+
+    @Override
+    public void setImageFile(Image imageFile) {
+        this.imageFile = imageFile;
     }
 
 }

@@ -3,18 +3,21 @@ package com.FlowLogic;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
-import java.awt.*;
 import java.io.File;
-import java.io.FileInputStream;
 
 
 public class UserInterface extends Application {
@@ -30,8 +33,6 @@ public class UserInterface extends Application {
     // Variables to track zoom and pan offsets
     private double offsetX = 0;
     private double offsetY = 0;
-    private double scaleFactor = 1.0; // Track zoom level
-
     public static Grid grid;
 
     // Tracks if the User is Panning the screen disables clicking events
@@ -70,6 +71,10 @@ public class UserInterface extends Application {
         final Scale scale = new Scale();
         gridGroup.getTransforms().add(scale);
 
+        double maxZoom = SCREEN_HEIGHT/(32 * grid.getNumColumns() * 1.0);
+        scale.setY(maxZoom);
+        scale.setX(maxZoom);
+
         // Zoom in/out using mouse wheel
         root.setOnScroll(event -> {
             if (event.getDeltaY() > 0) {
@@ -79,7 +84,15 @@ public class UserInterface extends Application {
                 scale.setX(scale.getX() / 1.1);
                 scale.setY(scale.getY() / 1.1);
             }
-            event.consume();
+            if (scale.getX() < maxZoom || scale.getY() < maxZoom) {
+                scale.setX(maxZoom);
+                scale.setY(maxZoom);
+            }
+
+            ensureXY(gridContainer, scale);
+
+            gridGroup.setTranslateX(offsetX);
+            gridGroup.setTranslateY(offsetY);
         });
 
         // Panning functionality (dragging the grid)
@@ -95,23 +108,7 @@ public class UserInterface extends Application {
             offsetX += deltaX;
             offsetY += deltaY;
 
-            double gridContainerWidth = gridContainer.getPrefWidth();
-            double gridContainerHeight = gridContainer.getPrefHeight();
-            double gridGroupWidth = gridGroup.getBoundsInLocal().getWidth();
-            double gridGroupHeight = gridGroup.getBoundsInLocal().getHeight();
-
-            if (offsetX > 0) {
-                offsetX = 0; // Prevent panning to the right
-            }
-            if (offsetX < gridContainerWidth - gridGroupWidth) {
-                offsetX = gridContainerWidth - gridGroupWidth; // Prevent panning to the left
-            }
-            if (offsetY > 0) {
-                offsetY = 0; // Prevent panning down
-            }
-            if (offsetY < gridContainerHeight - gridGroupHeight) {
-                offsetY = gridContainerHeight - gridGroupHeight; // Prevent panning up
-            }
+            ensureXY(gridContainer, scale);
 
             gridGroup.setTranslateX(offsetX);
             gridGroup.setTranslateY(offsetY);
@@ -128,23 +125,40 @@ public class UserInterface extends Application {
                 // Get the mouse click coordinates
                 double x = event.getX();
                 double y = event.getY();
-                System.out.println(x + "X," + y + "Y");
 
                 // Calculate the grid position (row, column)
                 int row = (int) (y / CELL_SIZE);
                 int col = (int) (x / CELL_SIZE);
 
-                // Print the grid position
-                System.out.println("Grid position: (" + row + ", " + col + ")");
-
-                // Get the clicked cell (rectangle) and change its color
-
-                Image img = new Image("file:Images/Penguin.png");
-                grid.getFrontGrid()[row][col].setFill(new ImagePattern(img));
+                grid.getFrontGrid()[row][col].setFill(Color.TRANSPARENT);
 
             }
             pan = false;
         });
+
+        GridPane left = new GridPane();
+        left.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
+        left.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
+        left.setStyle("-fx-background-color: #D3D3D3;");
+
+        AnchorPane.setLeftAnchor(left, 0.0);
+        AnchorPane.setTopAnchor(left, 0.0);     // Set top anchor
+        AnchorPane.setBottomAnchor(left, 0.0);  // Set bottom anchor
+        root.getChildren().add(left);
+        addDraggableImages(left, 3);
+
+        VBox right = new VBox();
+        right.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
+        right.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
+        right.setStyle("-fx-background-color: #D3D3D3;");
+
+        AnchorPane.setRightAnchor(right, 0.0);
+        AnchorPane.setTopAnchor(right, 0.0);     // Set top anchor
+        AnchorPane.setBottomAnchor(right, 0.0);  // Set bottom anchor
+        root.getChildren().add(right);
+
+        // Add the save button to the bottom right of the grid
+        saveGridButton(right, grid);
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -165,10 +179,118 @@ public class UserInterface extends Application {
                 cell.setX(col * CELL_SIZE);
                 cell.setY(row * CELL_SIZE);
 
+                cell.setOnDragOver(event -> {
+                    //Cell accepts transfer if the source is an image and is coming from the Dragboard
+                    if (event.getGestureSource() instanceof ImageView && event.getDragboard().hasImage()) {
+                        event.acceptTransferModes(TransferMode.COPY);
+                    }
+                });
+
+                cell.setOnDragDropped(event -> {
+                    //Fills the cell with the image
+                    Dragboard db = event.getDragboard();
+                    cell.setFill(new ImagePattern(db.getImage()));
+                });
+
                 // Add the cell to the grid group
                 gridGroup.getChildren().add(cell);
             }
         }
+
+    }
+
+    private void ensureXY(Pane gridContainer, Scale scale){
+        double scaleFactor = scale.getX(); // Get current scale
+        double gridWidth = GRID_COLS * CELL_SIZE * scaleFactor; // Scaled grid width
+        double gridHeight = GRID_ROWS * CELL_SIZE * scaleFactor; // Scaled grid height
+        double gridContainerWidth = gridContainer.getPrefWidth();
+        double gridContainerHeight = gridContainer.getPrefHeight();
+
+        // Ensure grid stays within visible bounds
+        double minX = gridContainerWidth - gridWidth;
+        double minY = gridContainerHeight - gridHeight;
+
+        if (offsetX > 0) {
+            offsetX = 0; // Prevent panning right
+        }
+        if (offsetX < minX) {
+            offsetX = minX; // Prevent panning left
+        }
+        if (offsetY > 0) {
+            offsetY = 0; // Prevent panning down
+        }
+        if (offsetY < minY) {
+            offsetY = minY; // Prevent panning up
+        }
+    }
+
+    private void addDraggableImages(GridPane left, int numColumns) {
+        File dir = new File("Images");
+        int count = 0;
+        if (dir.exists() && dir.isDirectory()) {
+            for (File file : dir.listFiles()) {
+                Image img = new Image(file.toURI().toString());
+                ImageView imageView = new ImageView(img);
+                imageView.setFitWidth(64);
+                imageView.setFitHeight(64);
+                int row = count / numColumns;
+                int col = count % numColumns;
+                count++;
+
+                // Enable dragging
+                imageView.setOnDragDetected(event -> {
+                    //Transfers the data
+                    Dragboard db = imageView.startDragAndDrop(TransferMode.COPY);
+                    //Stores the data
+                    ClipboardContent content = new ClipboardContent();
+                    content.putImage(img);
+                    db.setContent(content);
+                });
+
+                left.add(imageView, col, row);
+            }
+        }
+    }
+
+    /**
+     * This method will add a save grid button to the bottom right of the application
+     * It will be connected to Grid.java's saveGridState function
+     *
+     * @param mainLayout The main BorderPane layout
+     * @param grid The Grid object containing the grid data to save
+     */
+    public void saveGridButton(VBox mainLayout, Grid grid) {
+        // Create the button (100 x 30)
+        Button saveButton = new Button("Save Current Layout");
+        saveButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+
+        // Add the button to the AnchorPane
+        mainLayout.getChildren().add(saveButton);
+
+        saveButton.setOnAction(event -> {
+            // Create a file chooser dialog - select where to save it
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Current Layout");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("JSON Files", "*.json")
+            );
+
+            // Show the save dialog
+            File file = fileChooser.showSaveDialog(mainLayout.getScene().getWindow());
+
+            if (file != null) {
+                // Call the grid's saveGridState method with the selected file path
+                boolean saveSuccessful = grid.saveGridState(file.getAbsolutePath());
+
+                if (saveSuccessful) {
+                    // Insert any additional success logic here (popup?)
+                    System.out.println("Grid saved successfully to " + file.getName());
+                } else {
+                    // Insert any additional error logic here (popup?)
+                    System.out.println("Failed to save grid to " + file.getName());
+                }
+            }
+        });
     }
 
     public static void main(String[] args) {
