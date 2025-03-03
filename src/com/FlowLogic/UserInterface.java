@@ -3,6 +3,8 @@ package com.FlowLogic;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -30,8 +32,8 @@ public class UserInterface extends Application {
     private static final int SCREEN_HEIGHT = 720;     // Height of the screen
 
     private static final int CELL_SIZE = 32;          // Fixed cell size of 32x32
-    private static int GRID_ROWS = 10;         // Number of rows in the grid
-    private static int GRID_COLS = 10;         // Number of columns in the grid
+
+    private static int GRID_SIZE = 100;         // Number of rows and columns in the grid
 
     // Variables to track zoom and pan offsets
     private double offsetX = 0;
@@ -43,6 +45,11 @@ public class UserInterface extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Error{
+        //Logic will go here to move between windows
+        setupBuildMenu(primaryStage);
+    }
+
+    private void setupBuildMenu(Stage primaryStage){
         //Stops user from resizing the window
         primaryStage.setResizable(false);
 
@@ -53,13 +60,13 @@ public class UserInterface extends Application {
         Pane gridContainer = new Pane();
         gridContainer.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
 
-        Group gridGroup = new Group();
-        gridContainer.getChildren().add(gridGroup);
-        root.getChildren().add(gridContainer);
-
         // Define grid container size such that the grid is a Square
         double gridViewWidth = SCREEN_WIDTH * ((SCREEN_HEIGHT * 1.0) / SCREEN_WIDTH);
         double gridViewHeight = SCREEN_HEIGHT * 1.00;
+
+        Group gridGroup = new Group();
+        gridContainer.getChildren().add(gridGroup);
+        root.getChildren().add(gridContainer);
 
         gridContainer.setPrefSize(gridViewWidth, gridViewHeight);
 
@@ -79,7 +86,7 @@ public class UserInterface extends Application {
         scale.setX(maxZoom);
 
         // Zoom in/out using mouse wheel
-        root.setOnScroll(event -> {
+        gridContainer.setOnScroll(event -> {
             if (event.getDeltaY() > 0) {
                 scale.setX(scale.getX() * 1.1);
                 scale.setY(scale.getY() * 1.1);
@@ -105,7 +112,7 @@ public class UserInterface extends Application {
             mousePos[1] = event.getSceneY();
         });
 
-        gridGroup.setOnMouseDragged(event -> {
+        gridContainer.setOnMouseDragged(event -> {
             double deltaX = event.getSceneX() - mousePos[0];
             double deltaY = event.getSceneY() - mousePos[1];
             offsetX += deltaX;
@@ -123,32 +130,58 @@ public class UserInterface extends Application {
         // Create the grid cells
         createGridCells(gridGroup);
 
-        gridGroup.setOnMouseClicked(event -> {
+        gridContainer.setOnMouseClicked(event -> {
             if (!pan){
                 // Get the mouse click coordinates
-                double x = event.getX();
-                double y = event.getY();
+                double x = (event.getX() - offsetX) / scale.getX();
+                double y = (event.getY() - offsetY) / scale.getY();
 
                 // Calculate the grid position (row, column)
                 int row = (int) (y / CELL_SIZE);
                 int col = (int) (x / CELL_SIZE);
-
-                grid.getFrontGrid()[row][col].setFill(Color.TRANSPARENT);
+                Rectangle cell = grid.getFrontGrid()[row][col];
+                cell.setFill(Color.LIGHTGRAY);
+                cell.setStroke(Color.BLACK);
 
             }
             pan = false;
+        });
+
+        gridContainer.setOnDragOver(event -> {
+            //Cell accepts transfer if the source is an image and is coming from the Dragboard
+            if (event.getGestureSource() instanceof ImageView && event.getDragboard().hasImage()) {
+                event.acceptTransferModes(TransferMode.COPY);
+            }
+        });
+
+        gridContainer.setOnDragDropped(event -> {
+            //Fills the cell with the image
+            Dragboard db = event.getDragboard();
+            // Get the mouse click coordinates
+            double x = (event.getX() - offsetX) / scale.getX();
+            double y = (event.getY() - offsetY) / scale.getY();
+
+            // Calculate the grid position (row, column)
+            int row = (int) (y / CELL_SIZE);
+            int col = (int) (x / CELL_SIZE);
+            Rectangle cell = grid.getFrontGrid()[row][col];
+            if (!(cell.getFill() instanceof ImagePattern)) {
+                cell.setFill(new ImagePattern(db.getImage()));
+            }
         });
 
         GridPane left = new GridPane();
         left.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
         left.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
         left.setStyle("-fx-background-color: #D3D3D3;");
+        left.setHgap(6);
+        left.setVgap(6);
 
         AnchorPane.setLeftAnchor(left, 0.0);
         AnchorPane.setTopAnchor(left, 0.0);     // Set top anchor
         AnchorPane.setBottomAnchor(left, 0.0);  // Set bottom anchor
         root.getChildren().add(left);
-        addDraggableImages(left, 3);
+        addDraggableImages(left, 4);
 
         VBox right = new VBox();
         right.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
@@ -160,10 +193,10 @@ public class UserInterface extends Application {
         AnchorPane.setBottomAnchor(right, 0.0);  // Set bottom anchor
         root.getChildren().add(right);
 
-        // Add the save button to the bottom right of the grid
-        saveGridButton(right, grid);
         // add the resize button to the top right
         gridResizeBox(right, grid);
+        // Add the save button to the bottom right of the grid
+        saveGridButton(right, grid);
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -173,9 +206,10 @@ public class UserInterface extends Application {
     }
 
     private void createGridCells(Group gridGroup) {
+        gridGroup.getChildren().removeAll();
         // Create a large grid of cells that always exists
-        for (int row = 0; row < GRID_ROWS; row++) {
-            for (int col = 0; col < GRID_COLS; col++) {
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
                 // Create each cell as a rectangle
                 Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE);
                 grid.getFrontGrid()[row][col] = cell;
@@ -183,31 +217,15 @@ public class UserInterface extends Application {
                 cell.setStroke(Color.BLACK);
                 cell.setX(col * CELL_SIZE);
                 cell.setY(row * CELL_SIZE);
-
-                cell.setOnDragOver(event -> {
-                    //Cell accepts transfer if the source is an image and is coming from the Dragboard
-                    if (event.getGestureSource() instanceof ImageView && event.getDragboard().hasImage()) {
-                        event.acceptTransferModes(TransferMode.COPY);
-                    }
-                });
-
-                cell.setOnDragDropped(event -> {
-                    //Fills the cell with the image
-                    Dragboard db = event.getDragboard();
-                    cell.setFill(new ImagePattern(db.getImage()));
-                });
-
-                // Add the cell to the grid group
                 gridGroup.getChildren().add(cell);
             }
         }
-
     }
 
     private void ensureXY(Pane gridContainer, Scale scale){
         double scaleFactor = scale.getX(); // Get current scale
-        double gridWidth = GRID_COLS * CELL_SIZE * scaleFactor; // Scaled grid width
-        double gridHeight = GRID_ROWS * CELL_SIZE * scaleFactor; // Scaled grid height
+        double gridWidth = GRID_SIZE * CELL_SIZE * scaleFactor; // Scaled grid width
+        double gridHeight = GRID_SIZE * CELL_SIZE * scaleFactor; // Scaled grid height
         double gridContainerWidth = gridContainer.getPrefWidth();
         double gridContainerHeight = gridContainer.getPrefHeight();
 
@@ -228,7 +246,6 @@ public class UserInterface extends Application {
             offsetY = minY; // Prevent panning up
         }
     }
-
     private void addDraggableImages(GridPane left, int numColumns) {
         File dir = new File("Images");
         int count = 0;
@@ -300,8 +317,8 @@ public class UserInterface extends Application {
 
     private void resizeGrid(int newSize) {
         grid.resize(newSize, newSize);
-        GRID_COLS = newSize;
-        GRID_ROWS = newSize;
+        GRID_SIZE = newSize;
+
     }
 
 
@@ -340,7 +357,7 @@ public class UserInterface extends Application {
     }
 
     public static void main(String[] args) {
-        grid = new Grid(GRID_ROWS,GRID_COLS);
+        grid = new Grid(GRID_SIZE,GRID_SIZE);
         launch(args);
     }
 }
