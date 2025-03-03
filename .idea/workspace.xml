@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Fixed Grid Snapping algorithm and created some basic tests for it">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/StopSign.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/StopSign.java" afterDir="false" />
-    </list>
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="version for pull" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -152,7 +148,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740496345843</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="version for pull">
+      <option name="closed" value="true" />
+      <created>1741023076949</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1741023076956</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -216,8 +220,8 @@
     <MESSAGE value="Implemented the stop light class" />
     <MESSAGE value="Implemented switchLights in the stop light class" />
     <MESSAGE value="Added Road and intersection images" />
-    <MESSAGE value="version for pull" />
     <MESSAGE value="Fixed Grid Snapping algorithm and created some basic tests for it" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed Grid Snapping algorithm and created some basic tests for it" />
+    <MESSAGE value="version for pull" />
+    <option name="LAST_COMMIT_MESSAGE" value="version for pull" />
   </component>
 </project>
