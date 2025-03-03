@@ -40,21 +40,4 @@ public class StopSign extends Intersection {
     public void setQueue(Queue<Vehicle> queue) {
         this.queue = queue;
     }
-
-    public int getRowNum() {
-        return rowNum;
-    }
-
-    public int getColNum() {
-        return colNum;
-    }
-
-    public void setColNum(int newCol) {
-        this.colNum = newCol;
-    }
-
-    public void setRowNum(int newRow) {
-        this.rowNum = newRow;
-
-    }
 }

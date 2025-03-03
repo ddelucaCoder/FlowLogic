@@ -5,13 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="version for pull">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Building.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Building.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Intersection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Intersection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/OneWayRoad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/OneWayRoad.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Road.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Road.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/TwoWayRoad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/TwoWayRoad.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/StopSign.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/StopSign.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,19 +44,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;isaac-dev&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "dom__dev",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RunManager">
+    <configuration name="UI" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="com.FlowLogic.UserInterface" />
+      <module name="FlowLogic" />
+      <option name="PROGRAM_PARAMETERS" value="-Dprism.order=j2d" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;lib/javafx-sdk-17.0.14/lib&quot; --add-modules=javafx.controls,javafx.fxml" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
