@@ -5,6 +5,7 @@ import javafx.scene.shape.Rectangle;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import org.json.JSONArray;
@@ -30,6 +31,9 @@ public class Grid {
     private Rectangle[][] frontGrid;
 
     public static int GRID_SIZE;
+
+    //Allows for quick conversion from Image file to backend object
+    public static HashMap<String, GridObject> imgToObj;
 
     public Grid(int numRows, int numColumns) {
         this.numRows = numRows;

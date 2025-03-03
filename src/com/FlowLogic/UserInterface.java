@@ -130,8 +130,7 @@ public class UserInterface extends Application {
                 int row = (int) (y / CELL_SIZE);
                 int col = (int) (x / CELL_SIZE);
 
-                Image img = new Image("file:Images/Penguin.png");
-                grid.getFrontGrid()[row][col].setFill(new ImagePattern(img));
+                grid.getFrontGrid()[row][col].setFill(Color.TRANSPARENT);
 
             }
             pan = false;
@@ -180,10 +179,24 @@ public class UserInterface extends Application {
                 cell.setX(col * CELL_SIZE);
                 cell.setY(row * CELL_SIZE);
 
+                cell.setOnDragOver(event -> {
+                    //Cell accepts transfer if the source is an image and is coming from the Dragboard
+                    if (event.getGestureSource() instanceof ImageView && event.getDragboard().hasImage()) {
+                        event.acceptTransferModes(TransferMode.COPY);
+                    }
+                });
+
+                cell.setOnDragDropped(event -> {
+                    //Fills the cell with the image
+                    Dragboard db = event.getDragboard();
+                    cell.setFill(new ImagePattern(db.getImage()));
+                });
+
                 // Add the cell to the grid group
                 gridGroup.getChildren().add(cell);
             }
         }
+
     }
 
     private void ensureXY(Pane gridContainer, Scale scale){
@@ -226,7 +239,9 @@ public class UserInterface extends Application {
 
                 // Enable dragging
                 imageView.setOnDragDetected(event -> {
+                    //Transfers the data
                     Dragboard db = imageView.startDragAndDrop(TransferMode.COPY);
+                    //Stores the data
                     ClipboardContent content = new ClipboardContent();
                     content.putImage(img);
                     db.setContent(content);
@@ -251,10 +266,6 @@ public class UserInterface extends Application {
 
         // Add the button to the AnchorPane
         mainLayout.getChildren().add(saveButton);
-
-        // Anchor the button in the bottom right corner
-        //AnchorPane.setBottomAnchor(saveButton, 10.0);
-        //AnchorPane.setRightAnchor(saveButton, 10.0);
 
         saveButton.setOnAction(event -> {
             // Create a file chooser dialog - select where to save it
