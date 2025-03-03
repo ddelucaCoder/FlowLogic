@@ -2,11 +2,9 @@ package com.FlowLogic;
 import java.util.Queue;
 public class StopSign extends Intersection {
     private Queue<Vehicle> queue;
-    private int rowNum;
-    private int colNum;
 
-    public StopSign(Road roadOne, Road roadTwo) {
-        super(roadOne, roadTwo);
+    public StopSign(int rowNum, int colNum, Road[] roads) {
+        super(rowNum, colNum, roads);
     }
 
 
@@ -43,20 +41,4 @@ public class StopSign extends Intersection {
         this.queue = queue;
     }
 
-    public int getRowNum() {
-        return rowNum;
-    }
-
-    public int getColNum() {
-        return colNum;
-    }
-
-    public void setColNum(int newCol) {
-        this.colNum = newCol;
-    }
-
-    public void setRowNum(int newRow) {
-        this.rowNum = newRow;
-
-    }
 }
