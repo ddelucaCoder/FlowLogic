@@ -4,6 +4,9 @@ import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
@@ -27,8 +30,8 @@ public class UserInterface extends Application {
     private static final int SCREEN_HEIGHT = 720;     // Height of the screen
 
     private static final int CELL_SIZE = 32;          // Fixed cell size of 32x32
-    private static final int GRID_ROWS = 100;         // Number of rows in the grid
-    private static final int GRID_COLS = 100;         // Number of columns in the grid
+    private static int GRID_ROWS = 10;         // Number of rows in the grid
+    private static int GRID_COLS = 10;         // Number of columns in the grid
 
     // Variables to track zoom and pan offsets
     private double offsetX = 0;
@@ -159,6 +162,8 @@ public class UserInterface extends Application {
 
         // Add the save button to the bottom right of the grid
         saveGridButton(right, grid);
+        // add the resize button to the top right
+        gridResizeBox(right, grid);
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -291,6 +296,47 @@ public class UserInterface extends Application {
                 }
             }
         });
+    }
+
+    private void resizeGrid(int newSize) {
+        grid.resize(newSize, newSize);
+        GRID_COLS = newSize;
+        GRID_ROWS = newSize;
+    }
+
+
+
+    public void gridResizeBox(VBox mainLayout, Grid grid) {
+        Label instructionLabel = new Label("Enter a size for the grid:");
+        TextField sizeField = new TextField();
+        // Define a TextFormatter that only allows digits
+        TextFormatter<String> numberFormatter = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+        sizeField.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+
+        sizeField.setTextFormatter(numberFormatter);
+
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction(e -> {
+            String input = sizeField.getText();
+            int size = 0;
+            if (input.isEmpty()) {
+                return;
+            } else {
+                size = Integer.parseInt(input);
+            }
+            resizeGrid(size);
+        });
+
+        // Add the button to the AnchorPane
+        mainLayout.getChildren().add(instructionLabel);
+        mainLayout.getChildren().add(sizeField);
+        mainLayout.getChildren().add(submitButton);
+
     }
 
     public static void main(String[] args) {
