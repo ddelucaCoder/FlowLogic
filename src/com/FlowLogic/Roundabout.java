@@ -38,6 +38,9 @@ public class Roundabout implements GridObject {
 
         return numAvailableSpots;
     }
+    public GridObject clone() {
+        return null;
+    }
 
     /**
      * Closes a spot in the roundabout

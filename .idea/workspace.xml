@@ -6,7 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Reformatted UI and improved drag and drop Efficiency">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Building.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Building.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/GridObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/GridObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Intersection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Intersection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/OneWayRoad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/OneWayRoad.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Parking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Parking.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Road.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Road.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Roundabout.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Roundabout.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/StopLight.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/StopLight.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/StopSign.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/StopSign.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/TwoWayRoad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/TwoWayRoad.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -170,27 +180,6 @@
     <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="isaac-dev" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
     <option name="RECENT_FILTERS">
       <map>
         <entry key="Branch">
@@ -212,6 +201,27 @@
                 </option>
               </RecentGroup>
             </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="isaac-dev" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>

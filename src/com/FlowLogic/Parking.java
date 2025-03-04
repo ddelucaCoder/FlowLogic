@@ -81,6 +81,10 @@ public class Parking implements GridObject {
      * toString Method for Debugging Purposes
      */
 
+    public GridObject clone() {
+        return null;
+    }
+
     @Override
     public String toString() {
         return "Parking{" +

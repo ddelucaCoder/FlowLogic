@@ -23,6 +23,10 @@ public class TwoWayRoad extends Road {
         right.updateGraphic();
     }
 
+    public GridObject clone() {
+        return null;
+    }
+
     public void rotateRoad(Direction direction) {
         if (direction == Direction.UP) {
             left.rotateRoad(Direction.DOWN);

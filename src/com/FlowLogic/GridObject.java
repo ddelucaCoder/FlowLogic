@@ -7,4 +7,6 @@ public interface GridObject {
 
     void setRowNum(int row);
     void setColNum(int col);
+
+    GridObject clone();
 }

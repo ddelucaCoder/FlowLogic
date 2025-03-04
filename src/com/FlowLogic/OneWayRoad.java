@@ -28,6 +28,23 @@ public class OneWayRoad extends Road implements GridObject {
         updateGraphic();
     }
 
+    public OneWayRoad(Orientation orientation, Direction direction) {
+        super(orientation, 40, false, 0, 0, 0);
+        this.direction = direction;
+        this.numLanes = 1;
+        this.vehicleList = new ArrayList<Vehicle>();
+        updateGraphic();
+    }
+
+    public OneWayRoad(OneWayRoad road) {
+        super(road.getOrientation(), road.getSpeedLimit(), road.isInRoad(), road.getInCars(), road.getRowNum(),
+            road.getColNum());
+        this.direction = road.getDirection();
+        this.numLanes = road.numLanes;
+        this.vehicleList = road.getVehicleList();
+        updateGraphic();
+    }
+
     public boolean addCar(ArrayList<Vehicle> addCarList) {
         if (addCarList.isEmpty()) {
             System.out.println("You must select a car to add\n");
@@ -61,6 +78,11 @@ public class OneWayRoad extends Road implements GridObject {
    public void rotateRoad(Direction direction) {
         this.direction = direction;
         updateGraphic();
+   }
+
+   @Override
+   public GridObject clone() {
+        return new OneWayRoad(this);
    }
 
 

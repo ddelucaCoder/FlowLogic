@@ -41,6 +41,10 @@ public class StopLight extends Intersection implements GridObject {
         }
     }
 
+    public GridObject clone() {
+        return null;
+    }
+
     /**
      * This functions switches the stop lights by one instance
      * If its on green it will change to yellow for 5 counts
