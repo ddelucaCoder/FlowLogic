@@ -1,5 +1,6 @@
 package com.FlowLogic;
 
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 import java.io.FileReader;
@@ -296,13 +297,13 @@ public class Grid {
         GridObject[][] newGrid = new GridObject[newNumRows][newNumCols];
         int leastRows = Math.min(numRows, newNumRows);
         int leastCols = Math.min(numColumns, newNumCols);
-        frontGrid = new Rectangle[newNumRows][newNumCols];
+        Rectangle[][] newFront = new Rectangle[newNumRows][newNumCols];
         // iterate
         for (int i = 0; i < leastRows; i++) {
             for (int k = 0; k < leastCols; k++) {
                 // copy objects from old grid to new one
                 newGrid[i][k] = grid[i][k];
-                //frontGrid[i][k] = grid[i][k];
+                newFront[i][k] = frontGrid[i][k];
             }
         }
 
@@ -310,6 +311,7 @@ public class Grid {
         this.numRows = newNumRows;
         this.numColumns = newNumCols;
         this.grid = newGrid;
+        this.frontGrid = newFront;
 
     }
 

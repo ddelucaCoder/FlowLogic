@@ -33,7 +33,7 @@ public class UserInterface extends Application {
 
     private static final int CELL_SIZE = 32;          // Fixed cell size of 32x32
 
-    private static int GRID_SIZE = 100;         // Number of rows and columns in the grid
+    private static int GRID_SIZE = 20;         // Number of rows and columns in the grid
 
     // Variables to track zoom and pan offsets
     private double offsetX = 0;
@@ -54,9 +54,12 @@ public class UserInterface extends Application {
     double maxZoom;
     Scale scale;
 
+    private static Stage stage;
+
     @Override
     public void start(Stage primaryStage) throws Error{
         //Logic will go here to move between windows
+        stage = primaryStage;
         setupBuildMenu(primaryStage);
     }
 
@@ -75,7 +78,7 @@ public class UserInterface extends Application {
         gridViewWidth = SCREEN_WIDTH * ((SCREEN_HEIGHT * 1.0) / SCREEN_WIDTH);
         gridViewHeight = SCREEN_HEIGHT * 1.00;
 
-        Group gridGroup = new Group();
+        gridGroup = new Group();
         gridContainer.getChildren().add(gridGroup);
         root.getChildren().add(gridContainer);
 
@@ -218,17 +221,22 @@ public class UserInterface extends Application {
     }
 
     private void createGridCells(Group gridGroup) {
-        gridGroup.getChildren().removeAll();
         // Create a large grid of cells that always exists
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
                 // Create each cell as a rectangle
-                Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE);
-                grid.getFrontGrid()[row][col] = cell;
-                cell.setFill(Color.LIGHTGRAY);
-                cell.setStroke(Color.BLACK);
-                cell.setX(col * CELL_SIZE);
-                cell.setY(row * CELL_SIZE);
+                Rectangle cell = grid.getFrontGrid()[row][col];
+                if (cell == null) {
+                    cell = new Rectangle(CELL_SIZE, CELL_SIZE);
+                }
+                if (!(cell.getFill() instanceof ImagePattern)) {
+                    //Default Cell config
+                    cell.setFill(Color.LIGHTGRAY);
+                    cell.setStroke(Color.BLACK);
+                    cell.setX(col * CELL_SIZE);
+                    cell.setY(row * CELL_SIZE);
+                    grid.getFrontGrid()[row][col] = cell;
+                }
                 gridGroup.getChildren().add(cell);
             }
         }
@@ -329,8 +337,8 @@ public class UserInterface extends Application {
 
     private void resizeGrid(int newSize) {
         grid.resize(newSize, newSize);
-        GRID_COLS = newSize;
-        GRID_ROWS = newSize;
+        GRID_SIZE = newSize;
+        gridGroup.getChildren().clear();
         createGridCells(gridGroup);
         AnchorPane.setLeftAnchor(gridContainer, (SCREEN_WIDTH - gridViewWidth) / 2);
         AnchorPane.setRightAnchor(gridContainer, (SCREEN_WIDTH - gridViewWidth) / 2);
@@ -371,7 +379,6 @@ public class UserInterface extends Application {
         mainLayout.getChildren().add(instructionLabel);
         mainLayout.getChildren().add(sizeField);
         mainLayout.getChildren().add(submitButton);
-
     }
 
     public static void main(String[] args) {
