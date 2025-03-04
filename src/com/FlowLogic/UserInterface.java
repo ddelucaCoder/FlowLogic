@@ -215,6 +215,8 @@ public class UserInterface extends Application {
         gridResizeBox(right, grid);
         // Add the save button to the bottom right of the grid
         saveGridButton(right, grid);
+        // Add the load button to the grid
+        loadGridButton(right, grid);
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -303,11 +305,11 @@ public class UserInterface extends Application {
      * This method will add a save grid button to the bottom right of the application
      * It will be connected to Grid.java's saveGridState function
      *
-     * @param mainLayout The main BorderPane layout
+     * @param mainLayout The main VBox layout
      * @param grid The Grid object containing the grid data to save
      */
     public void saveGridButton(VBox mainLayout, Grid grid) {
-        // Create the button (100 x 30)
+        // Create the button
         Button saveButton = new Button("Save Current Layout");
         saveButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
 
@@ -335,6 +337,47 @@ public class UserInterface extends Application {
                 } else {
                     // Insert any additional error logic here (popup?)
                     System.out.println("Failed to save grid to " + file.getName());
+                }
+            }
+        });
+    }
+
+    /**
+     * This method will add a load grid button to the UI of the application
+     * It will be connected to Grid.java's loadGridState function
+     *
+     * @param mainLayout The main AnchorPane layout
+     * @param grid The Grid object containing the grid data to save
+     */
+    public void loadGridButton(VBox mainLayout, Grid grid) {
+        // Create the button
+        Button loadButton = new Button("Load Existing Layout");
+        loadButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+
+        // Add the button to the AnchorPane
+        mainLayout.getChildren().add(loadButton);
+
+        loadButton.setOnAction(event -> {
+            // Create a file chooser dialog - select where to save it
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Load Existing Layout");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("JSON Files", "*.json")
+            );
+
+            // Show the load dialog
+            File file = fileChooser.showOpenDialog(mainLayout.getScene().getWindow());
+
+            if (file != null) {
+                // Call the grid's loadGridState method with the selected file path
+                boolean loadSuccessful = grid.loadGridState(file.getAbsolutePath());
+
+                if (loadSuccessful) {
+                    // Insert any additional success logic here (popup?)
+                    System.out.println("Grid loaded successfully from " + file.getName());
+                } else {
+                    // Insert any additional error logic here (popup?)
+                    System.out.println("Failed to load grid from " + file.getName());
                 }
             }
         });
