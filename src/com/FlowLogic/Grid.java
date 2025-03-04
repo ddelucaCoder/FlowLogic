@@ -264,6 +264,10 @@ public class Grid {
 
     }
 
+    private Rectangle getImgFromObject(GridObject obj) {
+        return null;
+    }
+
     public int getNumRows() {
         return this.numRows;
     }
@@ -292,11 +296,13 @@ public class Grid {
         GridObject[][] newGrid = new GridObject[newNumRows][newNumCols];
         int leastRows = Math.min(numRows, newNumRows);
         int leastCols = Math.min(numColumns, newNumCols);
+        frontGrid = new Rectangle[newNumRows][newNumCols];
         // iterate
         for (int i = 0; i < leastRows; i++) {
             for (int k = 0; k < leastCols; k++) {
                 // copy objects from old grid to new one
                 newGrid[i][k] = grid[i][k];
+                //frontGrid[i][k] = grid[i][k];
             }
         }
 
@@ -304,6 +310,7 @@ public class Grid {
         this.numRows = newNumRows;
         this.numColumns = newNumCols;
         this.grid = newGrid;
+
     }
 
     private void setIntersectionAt(int rowNum, int colNum, Road newRoad) {
