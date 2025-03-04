@@ -209,13 +209,13 @@ public class UserInterface extends Application {
         AnchorPane.setBottomAnchor(right, 0.0);  // Set bottom anchor
         root.getChildren().add(right);
 
-        // add the resize button to the top right
-        gridResizeBox(right, grid);
+
         // Add the save button to the bottom right of the grid
         saveGridButton(right, grid);
         // Add the load button to the grid
         loadGridButton(right, grid);
-
+        // add the resize button to the top right
+        showResizeBox(right, grid);
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         primaryStage.setScene(scene);
@@ -381,6 +381,7 @@ public class UserInterface extends Application {
         });
     }
 
+
     public static void refreshGrid(int newSize) {
         GRID_SIZE = newSize;
         gridGroup.getChildren().clear();
@@ -392,6 +393,23 @@ public class UserInterface extends Application {
         scale.setX(maxZoom);
     }
 
+    private void showResizeBox(VBox mainLayout, Grid grid) {
+        Button submitButton = new Button("Show Resize Options");
+        submitButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+        mainLayout.getChildren().add(submitButton);
+        submitButton.setOnAction(e -> {
+            mainLayout.getChildren().remove(submitButton);
+            gridResizeBox(mainLayout, grid);
+        });
+
+    }
+
+
+    /**
+     * The box used for input for changing the size of grid.
+     * @param mainLayout- the main layout
+     * @param grid- current grid
+     */
     public void gridResizeBox(VBox mainLayout, Grid grid) {
         Label instructionLabel = new Label("Enter a size for the grid:");
         TextField sizeField = new TextField();
@@ -420,10 +438,23 @@ public class UserInterface extends Application {
 
         });
 
+        Button hideButton = new Button("Hide Resize Options");
+
+
         // Add the button to the AnchorPane
         mainLayout.getChildren().add(instructionLabel);
         mainLayout.getChildren().add(sizeField);
         mainLayout.getChildren().add(submitButton);
+        mainLayout.getChildren().add(hideButton);
+
+
+        hideButton.setOnAction(e -> {
+            mainLayout.getChildren().remove(instructionLabel);
+            mainLayout.getChildren().remove(sizeField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(hideButton);
+            showResizeBox(mainLayout, grid);
+        });
     }
 
     public static void main(String[] args) {
