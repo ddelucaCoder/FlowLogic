@@ -317,8 +317,14 @@ public class UserInterface extends Application {
 
     private void resizeGrid(int newSize) {
         grid.resize(newSize, newSize);
-        GRID_SIZE = newSize;
-
+        GRID_COLS = newSize;
+        GRID_ROWS = newSize;
+        createGridCells(gridGroup);
+        AnchorPane.setLeftAnchor(gridContainer, (SCREEN_WIDTH - gridViewWidth) / 2);
+        AnchorPane.setRightAnchor(gridContainer, (SCREEN_WIDTH - gridViewWidth) / 2);
+        maxZoom = SCREEN_HEIGHT / (32 * grid.getNumColumns() * 1.0);
+        scale.setY(maxZoom);
+        scale.setX(maxZoom);
     }
 
 
