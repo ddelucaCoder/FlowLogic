@@ -11,3 +11,4 @@
 /out/production/FlowLogic/com/FlowLogic/*.class
 *.class
 *.jar
+*.classpath

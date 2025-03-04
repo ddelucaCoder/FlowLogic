@@ -1,6 +1,24 @@
 package com.FlowLogic;
 
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Scanner;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import javax.print.attribute.standard.OrientationRequested;
 
 /**
  * This class represents the grid that holds all of the "GridObjects"
@@ -21,16 +39,246 @@ public class Grid {
 
     public static int GRID_SIZE;
 
+    //Allows for quick conversion from Image file to backend object
+    public static HashMap<String, GridObject> imgToObj = new HashMap<>();
+
     public Grid(int numRows, int numColumns) {
         this.numRows = numRows;
         this.numColumns = numColumns;
         grid = new GridObject[numRows][numColumns];
         frontGrid = new Rectangle[numRows][numColumns];
+        populateMap();
     }
 
-    public Grid(String filename) {
-        // TODO: implement grid loading from file 
+    private void populateMap() {
+        imgToObj.put("RoadImageDown.png", new OneWayRoad(Orientation.VERTICAL, Direction.DOWN));
+        imgToObj.put("RoadImage.png", new OneWayRoad(Orientation.VERTICAL, Direction.UP));
+        imgToObj.put("RoadImageLeft.png", new OneWayRoad(Orientation.HORIZONTAL, Direction.LEFT));
+        imgToObj.put("RoadImageRight.png", new OneWayRoad(Orientation.HORIZONTAL, Direction.RIGHT));
+        imgToObj.put("BasicIntersection.png", new Intersection(0, 0, new Road[4]));
     }
+
+    /**
+     * This method loads a grid state from a JSON file.
+     * The method will parse the JSON structure to recreate the grid dimensions and objects.
+     *
+     * @param filename The name of the file to load the grid state from
+     * @return boolean indicating if the load was successful
+     */
+    public boolean loadGridState(String filename) {
+        try {
+            // Read in the JSON file content as a large string
+            String content = new String(Files.readAllBytes(Paths.get(filename)));
+            JSONObject gridJson = new JSONObject(content);
+
+            // Load grid dimensions
+            this.numRows = gridJson.getInt("numRows");
+            this.numColumns = gridJson.getInt("numColumns");
+            GRID_SIZE = gridJson.getInt("gridSize");
+
+            // Initialize a new grid with the loaded dimensions
+            this.grid = new GridObject[numRows][numColumns];
+            this.frontGrid = new Rectangle[numRows][numColumns];
+
+            // Load objects from JSON
+            JSONArray gridObjectsArray = gridJson.getJSONArray("objects");
+
+            // First Loop: Create all of the objects.
+            //             Don't connect anything just yet
+            for (int i = 0; i < gridObjectsArray.length(); i++) {
+                JSONObject cellJson = gridObjectsArray.getJSONObject(i);
+                int row = cellJson.getInt("row");
+                int col = cellJson.getInt("column");
+                String type = cellJson.getString("type");
+                JSONObject properties = cellJson.getJSONObject("properties");
+
+                GridObject gridObject = null;
+
+                // Reconstruct the object based on its type in the file
+                // Determine the type, then fill out the necessary object fields
+                switch (type) {
+                    case "OneWayRoad":
+                        Orientation orientation = Orientation.valueOf(properties.getString("orientation"));
+                        int speedLimit = properties.getInt("speedLimit");
+                        int length = properties.getInt("length");
+                        boolean isInRoad = properties.getBoolean("isInRoad");
+                        int inCars = properties.getInt("inCars");
+
+                        Road road = new Road(orientation, speedLimit, isInRoad, inCars, row, col);
+                        road.setLength(length);
+
+                        gridObject = road;
+                        break;
+                    case "Building":
+                        int xLength = properties.getInt("xLength");
+                        int yLength = properties.getInt("yLength");
+                        int dailyPopulation = properties.getInt("dailyPopulation");
+
+                        Building building = new Building(xLength, yLength, dailyPopulation);
+                        building.setRowNum(row);
+                        building.setColNum(col);
+
+                        gridObject = building;
+                        break;
+                    case "Parking":
+                        int parkingXLength = properties.getInt("xLength");
+                        int parkingYLength = properties.getInt("yLength");
+                        int parkingCapacity = properties.getInt("parkingCapacity");
+                        int numCars = properties.getInt("numCars");
+
+                        Parking parking = new Parking(parkingXLength, parkingYLength, parkingCapacity, numCars);
+                        parking.setRowNum(row);
+                        parking.setColNum(col);
+
+                        gridObject = parking;
+                        break;
+                    case "Intersection":
+                        // Roads will be connected during the second pass
+                        Intersection intersection = new Intersection(row, col, new Road[4]);
+                        gridObject = intersection;
+                        break;
+                }
+                // Add everything to the grid
+                if (gridObject != null) {
+                    grid[row][col] = gridObject;
+                }
+            }
+
+            // Second loop: Connect the roads to intersections
+            for (int i = 0; i < gridObjectsArray.length(); i++) {
+                JSONObject objJson = gridObjectsArray.getJSONObject(i);
+                if ("Intersection".equals(objJson.getString("type"))) {
+                    int row = objJson.getInt("row");
+                    int col = objJson.getInt("column");
+                    JSONObject properties = objJson.getJSONObject("properties");
+                    JSONArray connectedRoads = properties.getJSONArray("connectedRoads");
+
+                    Intersection intersection = (Intersection) grid[row][col];
+
+                    // Connect each road to the intersection
+                    for (int j = 0; j < connectedRoads.length(); j++) {
+                        JSONObject roadRef = connectedRoads.getJSONObject(j);
+                        int roadRow = roadRef.getInt("row");
+                        int roadCol = roadRef.getInt("column");
+
+                        // Find road from the grid
+                        if (roadRow >= 0 && roadRow < numRows && roadCol >= 0 && roadCol < numColumns) {
+                            GridObject obj = grid[roadRow][roadCol];
+                            if (obj instanceof Road) {
+                                intersection.addRoad((Road) obj);
+                            }
+                        }
+                    }
+                }
+            }
+            UserInterface.refreshGrid(numRows);
+            synchronizeGrid();
+            System.out.println("Successfully loaded grid from " + filename);
+            return true;
+        }
+        catch (Exception e){
+            // Insert additional error logic here if needed
+            System.out.println("Error saving grid to file: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * This method saves the current grid state to a JSON file.
+     * The JSON structure contains the grid dimensions and all grid objects.
+     *
+     * @param filename The name of the file to save the grid state to
+     * @return boolean indicating if the save was successful
+     */
+    public boolean saveGridState(String filename) {
+        JSONObject gridJson = new JSONObject();
+
+        // Save the grid dimensions
+        gridJson.put("numRows", this.numRows);
+        gridJson.put("numColumns", this.numColumns);
+        gridJson.put("gridSize", GRID_SIZE);
+
+        // Create an array for the objects
+        JSONArray gridObjectsArray = new JSONArray();
+
+        for (int row = 0; row < numRows; row++) {
+            for (int col = 0; col < numColumns; col++) {
+                GridObject obj = grid[row][col];
+                if (obj != null) {
+                    JSONObject cellJson = new JSONObject();
+                    cellJson.put("row", row);
+                    cellJson.put("column", col);
+                    cellJson.put("type", obj.getClass().getSimpleName());
+
+                    // Store type-specific properties
+                    JSONObject properties = new JSONObject();
+
+                    // Add different properties based on object type
+                    if (obj instanceof Road) {
+                        Road road = (Road) obj;
+                        properties.put("orientation", road.getOrientation());
+                        properties.put("speedLimit", road.getSpeedLimit());
+                        properties.put("length", road.getLength());
+                        properties.put("isInRoad", road.isInRoad());
+                        properties.put("inCars", road.getInCars());
+                    } else if (obj instanceof Intersection intersection) {
+
+                        // Save the connected roads as an array of references
+                        JSONArray connectedRoads = new JSONArray();
+                        Road[] roadList = intersection.getRoadList();
+
+                        if (roadList != null) {
+                            for (Road road : roadList) {
+                                if (road != null) {
+                                    JSONObject roadRef = new JSONObject();
+                                    roadRef.put("row", road.getRowNum());
+                                    roadRef.put("column", road.getColNum());
+                                    roadRef.put("orientation", road.getOrientation());
+                                    connectedRoads.put(roadRef);
+                                }
+                            }
+                        }
+                        properties.put("connectedRoads", connectedRoads);
+                    }
+                    else if (obj instanceof Building building) {
+                        properties.put("xLength", building.getxLength());
+                        properties.put("yLength", building.getyLength());
+                        properties.put("dailyPopulation", building.getDailyPopulation());
+                    }
+                    else if (obj instanceof Parking parking) {
+                        properties.put("xLength", parking.getxLength());
+                        properties.put("yLength", parking.getyLength());
+                        properties.put("parkingCapacity", parking.getParkingCapacity());
+                        properties.put("numCars", parking.getNumCars());
+                    }
+
+                    cellJson.put("properties", properties);
+                    gridObjectsArray.put(cellJson);
+                }
+            }
+        }
+
+        gridJson.put("objects", gridObjectsArray);
+
+        // Write to file
+        try (FileWriter file = new FileWriter(filename)) {
+            file.write(gridJson.toString());
+            file.flush();
+            System.out.println("Successfully saved grid to " + filename);
+            return true;
+        } catch (IOException e) {
+            // Insert additional error logic here if needed
+            System.out.println("Error saving grid to file: " + e.getMessage());
+            return false;
+        }
+
+    }
+
+    public void placeObjectByImage(String imageFile, int rowNum, int colNum) {
+        GridObject newObject = imgToObj.get(imageFile);
+        addObject(newObject.clone(), rowNum, colNum);
+    }
+
 
     public int getNumRows() {
         return this.numRows;
@@ -48,6 +296,10 @@ public class Grid {
         return frontGrid;
     }
 
+    public GridObject getGridObject() {
+        return null;
+    }
+
     /**
      * Resizes the grid from its current size to newNumRows X newNumCols. If
      * the grid shrinks, and there are grid objects in the part of the grid
@@ -60,11 +312,13 @@ public class Grid {
         GridObject[][] newGrid = new GridObject[newNumRows][newNumCols];
         int leastRows = Math.min(numRows, newNumRows);
         int leastCols = Math.min(numColumns, newNumCols);
+        Rectangle[][] newFront = new Rectangle[newNumRows][newNumCols];
         // iterate
         for (int i = 0; i < leastRows; i++) {
             for (int k = 0; k < leastCols; k++) {
                 // copy objects from old grid to new one
                 newGrid[i][k] = grid[i][k];
+                newFront[i][k] = frontGrid[i][k];
             }
         }
 
@@ -72,6 +326,8 @@ public class Grid {
         this.numRows = newNumRows;
         this.numColumns = newNumCols;
         this.grid = newGrid;
+        this.frontGrid = newFront;
+
     }
 
     private void setIntersectionAt(int rowNum, int colNum, Road newRoad) {
@@ -102,7 +358,10 @@ public class Grid {
 
         grid[rowNum][colNum] = newIntersection;
 
-
+        File imageFile = new File("Images/BasicIntersection.png");
+        Image intersection = new Image(imageFile.toURI().toString());
+        ImagePattern intersectionPattern = new ImagePattern(intersection);
+        frontGrid[rowNum][colNum].setFill(intersectionPattern);
     }
 
     private void checkIntersectionNeeded(int rowNum, int colNum, Road newRoad) {
@@ -236,6 +495,19 @@ public class Grid {
         answer[1] = x / GRID_SIZE;
 
         return answer;
+    }
+    /**
+     * This function updates the frontend to represent the backend
+     */
+    public void synchronizeGrid(){
+        for (int i = 0; i < numRows; i++) {
+            for (int k = 0; k < numColumns; k++) {
+                if (grid[i][k] != null) {
+                    frontGrid[i][k].setFill(new ImagePattern(grid[i][k].getImageFile()));
+                }
+            }
+        }
+        UserInterface.refreshGrid(numRows);
     }
 
 }

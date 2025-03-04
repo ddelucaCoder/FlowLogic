@@ -1,4 +1,7 @@
 package com.FlowLogic;
+
+import javafx.scene.image.Image;
+
 /**
  * Class definition file for com.FlowLogic.Building objects
  * Purdue University
@@ -10,6 +13,8 @@ public class Building implements GridObject {
     int rowNum;
     int colNum;
     int xLength, yLength, dailyPopulation;
+    private Image imageFile;
+
 
     /**
      * Class Definition Function
@@ -67,6 +72,10 @@ public class Building implements GridObject {
     public void setDailyPopulation(int dailyPopulation) {
         this.dailyPopulation = dailyPopulation;
     }
+
+    public GridObject clone() {
+        return null;
+    }
     /*
      * toString Method for Debugging Purposes
      */
@@ -80,4 +89,8 @@ public class Building implements GridObject {
                 ", dailyPopulation=" + dailyPopulation +
                 '}';
     }
+    public Image getImageFile() {
+        return imageFile;
+    }
+
 }

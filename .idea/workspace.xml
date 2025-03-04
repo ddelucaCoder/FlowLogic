@@ -4,13 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Added new image files for stop ligts and updated switch logic to update the graphic image file">
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Reformatted UI and improved drag and drop Efficiency">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -35,6 +39,9 @@
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="2tJBgVREtcyT8S2UDQC44aQvxin" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -44,7 +51,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;isaac-dev&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dom__dev&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -52,6 +59,17 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RunManager">
+    <configuration name="UI" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="com.FlowLogic.UserInterface" />
+      <module name="FlowLogic" />
+      <option name="PROGRAM_PARAMETERS" value="-Dprism.order=j2d" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;lib/javafx-sdk-17.0.14/lib&quot; --add-modules=javafx.controls,javafx.fxml" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -63,8 +81,7 @@
       <workItem from="1740060409708" duration="4670000" />
       <workItem from="1740443332602" duration="4938000" />
       <workItem from="1740664465878" duration="1514000" />
-      <workItem from="1740752532896" duration="2092000" />
-      <workItem from="1740775725826" duration="6509000" />
+      <workItem from="1740752532896" duration="1056000" />
     </task>
     <task id="LOCAL-00001" summary="implemented onewayroad class">
       <option name="closed" value="true" />
@@ -138,45 +155,44 @@
       <option name="project" value="LOCAL" />
       <updated>1740496345843</updated>
     </task>
-    <task id="LOCAL-00010" summary="Updated files to have new image files">
-      <option name="closed" value="true" />
-      <created>1740756369414</created>
+    <task id="LOCAL-00010" summary="Reformatted UI and improved drag and drop Efficiency">
+      <created>1741039450242</created>
       <option name="number" value="00010" />
       <option name="presentableId" value="LOCAL-00010" />
       <option name="project" value="LOCAL" />
-      <updated>1740756369414</updated>
+      <updated>1741039450242</updated>
     </task>
-    <task id="LOCAL-00011" summary="Added functions to rotate and update one way and two way road graphics">
-      <option name="closed" value="true" />
-      <created>1740779102697</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1740779102697</updated>
-    </task>
-    <task id="LOCAL-00012" summary="Added new image files for stop ligts and updated switch logic to update the graphic image file">
-      <option name="closed" value="true" />
-      <created>1740854065947</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1740854065947</updated>
-    </task>
-    <task id="LOCAL-00013" summary="Added new image files for stop ligts and updated switch logic to update the graphic image file">
-      <option name="closed" value="true" />
-      <created>1740854118399</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1740854118399</updated>
-    </task>
-    <option name="localTasksCounter" value="14" />
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.py" />
+  </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="isaac-dev" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="RECENT_FILTERS">
       <map>
         <entry key="Branch">
@@ -202,27 +218,6 @@
         </entry>
       </map>
     </option>
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="isaac-dev" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="implemented onewayroad class" />
@@ -235,9 +230,7 @@
     <MESSAGE value="Implemented switchLights in the stop light class" />
     <MESSAGE value="Added Road and intersection images" />
     <MESSAGE value="version for pull" />
-    <MESSAGE value="Updated files to have new image files" />
-    <MESSAGE value="Added functions to rotate and update one way and two way road graphics" />
-    <MESSAGE value="Added new image files for stop ligts and updated switch logic to update the graphic image file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added new image files for stop ligts and updated switch logic to update the graphic image file" />
+    <MESSAGE value="Reformatted UI and improved drag and drop Efficiency" />
+    <option name="LAST_COMMIT_MESSAGE" value="Reformatted UI and improved drag and drop Efficiency" />
   </component>
 </project>

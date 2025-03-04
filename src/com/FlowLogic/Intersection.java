@@ -16,6 +16,18 @@ public class Intersection implements GridObject {
         this.imageFile = new Image("file:Images/BasicIntersection.png");
     }
 
+    public Intersection(Intersection i) {
+        this.rowNum = i.getRowNum();
+        this.colNum = i.getColNum();
+        this.roadList = i.getRoadList();
+        this.imageFile = new Image("file:Images/BasicIntersection.png");
+    }
+
+
+    public GridObject clone() {
+        return new Intersection(this);
+    }
+
     @Override
     public int getColNum() {
         return colNum;
