@@ -1,4 +1,6 @@
 package com.FlowLogic;
+import javafx.scene.image.Image;
+
 import java.util.List;
 
 /**
@@ -13,6 +15,8 @@ public class Roundabout implements GridObject {
     int rowNum;
     int colNum;
     List<Boolean> availableSpots;
+
+    private Image imageFile;
 
     /**
      * Class Definition Function
@@ -104,4 +108,8 @@ public class Roundabout implements GridObject {
                 ", availableSpots=" + availableSpots +
                 '}';
     }
+    public Image getImageFile() {
+        return imageFile;
+    }
+
 }

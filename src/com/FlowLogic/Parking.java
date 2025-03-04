@@ -1,5 +1,7 @@
 package com.FlowLogic;
 
+import javafx.scene.image.Image;
+
 /**
  * Class Definition File for com.FlowLogic.Parking objects
  * Purdue University
@@ -11,6 +13,8 @@ public class Parking implements GridObject {
     int rowNum;
     int colNum;
     int xLength, yLength, parkingCapacity, numCars;
+    private Image imageFile;
+
 
     /**
      * Class Definition Function
@@ -96,4 +100,8 @@ public class Parking implements GridObject {
                 ", numCars=" + numCars +
                 '}';
     }
+    public Image getImageFile() {
+        return imageFile;
+    }
+
 }

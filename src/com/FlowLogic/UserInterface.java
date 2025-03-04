@@ -44,15 +44,14 @@ public class UserInterface extends Application {
     private boolean pan = false;
 
 
-    Group gridGroup;
-    AnchorPane root;
-
-    Rectangle clip;
-    Pane gridContainer;
-    double gridViewWidth;
-    double gridViewHeight;
-    double maxZoom;
-    Scale scale;
+    public static Group gridGroup;
+    public static AnchorPane root;
+    public static Rectangle clip;
+    public static Pane gridContainer;
+    public static double gridViewWidth;
+    public static double gridViewHeight;
+    public static double maxZoom;
+    public static Scale scale;
 
     private static Stage stage;
 
@@ -156,7 +155,7 @@ public class UserInterface extends Application {
                 int col = (int) (x / CELL_SIZE);
                 Rectangle cell = grid.getFrontGrid()[row][col];
                 cell.setFill(Color.LIGHTGRAY);
-                cell.setStroke(Color.BLACK);
+                cell.setStroke(Color.BLUE);
 
             }
             pan = false;
@@ -182,7 +181,6 @@ public class UserInterface extends Application {
             Rectangle cell = grid.getFrontGrid()[row][col];
             if (!(cell.getFill() instanceof ImagePattern)) {
                 cell.setFill(new ImagePattern(db.getImage()));
-                System.out.println(db.getString());
                 grid.placeObjectByImage(db.getString(), row, col);
             }
 
@@ -225,7 +223,7 @@ public class UserInterface extends Application {
         primaryStage.show();
     }
 
-    private void createGridCells(Group gridGroup) {
+    private static void createGridCells(Group gridGroup) {
         // Create a large grid of cells that always exists
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
@@ -383,8 +381,7 @@ public class UserInterface extends Application {
         });
     }
 
-    private void resizeGrid(int newSize) {
-        grid.resize(newSize, newSize);
+    public static void refreshGrid(int newSize) {
         GRID_SIZE = newSize;
         gridGroup.getChildren().clear();
         createGridCells(gridGroup);
@@ -394,8 +391,6 @@ public class UserInterface extends Application {
         scale.setY(maxZoom);
         scale.setX(maxZoom);
     }
-
-
 
     public void gridResizeBox(VBox mainLayout, Grid grid) {
         Label instructionLabel = new Label("Enter a size for the grid:");
@@ -420,7 +415,9 @@ public class UserInterface extends Application {
             } else {
                 size = Integer.parseInt(input);
             }
-            resizeGrid(size);
+            grid.resize(size, size);
+            refreshGrid(size);
+
         });
 
         // Add the button to the AnchorPane
