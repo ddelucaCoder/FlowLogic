@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -64,15 +66,8 @@ public class Grid {
     public boolean loadGridState(String filename) {
         try {
             // Read in the JSON file content as a large string
-            StringBuilder jsonFileContent = new StringBuilder();
-            try (Scanner scanner = new Scanner(new FileReader(filename))) {
-                while (scanner.hasNextLine()) {
-                    jsonFileContent.append(scanner.nextLine());
-                }
-            }
-
-            // Parse JSON data
-            JSONObject gridJson = new JSONObject(jsonFileContent);
+            String content = new String(Files.readAllBytes(Paths.get(filename)));
+            JSONObject gridJson = new JSONObject(content);
 
             // Load grid dimensions
             this.numRows = gridJson.getInt("numRows");
