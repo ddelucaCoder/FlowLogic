@@ -16,6 +16,8 @@ public class Roundabout implements GridObject {
     int colNum;
     List<Boolean> availableSpots;
 
+
+
     private Image imageFile;
 
     /**
@@ -25,7 +27,9 @@ public class Roundabout implements GridObject {
      */
     public Roundabout(List<Boolean> availableSpots) {
         this.availableSpots = availableSpots;
+        this.imageFile = new Image("file:Images/roundabout");
     }
+
 
     /**
      * Gets the total number of available spots in the roundabout
@@ -110,6 +114,9 @@ public class Roundabout implements GridObject {
     }
     public Image getImageFile() {
         return imageFile;
+    }
+    public void setImageFile(Image imageFile) {
+        this.imageFile = imageFile;
     }
 
 }
