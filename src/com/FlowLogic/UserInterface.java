@@ -43,6 +43,17 @@ public class UserInterface extends Application {
     // Tracks if the User is Panning the screen disables clicking events
     private boolean pan = false;
 
+
+    Group gridGroup;
+    AnchorPane root;
+
+    Rectangle clip;
+    Pane gridContainer;
+    double gridViewWidth;
+    double gridViewHeight;
+    double maxZoom;
+    Scale scale;
+
     @Override
     public void start(Stage primaryStage) throws Error{
         //Logic will go here to move between windows
@@ -54,15 +65,15 @@ public class UserInterface extends Application {
         primaryStage.setResizable(false);
 
         // Create an AnchorPane to contain everything
-        AnchorPane root = new AnchorPane();
+        root = new AnchorPane();
         root.setStyle("-fx-background-color: lightgray;");
 
-        Pane gridContainer = new Pane();
+        gridContainer = new Pane();
         gridContainer.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
 
         // Define grid container size such that the grid is a Square
-        double gridViewWidth = SCREEN_WIDTH * ((SCREEN_HEIGHT * 1.0) / SCREEN_WIDTH);
-        double gridViewHeight = SCREEN_HEIGHT * 1.00;
+        gridViewWidth = SCREEN_WIDTH * ((SCREEN_HEIGHT * 1.0) / SCREEN_WIDTH);
+        gridViewHeight = SCREEN_HEIGHT * 1.00;
 
         Group gridGroup = new Group();
         gridContainer.getChildren().add(gridGroup);
@@ -70,7 +81,7 @@ public class UserInterface extends Application {
 
         gridContainer.setPrefSize(gridViewWidth, gridViewHeight);
 
-        Rectangle clip = new Rectangle(gridViewWidth, gridViewHeight);
+        clip = new Rectangle(gridViewWidth, gridViewHeight);
         gridContainer.setClip(clip);
 
         AnchorPane.setLeftAnchor(gridContainer, (SCREEN_WIDTH - gridViewWidth) / 2);
@@ -78,10 +89,10 @@ public class UserInterface extends Application {
 
 
         // Create the zoom and pan functionality
-        final Scale scale = new Scale();
+        scale = new Scale();
         gridGroup.getTransforms().add(scale);
 
-        double maxZoom = SCREEN_HEIGHT/(32 * grid.getNumColumns() * 1.0);
+        maxZoom = SCREEN_HEIGHT / (32 * grid.getNumColumns() * 1.0);
         scale.setY(maxZoom);
         scale.setX(maxZoom);
 
@@ -126,6 +137,7 @@ public class UserInterface extends Application {
             mousePos[1] = event.getSceneY();
             pan = true;
         });
+
 
         // Create the grid cells
         createGridCells(gridGroup);
