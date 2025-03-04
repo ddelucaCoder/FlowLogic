@@ -97,7 +97,7 @@ public class Grid {
                 // Reconstruct the object based on its type in the file
                 // Determine the type, then fill out the necessary object fields
                 switch (type) {
-                    case "Road":
+                    case "OneWayRoad":
                         Orientation orientation = Orientation.valueOf(properties.getString("orientation"));
                         int speedLimit = properties.getInt("speedLimit");
                         int length = properties.getInt("length");
@@ -140,7 +140,6 @@ public class Grid {
                 }
                 // Add everything to the grid
                 if (gridObject != null) {
-                    System.out.println("HERE?");
                     grid[row][col] = gridObject;
                 }
             }
@@ -172,7 +171,8 @@ public class Grid {
                     }
                 }
             }
-            synchronizeGird();
+            UserInterface.refreshGrid(numRows);
+            synchronizeGrid();
             System.out.println("Successfully loaded grid from " + filename);
             return true;
         }
@@ -499,16 +499,11 @@ public class Grid {
     /**
      * This function updates the frontend to represent the backend
      */
-    public void synchronizeGird(){
-        System.out.println((Arrays.deepToString(grid)));
-        grid[0][0] = new OneWayRoad(Orientation.VERTICAL, 40, true,0,  0, 0, Direction.UP, 1, null);
-        OneWayRoad road = (OneWayRoad) grid[0][0];
-        road.updateGraphic();
+    public void synchronizeGrid(){
         for (int i = 0; i < numRows; i++) {
             for (int k = 0; k < numColumns; k++) {
                 if (grid[i][k] != null) {
-                    System.out.println(i +" i" + " " + k + " k");
-                    //frontGrid[i][k].setFill(new ImagePattern(grid[i][k].getImageFile()));
+                    frontGrid[i][k].setFill(new ImagePattern(grid[i][k].getImageFile()));
                 }
             }
         }
