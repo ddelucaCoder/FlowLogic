@@ -67,6 +67,10 @@ public class Building implements GridObject {
     public void setDailyPopulation(int dailyPopulation) {
         this.dailyPopulation = dailyPopulation;
     }
+
+    public GridObject clone() {
+        return null;
+    }
     /*
      * toString Method for Debugging Purposes
      */

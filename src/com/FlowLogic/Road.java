@@ -35,6 +35,9 @@ public class Road implements GridObject {
     public int getRowNum() {
         return rowNum;
     }
+    public GridObject clone() {
+        return null;
+    }
 
     @Override
     public int getColNum() {

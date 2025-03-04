@@ -1,8 +1,10 @@
 package com.FlowLogic;
 
+import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,13 +36,22 @@ public class Grid {
     public static int GRID_SIZE;
 
     //Allows for quick conversion from Image file to backend object
-    public static HashMap<String, GridObject> imgToObj;
+    public static HashMap<String, GridObject> imgToObj = new HashMap<>();
 
     public Grid(int numRows, int numColumns) {
         this.numRows = numRows;
         this.numColumns = numColumns;
         grid = new GridObject[numRows][numColumns];
         frontGrid = new Rectangle[numRows][numColumns];
+        populateMap();
+    }
+
+    private void populateMap() {
+        imgToObj.put("RoadImageDown.png", new OneWayRoad(Orientation.VERTICAL, Direction.DOWN));
+        imgToObj.put("RoadImage.png", new OneWayRoad(Orientation.VERTICAL, Direction.UP));
+        imgToObj.put("RoadImageLeft.png", new OneWayRoad(Orientation.HORIZONTAL, Direction.LEFT));
+        imgToObj.put("RoadImageRight.png", new OneWayRoad(Orientation.HORIZONTAL, Direction.RIGHT));
+        imgToObj.put("BasicIntersection.png", new Intersection(0, 0, new Road[4]));
     }
 
     /**
@@ -265,9 +276,11 @@ public class Grid {
 
     }
 
-    private Rectangle getImgFromObject(GridObject obj) {
-        return null;
+    public void placeObjectByImage(String imageFile, int rowNum, int colNum) {
+        GridObject newObject = imgToObj.get(imageFile);
+        addObject(newObject.clone(), rowNum, colNum);
     }
+
 
     public int getNumRows() {
         return this.numRows;
@@ -283,6 +296,10 @@ public class Grid {
 
     public Rectangle[][] getFrontGrid() {
         return frontGrid;
+    }
+
+    public GridObject getGridObject() {
+        return null;
     }
 
     /**
@@ -343,7 +360,10 @@ public class Grid {
 
         grid[rowNum][colNum] = newIntersection;
 
-
+        File imageFile = new File("Images/BasicIntersection.png");
+        Image intersection = new Image(imageFile.toURI().toString());
+        ImagePattern intersectionPattern = new ImagePattern(intersection);
+        frontGrid[rowNum][colNum].setFill(intersectionPattern);
     }
 
     private void checkIntersectionNeeded(int rowNum, int colNum, Road newRoad) {

@@ -37,6 +37,10 @@ public class StopSign extends Intersection {
         return queue;
     }
 
+    public GridObject clone() {
+        return null;
+    }
+
     public void setQueue(Queue<Vehicle> queue) {
         this.queue = queue;
     }

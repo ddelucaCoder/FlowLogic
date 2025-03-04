@@ -182,7 +182,10 @@ public class UserInterface extends Application {
             Rectangle cell = grid.getFrontGrid()[row][col];
             if (!(cell.getFill() instanceof ImagePattern)) {
                 cell.setFill(new ImagePattern(db.getImage()));
+                System.out.println(db.getString());
+                grid.placeObjectByImage(db.getString(), row, col);
             }
+
         });
 
         GridPane left = new GridPane();
@@ -273,6 +276,7 @@ public class UserInterface extends Application {
             for (File file : dir.listFiles()) {
                 Image img = new Image(file.toURI().toString());
                 ImageView imageView = new ImageView(img);
+                imageView.setUserData(file.getName());
                 imageView.setFitWidth(64);
                 imageView.setFitHeight(64);
                 int row = count / numColumns;
@@ -285,6 +289,7 @@ public class UserInterface extends Application {
                     Dragboard db = imageView.startDragAndDrop(TransferMode.COPY);
                     //Stores the data
                     ClipboardContent content = new ClipboardContent();
+                    content.putString(file.getName());
                     content.putImage(img);
                     db.setContent(content);
                 });
