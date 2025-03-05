@@ -1,10 +1,9 @@
 package com.FlowLogic;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -36,39 +35,78 @@ public class UserInterface extends Application {
     private static int GRID_SIZE = 20;         // Number of rows and columns in the grid
 
     // Variables to track zoom and pan offsets
-    private double offsetX = 0;
-    private double offsetY = 0;
-    public static Grid grid;
+    private static double offsetX = 0;
+    private static double offsetY = 0;
+    public static Grid grid = new Grid(0,0);
 
     // Tracks if the User is Panning the screen disables clicking events
-    private boolean pan = false;
+    private static boolean pan = false;
 
 
-    public static Group gridGroup;
-    public static AnchorPane root;
+    public static Group gridGroup = new Group();
     public static Rectangle clip;
-    public static Pane gridContainer;
+    public static Pane gridContainer = new Pane();
     public static double gridViewWidth;
     public static double gridViewHeight;
     public static double maxZoom;
-    public static Scale scale;
+    public static Scale scale = new Scale();
 
     private static Stage stage;
 
     @Override
     public void start(Stage primaryStage) throws Error{
-        //Logic will go here to move between windows
         stage = primaryStage;
-        setupBuildMenu(primaryStage);
+        stage.setTitle("FlowLogic");
+
+        Label title = new Label("FlowLogic");
+        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+        Button newButton = new Button("New");
+        Button loadButton = new Button("Load");
+        newButton.setPrefSize(100, 20);
+        loadButton.setPrefSize(100,20);
+        newButton.setOnAction(event -> {
+            Stage dialog = new Stage();
+            dialog.setTitle("FlowLogic");
+            Label prompt = new Label("Enter a size for the Grid");
+            TextField sizeField = new TextField();
+            // Define a TextFormatter that only allows digits
+            TextFormatter<String> numberFormatter = new TextFormatter<>(change -> {
+                if (change.getText().matches("[0-9]*")) {
+                    return change;  // Accept change
+                }
+                return null;  // Reject change
+            });
+            sizeField.setTextFormatter(numberFormatter);
+            Button confirmButton = new Button("OK");
+            confirmButton.setOnAction(e -> {
+                int value = Integer.parseInt(sizeField.getText());
+                System.out.println("User entered: " + value);
+                grid = new Grid(value,value);
+                GRID_SIZE = value;
+                dialog.close();
+                setupBuildMenu();
+            });
+            VBox layout = new VBox(10,prompt , sizeField, confirmButton);
+            layout.setAlignment(Pos.CENTER);
+            Scene s = new Scene(layout, 200, 150);
+            dialog.setScene(s);
+            dialog.showAndWait();
+        });
+        loadButton.setOnAction(e -> setupLoadMenu());
+        VBox root = new VBox(20, title, newButton, loadButton);
+        root.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
+        stage.setScene(scene);
+        stage.show();
     }
 
-    private void setupBuildMenu(Stage primaryStage){
+    private static void setupBuildMenu(){
         //Stops user from resizing the window
-        primaryStage.setResizable(false);
+        stage.setResizable(false);
 
         // Create an AnchorPane to contain everything
-        root = new AnchorPane();
-        root.setStyle("-fx-background-color: lightgray;");
+        AnchorPane root = new AnchorPane();
 
         gridContainer = new Pane();
         gridContainer.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
@@ -155,8 +193,6 @@ public class UserInterface extends Application {
                 int col = (int) (x / CELL_SIZE);
                 Rectangle cell = grid.getFrontGrid()[row][col];
                 cell.setFill(Color.LIGHTGRAY);
-                cell.setStroke(Color.BLUE);
-
             }
             pan = false;
         });
@@ -209,18 +245,27 @@ public class UserInterface extends Application {
         AnchorPane.setBottomAnchor(right, 0.0);  // Set bottom anchor
         root.getChildren().add(right);
 
-
+        // add the resize button to the top right
+        gridResizeBox(right, grid);
         // Add the save button to the bottom right of the grid
         saveGridButton(right, grid);
         // Add the load button to the grid
         loadGridButton(right, grid);
-        // add the resize button to the top right
-        showResizeBox(right, grid);
+
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("FlowLogic");
-        primaryStage.show();
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private static void setupLoadMenu() {
+        VBox root = new VBox();
+        root.setAlignment(Pos.CENTER);
+        loadGridButton(root, grid);
+        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
+        stage.setScene(scene);
+        stage.show();
+
     }
 
     private static void createGridCells(Group gridGroup) {
@@ -245,7 +290,7 @@ public class UserInterface extends Application {
         }
     }
 
-    private void ensureXY(Pane gridContainer, Scale scale){
+    private static void ensureXY(Pane gridContainer, Scale scale){
         double scaleFactor = scale.getX(); // Get current scale
         double gridWidth = GRID_SIZE * CELL_SIZE * scaleFactor; // Scaled grid width
         double gridHeight = GRID_SIZE * CELL_SIZE * scaleFactor; // Scaled grid height
@@ -269,7 +314,7 @@ public class UserInterface extends Application {
             offsetY = minY; // Prevent panning up
         }
     }
-    private void addDraggableImages(GridPane left, int numColumns) {
+    private static void addDraggableImages(GridPane left, int numColumns) {
         File dir = new File("Images");
         int count = 0;
         if (dir.exists() && dir.isDirectory()) {
@@ -306,7 +351,7 @@ public class UserInterface extends Application {
      * @param mainLayout The main VBox layout
      * @param grid The Grid object containing the grid data to save
      */
-    public void saveGridButton(VBox mainLayout, Grid grid) {
+    public static void saveGridButton(VBox mainLayout, Grid grid) {
         // Create the button
         Button saveButton = new Button("Save Current Layout");
         saveButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
@@ -347,7 +392,7 @@ public class UserInterface extends Application {
      * @param mainLayout The main AnchorPane layout
      * @param grid The Grid object containing the grid data to save
      */
-    public void loadGridButton(VBox mainLayout, Grid grid) {
+    public static void loadGridButton(VBox mainLayout, Grid grid) {
         // Create the button
         Button loadButton = new Button("Load Existing Layout");
         loadButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
@@ -373,6 +418,7 @@ public class UserInterface extends Application {
                 if (loadSuccessful) {
                     // Insert any additional success logic here (popup?)
                     System.out.println("Grid loaded successfully from " + file.getName());
+                    setupBuildMenu();
                 } else {
                     // Insert any additional error logic here (popup?)
                     System.out.println("Failed to load grid from " + file.getName());
@@ -380,7 +426,6 @@ public class UserInterface extends Application {
             }
         });
     }
-
 
     public static void refreshGrid(int newSize) {
         GRID_SIZE = newSize;
@@ -393,24 +438,7 @@ public class UserInterface extends Application {
         scale.setX(maxZoom);
     }
 
-    private void showResizeBox(VBox mainLayout, Grid grid) {
-        Button submitButton = new Button("Show Resize Options");
-        submitButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
-        mainLayout.getChildren().add(submitButton);
-        submitButton.setOnAction(e -> {
-            mainLayout.getChildren().remove(submitButton);
-            gridResizeBox(mainLayout, grid);
-        });
-
-    }
-
-
-    /**
-     * The box used for input for changing the size of grid.
-     * @param mainLayout- the main layout
-     * @param grid- current grid
-     */
-    public void gridResizeBox(VBox mainLayout, Grid grid) {
+    public static void gridResizeBox(VBox mainLayout, Grid grid) {
         Label instructionLabel = new Label("Enter a size for the grid:");
         TextField sizeField = new TextField();
         // Define a TextFormatter that only allows digits
@@ -427,7 +455,7 @@ public class UserInterface extends Application {
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> {
             String input = sizeField.getText();
-            int size = 0;
+            int size;
             if (input.isEmpty()) {
                 return;
             } else {
@@ -438,27 +466,13 @@ public class UserInterface extends Application {
 
         });
 
-        Button hideButton = new Button("Hide Resize Options");
-
-
         // Add the button to the AnchorPane
         mainLayout.getChildren().add(instructionLabel);
         mainLayout.getChildren().add(sizeField);
         mainLayout.getChildren().add(submitButton);
-        mainLayout.getChildren().add(hideButton);
-
-
-        hideButton.setOnAction(e -> {
-            mainLayout.getChildren().remove(instructionLabel);
-            mainLayout.getChildren().remove(sizeField);
-            mainLayout.getChildren().remove(submitButton);
-            mainLayout.getChildren().remove(hideButton);
-            showResizeBox(mainLayout, grid);
-        });
     }
 
     public static void main(String[] args) {
-        grid = new Grid(GRID_SIZE,GRID_SIZE);
         launch(args);
     }
 }

@@ -91,7 +91,6 @@ public class Grid {
                 int col = cellJson.getInt("column");
                 String type = cellJson.getString("type");
                 JSONObject properties = cellJson.getJSONObject("properties");
-
                 GridObject gridObject = null;
 
                 // Reconstruct the object based on its type in the file
@@ -143,7 +142,6 @@ public class Grid {
                     grid[row][col] = gridObject;
                 }
             }
-
             // Second loop: Connect the roads to intersections
             for (int i = 0; i < gridObjectsArray.length(); i++) {
                 JSONObject objJson = gridObjectsArray.getJSONObject(i);
@@ -178,7 +176,8 @@ public class Grid {
         }
         catch (Exception e){
             // Insert additional error logic here if needed
-            System.out.println("Error saving grid to file: " + e.getMessage());
+            System.out.println("Error loading grid: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }

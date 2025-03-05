@@ -1,10 +1,17 @@
 package com.FlowLogic;
+import javafx.scene.image.Image;
+
 import java.util.Queue;
 public class StopSign extends Intersection {
     private Queue<Vehicle> queue;
 
+
+
+    private Image imageFile;
+
     public StopSign(int rowNum, int colNum, Road[] roads) {
         super(rowNum, colNum, roads);
+        this.imageFile = new Image("file:Images/4WayStopSign");
     }
 
 
@@ -38,9 +45,18 @@ public class StopSign extends Intersection {
     }
 
     public GridObject clone() {
+
         return null;
     }
+    @Override
+    public Image getImageFile() {
+        return imageFile;
+    }
 
+    @Override
+    public void setImageFile(Image imageFile) {
+        this.imageFile = imageFile;
+    }
     public void setQueue(Queue<Vehicle> queue) {
         this.queue = queue;
     }
