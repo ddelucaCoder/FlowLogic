@@ -1,6 +1,7 @@
 package com.FlowLogic;
 
 import javafx.scene.image.Image;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
@@ -282,6 +283,20 @@ public class Grid {
         GridObject newObject = imgToObj.get(imageFile);
         addObject(newObject.clone(), rowNum, colNum);
     }
+
+    public void select(int row, int col, VBox mainLayout) {
+        if (getAtSpot(row, col) instanceof Building) {
+            Building b = (Building) getAtSpot(row, col);
+            UserInterface.showBuildingOptions(mainLayout, this, b.getxLength(), b.getyLength(),
+                b.getDailyPopulation(), row, col);
+        }
+    }
+
+    public void remove(int row, int col) {
+        grid[row][col] = null;
+        frontGrid[row][col] = null;
+    }
+
 
 
     public int getNumRows() {
