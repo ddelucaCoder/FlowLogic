@@ -182,20 +182,7 @@ public class UserInterface extends Application {
         // Create the grid cells
         createGridCells(gridGroup);
 
-        gridContainer.setOnMouseClicked(event -> {
-            if (!pan){
-                // Get the mouse click coordinates
-                double x = (event.getX() - offsetX) / scale.getX();
-                double y = (event.getY() - offsetY) / scale.getY();
 
-                // Calculate the grid position (row, column)
-                int row = (int) (y / CELL_SIZE);
-                int col = (int) (x / CELL_SIZE);
-                Rectangle cell = grid.getFrontGrid()[row][col];
-                cell.setFill(Color.LIGHTGRAY);
-            }
-            pan = false;
-        });
 
         gridContainer.setOnDragOver(event -> {
             //Cell accepts transfer if the source is an image and is coming from the Dragboard
@@ -252,6 +239,23 @@ public class UserInterface extends Application {
         loadGridButton(right, grid);
         // add the resize button to the top right
         hideResizeBox(right, grid);
+
+
+        gridContainer.setOnMouseClicked(event -> {
+            if (!pan){
+                // Get the mouse click coordinates
+                double x = (event.getX() - offsetX) / scale.getX();
+                double y = (event.getY() - offsetY) / scale.getY();
+
+                // Calculate the grid position (row, column)
+                int row = (int) (y / CELL_SIZE);
+                int col = (int) (x / CELL_SIZE);
+
+                // select the square
+                grid.select(row, col, right);
+            }
+            pan = false;
+        });
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -491,6 +495,93 @@ public class UserInterface extends Application {
             mainLayout.getChildren().remove(hideButton);
             hideResizeBox(mainLayout, grid);
         });
+    }
+
+    public static void showBuildingOptions(VBox mainLayout, Grid grid, int xLen, int yLen, int dailyPop, int row,
+                                           int col) {
+        Label titleLabel = new Label("Building Options");
+        Label xLabel = new Label("xLength:");
+        TextField xLengthField = new TextField();
+        Label yLabel = new Label("yLength:");
+        TextField yLengthField = new TextField();
+        Label populationLabel = new Label("dailyPopulation:");
+        TextField populationField = new TextField();
+        Button submitButton = new Button("Submit Changes");
+        Button removeButton = new Button("Remove Building");
+        Button closeButton = new Button("Close Building Options");
+
+
+        // formatters
+        TextFormatter<String> numberFormatterX = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        TextFormatter<String> numberFormatterY = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        TextFormatter<String> numberFormatterPop = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        // add formatters to fields
+        xLengthField.setTextFormatter(numberFormatterX);
+        yLengthField.setTextFormatter(numberFormatterY);
+        populationField.setTextFormatter(numberFormatterPop);
+
+        xLengthField.setText(Integer.toString(xLen));
+        yLengthField.setText(Integer.toString(yLen));
+        populationField.setText(Integer.toString(dailyPop));
+
+        mainLayout.getChildren().add(titleLabel);
+        mainLayout.getChildren().add(xLabel);
+        mainLayout.getChildren().add(xLengthField);
+        mainLayout.getChildren().add(yLabel);
+        mainLayout.getChildren().add(yLengthField);
+        mainLayout.getChildren().add(populationLabel);
+        mainLayout.getChildren().add(populationField);
+        mainLayout.getChildren().add(submitButton);
+        mainLayout.getChildren().add(removeButton);
+        mainLayout.getChildren().add(closeButton);
+
+        removeButton.setOnAction(e -> {
+            grid.remove(row, col);
+            refreshGrid(GRID_SIZE);
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(xLabel);
+            mainLayout.getChildren().remove(xLengthField);
+            mainLayout.getChildren().remove(yLabel);
+            mainLayout.getChildren().remove(yLengthField);
+            mainLayout.getChildren().remove(populationLabel);
+            mainLayout.getChildren().remove(populationField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        });
+
+        closeButton.setOnAction(e -> {
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(xLabel);
+            mainLayout.getChildren().remove(xLengthField);
+            mainLayout.getChildren().remove(yLabel);
+            mainLayout.getChildren().remove(yLengthField);
+            mainLayout.getChildren().remove(populationLabel);
+            mainLayout.getChildren().remove(populationField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        });
+
+
     }
 
     public static void main(String[] args) {
