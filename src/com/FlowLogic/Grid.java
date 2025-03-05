@@ -38,7 +38,7 @@ public class Grid {
     private GridObject[][] grid;
     private Rectangle[][] frontGrid;
 
-    public static int GRID_SIZE;
+    public static int GRID_SIZE = 32;
 
     //Allows for quick conversion from Image file to backend object
     public static HashMap<String, GridObject> imgToObj = new HashMap<>();
@@ -293,8 +293,86 @@ public class Grid {
     }
 
     public void remove(int row, int col) {
+        GridObject obj = getAtSpot(row, col);
+        if (obj == null) {
+            return;
+        }
         grid[row][col] = null;
         frontGrid[row][col] = null;
+        if (obj == getAtSpot(row - 1, col)) {
+            remove(row - 1, col);
+        }
+        if (obj == getAtSpot(row + 1, col)) {
+            remove(row + 1, col);
+        }
+        if (obj == getAtSpot(row, col - 1)) {
+            remove(row, col - 1);
+        }
+        if (obj == getAtSpot(row, col + 1)) {
+            remove(row, col + 1);
+        }
+    }
+
+    public void changeDailyPopulationBuilding(int row, int col, int newPop) {
+        GridObject obj = getAtSpot(row, col);
+        if (!(obj instanceof Building)) {
+            return;
+        }
+        ((Building) obj).setDailyPopulation(newPop);
+    }
+
+    public void changeBuildingSize(int row, int col, int newSizeX, int newSizeY) {
+        GridObject obj = getAtSpot(row, col);
+        if (!(obj instanceof Building) && !(obj instanceof Parking)) {
+            // if not building or parking lot return
+            return;
+        }
+        // move up to top left for reference
+        while (row > 0 && obj == getAtSpot(row - 1, col)) {
+            obj = getAtSpot(--row, col);
+        }
+        while (col > 0 && obj == getAtSpot(row, col - 1)) {
+            obj = getAtSpot(row, --col);
+        }
+
+        // make sure its in bounds
+
+        if (row + newSizeY >= numRows || col + newSizeX >= numRows) {
+            return;
+        }
+
+
+        //  validate area is available
+        for (int i = 1; i < newSizeX; i++) {
+            for (int k = 1; k < newSizeY; k++) {
+                if (getAtSpot(row + i, col + k) != null && !(getAtSpot(row + i, row + k) == obj)) {
+                    // not available
+                    return;
+                }
+            }
+        }
+
+        if (obj instanceof Building) {
+            ((Building) obj).setxLength(newSizeX);
+            ((Building) obj).setyLength(newSizeY);
+        }
+
+        // recursively delete the existing building and make a new one
+        Image imageFile = grid[row][col].getImageFile();
+
+
+        remove(row, col);
+        // build new one
+        for (int i = 0; i < newSizeX; i++) {
+            for (int k = 0; k < newSizeY; k++) {
+                Rectangle current = new Rectangle(GRID_SIZE, GRID_SIZE);
+                current.setFill(new ImagePattern(imageFile));
+                current.setY((row + k) * GRID_SIZE);
+                current.setX((col + i) * GRID_SIZE);
+                grid[row + k][col + i] = obj;
+                frontGrid[row + k][col + i] = current;
+            }
+        }
     }
 
 
@@ -474,6 +552,9 @@ public class Grid {
      * @return the GridObject at (rowNum, colNum)
      */
     public GridObject getAtSpot(int rowNum, int colNum) {
+        if (rowNum < 0 || rowNum >= numRows || colNum < 0 || colNum >= numColumns) {
+            return null;
+        }
         return grid[rowNum][colNum];
     }
 

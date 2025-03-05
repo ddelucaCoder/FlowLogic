@@ -15,6 +15,8 @@ public class Building implements GridObject {
     int xLength, yLength, dailyPopulation;
     private Image imageFile;
 
+    private String color;
+
 
     /**
      * Class Definition Function
@@ -26,18 +28,21 @@ public class Building implements GridObject {
         this.xLength = xLength;
         this.yLength = yLength;
         this.dailyPopulation = dailyPopulation;
+        imageFile = new Image("file:Images/RedBuilding.png");
     }
 
     public Building() {
         this.xLength = 1;
         this.yLength = 1;
         this.dailyPopulation = 0;
+        imageFile = new Image("file:Images/RedBuilding.png");
     }
 
     public Building(Building b) {
         this.xLength = b.getxLength();
         this.yLength = b.getyLength();
         this.dailyPopulation = b.getDailyPopulation();
+        imageFile = new Image("file:Images/RedBuilding.png");
     }
 
     /*
