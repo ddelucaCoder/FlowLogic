@@ -91,7 +91,7 @@ public class Grid {
                 int col = cellJson.getInt("column");
                 String type = cellJson.getString("type");
                 JSONObject properties = cellJson.getJSONObject("properties");
-
+                System.out.println(row + " row " + col + " col " + type + " type ");
                 GridObject gridObject = null;
 
                 // Reconstruct the object based on its type in the file

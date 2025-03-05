@@ -1,6 +1,7 @@
 package com.FlowLogic;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -45,7 +46,6 @@ public class UserInterface extends Application {
 
 
     public static Group gridGroup;
-    public static AnchorPane root;
     public static Rectangle clip;
     public static Pane gridContainer;
     public static double gridViewWidth;
@@ -59,16 +59,57 @@ public class UserInterface extends Application {
     public void start(Stage primaryStage) throws Error{
         //Logic will go here to move between windows
         stage = primaryStage;
-        setupBuildMenu(primaryStage);
+        stage.setTitle("FlowLogic");
+
+        Label title = new Label("FlowLogic");
+        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+        Button newButton = new Button("New");
+        Button loadButton = new Button("Load");
+        newButton.setPrefSize(100, 20);
+        loadButton.setPrefSize(100,20);
+        newButton.setOnAction(event -> {
+            Stage dialog = new Stage();
+            dialog.setTitle("FlowLogic");
+            Label prompt = new Label("Enter a size for the Grid");
+            TextField sizeField = new TextField();
+            // Define a TextFormatter that only allows digits
+            TextFormatter<String> numberFormatter = new TextFormatter<>(change -> {
+                if (change.getText().matches("[0-9]*")) {
+                    return change;  // Accept change
+                }
+                return null;  // Reject change
+            });
+            sizeField.setTextFormatter(numberFormatter);
+            Button confirmButton = new Button("OK");
+            confirmButton.setOnAction(e -> {
+                int value = Integer.parseInt(sizeField.getText());
+                System.out.println("User entered: " + value);
+                grid = new Grid(value,value);
+                GRID_SIZE = value;
+                dialog.close();
+                setupBuildMenu();
+            });
+            VBox layout = new VBox(10,prompt , sizeField, confirmButton);
+            layout.setAlignment(Pos.CENTER);
+            Scene s = new Scene(layout, 200, 150);
+            dialog.setScene(s);
+            dialog.showAndWait();
+        });
+        loadButton.setOnAction(e -> setupLoadMenu());
+        VBox root = new VBox(20, title, newButton, loadButton);
+        root.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
+        stage.setScene(scene);
+        stage.show();
     }
 
-    private void setupBuildMenu(Stage primaryStage){
+    private void setupBuildMenu(){
         //Stops user from resizing the window
-        primaryStage.setResizable(false);
+        stage.setResizable(false);
 
         // Create an AnchorPane to contain everything
-        root = new AnchorPane();
-        root.setStyle("-fx-background-color: lightgray;");
+        AnchorPane root = new AnchorPane();
 
         gridContainer = new Pane();
         gridContainer.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
@@ -155,8 +196,6 @@ public class UserInterface extends Application {
                 int col = (int) (x / CELL_SIZE);
                 Rectangle cell = grid.getFrontGrid()[row][col];
                 cell.setFill(Color.LIGHTGRAY);
-                cell.setStroke(Color.BLUE);
-
             }
             pan = false;
         });
@@ -218,9 +257,12 @@ public class UserInterface extends Application {
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("FlowLogic");
-        primaryStage.show();
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private static void setupLoadMenu() {
+        System.out.println("Cool");
     }
 
     private static void createGridCells(Group gridGroup) {
@@ -427,7 +469,6 @@ public class UserInterface extends Application {
     }
 
     public static void main(String[] args) {
-        grid = new Grid(GRID_SIZE,GRID_SIZE);
         launch(args);
     }
 }
