@@ -28,6 +28,23 @@ public class Parking implements GridObject {
         this.yLength = yLength;
         this.parkingCapacity = parkingCapacity;
         this.numCars = numCars;
+        imageFile = new Image("file:Images/ParkingLot.png");
+    }
+
+    public Parking() {
+        this.xLength = 1;
+        this.yLength = 1;
+        this.parkingCapacity = 0;
+        this.numCars = 0;
+        imageFile = new Image("file:Images/ParkingLot.png");
+    }
+
+    public Parking(Parking p) {
+        this.xLength = p.getxLength();
+        this.yLength = p.getyLength();
+        this.parkingCapacity = p.getParkingCapacity();
+        this.numCars = p.getNumCars();
+        imageFile = new Image("file:Images/ParkingLot.png");
     }
 
     /*
@@ -86,7 +103,7 @@ public class Parking implements GridObject {
      */
 
     public GridObject clone() {
-        return null;
+        return new Parking(this);
     }
 
     @Override

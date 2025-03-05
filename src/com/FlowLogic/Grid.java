@@ -1,6 +1,7 @@
 package com.FlowLogic;
 
 import javafx.scene.image.Image;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
@@ -37,7 +38,7 @@ public class Grid {
     private GridObject[][] grid;
     private Rectangle[][] frontGrid;
 
-    public static int GRID_SIZE;
+    public static int GRID_SIZE = 32;
 
     //Allows for quick conversion from Image file to backend object
     public static HashMap<String, GridObject> imgToObj = new HashMap<>();
@@ -56,6 +57,11 @@ public class Grid {
         imgToObj.put("RoadImageLeft.png", new OneWayRoad(Orientation.HORIZONTAL, Direction.LEFT));
         imgToObj.put("RoadImageRight.png", new OneWayRoad(Orientation.HORIZONTAL, Direction.RIGHT));
         imgToObj.put("BasicIntersection.png", new Intersection(0, 0, new Road[4]));
+        imgToObj.put("ParkingLot.png", new Parking());
+        imgToObj.put("YellowBuilding.png", new Building("yellow"));
+        imgToObj.put("GreenBuilding.png", new Building("green"));
+        imgToObj.put("RedBuilding.png", new Building("red"));
+
     }
 
     /**
@@ -91,7 +97,6 @@ public class Grid {
                 int col = cellJson.getInt("column");
                 String type = cellJson.getString("type");
                 JSONObject properties = cellJson.getJSONObject("properties");
-
                 GridObject gridObject = null;
 
                 // Reconstruct the object based on its type in the file
@@ -143,7 +148,6 @@ public class Grid {
                     grid[row][col] = gridObject;
                 }
             }
-
             // Second loop: Connect the roads to intersections
             for (int i = 0; i < gridObjectsArray.length(); i++) {
                 JSONObject objJson = gridObjectsArray.getJSONObject(i);
@@ -178,7 +182,8 @@ public class Grid {
         }
         catch (Exception e){
             // Insert additional error logic here if needed
-            System.out.println("Error saving grid to file: " + e.getMessage());
+            System.out.println("Error loading grid: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
@@ -278,6 +283,114 @@ public class Grid {
         GridObject newObject = imgToObj.get(imageFile);
         addObject(newObject.clone(), rowNum, colNum);
     }
+
+    public void select(int row, int col, VBox mainLayout) {
+        GridObject obj = getAtSpot(row, col);
+        if (obj instanceof Building) {
+            Building b = (Building) obj;
+            UserInterface.showBuildingOptions(mainLayout, this, b.getxLength(), b.getyLength(),
+                b.getDailyPopulation(), row, col);
+        } else if (obj instanceof Parking) {
+            Parking p = (Parking) obj;
+            UserInterface.showBuildingOptions(mainLayout, this, p.getxLength(), p.getyLength(),
+                p.getParkingCapacity(), row, col);
+        }
+    }
+
+    public void remove(int row, int col) {
+        GridObject obj = getAtSpot(row, col);
+        if (obj == null) {
+            return;
+        }
+        grid[row][col] = null;
+        frontGrid[row][col] = null;
+        if (obj == getAtSpot(row - 1, col)) {
+            remove(row - 1, col);
+        }
+        if (obj == getAtSpot(row + 1, col)) {
+            remove(row + 1, col);
+        }
+        if (obj == getAtSpot(row, col - 1)) {
+            remove(row, col - 1);
+        }
+        if (obj == getAtSpot(row, col + 1)) {
+            remove(row, col + 1);
+        }
+    }
+
+    public void changeDailyPopulationBuilding(int row, int col, int newPop) {
+        GridObject obj = getAtSpot(row, col);
+        if (!(obj instanceof Building)) {
+            return;
+        }
+        ((Building) obj).setDailyPopulation(newPop);
+    }
+
+    public void changeParkingCapacity(int row, int col, int newCap) {
+        GridObject obj = getAtSpot(row, col);
+        if (!(obj instanceof Parking)) {
+            return;
+        }
+        ((Parking) obj).setParkingCapacity(newCap);
+    }
+
+    public void changeBuildingSize(int row, int col, int newSizeX, int newSizeY) {
+        GridObject obj = getAtSpot(row, col);
+        if (!(obj instanceof Building) && !(obj instanceof Parking)) {
+            // if not building or parking lot return
+            return;
+        }
+        // move up to top left for reference
+        while (row > 0 && obj == getAtSpot(row - 1, col)) {
+            obj = getAtSpot(--row, col);
+        }
+        while (col > 0 && obj == getAtSpot(row, col - 1)) {
+            obj = getAtSpot(row, --col);
+        }
+
+        // make sure its in bounds
+
+        if (row + newSizeY >= numRows || col + newSizeX >= numRows) {
+            return;
+        }
+
+
+        //  validate area is available
+        for (int i = 1; i < newSizeX; i++) {
+            for (int k = 1; k < newSizeY; k++) {
+                if (getAtSpot(row + i, col + k) != null && !(getAtSpot(row + i, row + k) == obj)) {
+                    // not available
+                    return;
+                }
+            }
+        }
+
+        if (obj instanceof Building) {
+            ((Building) obj).setxLength(newSizeX);
+            ((Building) obj).setyLength(newSizeY);
+        } else {
+            ((Parking) obj).setxLength(newSizeX);
+            ((Parking) obj).setyLength(newSizeY);
+        }
+
+        // recursively delete the existing building and make a new one
+        Image imageFile = grid[row][col].getImageFile();
+
+
+        remove(row, col);
+        // build new one
+        for (int i = 0; i < newSizeX; i++) {
+            for (int k = 0; k < newSizeY; k++) {
+                Rectangle current = new Rectangle(GRID_SIZE, GRID_SIZE);
+                current.setFill(new ImagePattern(imageFile));
+                current.setY((row + k) * GRID_SIZE);
+                current.setX((col + i) * GRID_SIZE);
+                grid[row + k][col + i] = obj;
+                frontGrid[row + k][col + i] = current;
+            }
+        }
+    }
+
 
 
     public int getNumRows() {
@@ -455,6 +568,9 @@ public class Grid {
      * @return the GridObject at (rowNum, colNum)
      */
     public GridObject getAtSpot(int rowNum, int colNum) {
+        if (rowNum < 0 || rowNum >= numRows || colNum < 0 || colNum >= numColumns) {
+            return null;
+        }
         return grid[rowNum][colNum];
     }
 
