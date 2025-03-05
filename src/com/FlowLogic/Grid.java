@@ -56,6 +56,11 @@ public class Grid {
         imgToObj.put("RoadImageLeft.png", new OneWayRoad(Orientation.HORIZONTAL, Direction.LEFT));
         imgToObj.put("RoadImageRight.png", new OneWayRoad(Orientation.HORIZONTAL, Direction.RIGHT));
         imgToObj.put("BasicIntersection.png", new Intersection(0, 0, new Road[4]));
+        imgToObj.put("ParkingLot.png", new Parking());
+        imgToObj.put("YellowBuilding.png", new Building());
+        imgToObj.put("GreenBuilding.png", new Building());
+        imgToObj.put("RedBuilding.png", new Building());
+
     }
 
     /**

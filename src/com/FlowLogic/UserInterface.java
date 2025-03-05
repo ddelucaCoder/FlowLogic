@@ -245,12 +245,13 @@ public class UserInterface extends Application {
         AnchorPane.setBottomAnchor(right, 0.0);  // Set bottom anchor
         root.getChildren().add(right);
 
-        // add the resize button to the top right
-        gridResizeBox(right, grid);
+
         // Add the save button to the bottom right of the grid
         saveGridButton(right, grid);
         // Add the load button to the grid
         loadGridButton(right, grid);
+        // add the resize button to the top right
+        hideResizeBox(right, grid);
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -438,6 +439,16 @@ public class UserInterface extends Application {
         scale.setX(maxZoom);
     }
 
+    public static void hideResizeBox(VBox mainLayout, Grid grid) {
+        Button showButton = new Button("Edit Grid Size");
+        showButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+        mainLayout.getChildren().add(showButton);
+        showButton.setOnAction(e -> {
+            mainLayout.getChildren().remove(showButton);
+            gridResizeBox(mainLayout, grid);
+        });
+    }
+
     public static void gridResizeBox(VBox mainLayout, Grid grid) {
         Label instructionLabel = new Label("Enter a size for the grid:");
         TextField sizeField = new TextField();
@@ -470,6 +481,16 @@ public class UserInterface extends Application {
         mainLayout.getChildren().add(instructionLabel);
         mainLayout.getChildren().add(sizeField);
         mainLayout.getChildren().add(submitButton);
+
+        Button hideButton = new Button("Hide this option");
+        mainLayout.getChildren().add(hideButton);
+        hideButton.setOnAction(e -> {
+            mainLayout.getChildren().remove(instructionLabel);
+            mainLayout.getChildren().remove(sizeField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(hideButton);
+            hideResizeBox(mainLayout, grid);
+        });
     }
 
     public static void main(String[] args) {

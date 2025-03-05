@@ -28,6 +28,18 @@ public class Building implements GridObject {
         this.dailyPopulation = dailyPopulation;
     }
 
+    public Building() {
+        this.xLength = 1;
+        this.yLength = 1;
+        this.dailyPopulation = 0;
+    }
+
+    public Building(Building b) {
+        this.xLength = b.getxLength();
+        this.yLength = b.getyLength();
+        this.dailyPopulation = b.getDailyPopulation();
+    }
+
     /*
      * Getter and Setter Methods
      */
@@ -74,7 +86,7 @@ public class Building implements GridObject {
     }
 
     public GridObject clone() {
-        return null;
+        return new Building(this);
     }
     /*
      * toString Method for Debugging Purposes
