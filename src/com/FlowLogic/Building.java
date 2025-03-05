@@ -24,7 +24,16 @@ public class Building implements GridObject {
      * @param yLength Length of the building along the y-axis of the Grid
      * @param dailyPopulation The daily population of people the building will receive
      */
+    public Building(int rowNum, int colNum, int xLength, int yLength, int dailyPopulation) {
+        this.xLength = xLength;
+        this.yLength = yLength;
+        this.dailyPopulation = dailyPopulation;
+        imageFile = new Image("file:Images/RedBuilding.png");
+    }
+
     public Building(int xLength, int yLength, int dailyPopulation) {
+        this.rowNum = 0;
+        this.colNum = 0;
         this.xLength = xLength;
         this.yLength = yLength;
         this.dailyPopulation = dailyPopulation;
@@ -35,14 +44,41 @@ public class Building implements GridObject {
         this.xLength = 1;
         this.yLength = 1;
         this.dailyPopulation = 0;
-        imageFile = new Image("file:Images/RedBuilding.png");
+        this.color = "red";
+        updateImage();
+    }
+
+    public Building(String color) {
+        this.color = color;
+        this.xLength = 1;
+        this.yLength = 1;
+        this.dailyPopulation = 0;
+        updateImage();
     }
 
     public Building(Building b) {
+        this.rowNum = b.getRowNum();
+        this.colNum = b.getColNum();
         this.xLength = b.getxLength();
         this.yLength = b.getyLength();
         this.dailyPopulation = b.getDailyPopulation();
-        imageFile = new Image("file:Images/RedBuilding.png");
+        this.color = b.getColor();
+        updateImage();
+    }
+
+    private void updateImage() {
+        if (this.color.equals("red")) {
+            imageFile = new Image("file:Images/RedBuilding.png");
+        } else if (this.color.equals("yellow")) {
+            imageFile = new Image("file:Images/YellowBuilding.png");
+        } else if (this.color.equals("green")) {
+            imageFile = new Image("file:Images/GreenBuilding.png");
+        }
+    }
+
+
+    public String getColor() {
+        return this.color;
     }
 
     /*
