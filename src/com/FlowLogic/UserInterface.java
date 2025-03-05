@@ -553,6 +553,33 @@ public class UserInterface extends Application {
         mainLayout.getChildren().add(removeButton);
         mainLayout.getChildren().add(closeButton);
 
+        submitButton.setOnAction(e -> {
+            int xLenNew = Integer.parseInt(xLengthField.getText());
+            int yLenNew = Integer.parseInt(yLengthField.getText());
+            int popNew = Integer.parseInt(populationField.getText());
+            if (xLenNew > 0 && yLenNew > 0 && popNew >= 0) {
+                if (xLenNew != xLen || yLenNew != yLen) {
+                    grid.changeBuildingSize(row, col, xLenNew, yLenNew);
+                }
+                if (popNew != dailyPop) {
+                    grid.changeDailyPopulationBuilding(row, col, popNew);
+                }
+                mainLayout.getChildren().remove(titleLabel);
+                mainLayout.getChildren().remove(xLabel);
+                mainLayout.getChildren().remove(xLengthField);
+                mainLayout.getChildren().remove(yLabel);
+                mainLayout.getChildren().remove(yLengthField);
+                mainLayout.getChildren().remove(populationLabel);
+                mainLayout.getChildren().remove(populationField);
+                mainLayout.getChildren().remove(submitButton);
+                mainLayout.getChildren().remove(removeButton);
+                mainLayout.getChildren().remove(closeButton);
+
+                showBuildingOptions(mainLayout, grid, xLenNew, yLenNew, popNew, row, col);
+                refreshGrid(GRID_SIZE);
+            }
+        });
+
         removeButton.setOnAction(e -> {
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
