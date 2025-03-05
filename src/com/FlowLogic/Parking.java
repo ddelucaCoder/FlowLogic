@@ -30,6 +30,20 @@ public class Parking implements GridObject {
         this.numCars = numCars;
     }
 
+    public Parking() {
+        this.xLength = 1;
+        this.yLength = 1;
+        this.parkingCapacity = 0;
+        this.numCars = 0;
+    }
+
+    public Parking(Parking p) {
+        this.xLength = p.getxLength();
+        this.yLength = p.getyLength();
+        this.parkingCapacity = p.getParkingCapacity();
+        this.numCars = p.getNumCars();
+    }
+
     /*
      * Getter and Setter Methods
      */
@@ -86,7 +100,7 @@ public class Parking implements GridObject {
      */
 
     public GridObject clone() {
-        return null;
+        return new Parking(this);
     }
 
     @Override
