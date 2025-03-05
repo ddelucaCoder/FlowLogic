@@ -285,10 +285,15 @@ public class Grid {
     }
 
     public void select(int row, int col, VBox mainLayout) {
-        if (getAtSpot(row, col) instanceof Building) {
-            Building b = (Building) getAtSpot(row, col);
+        GridObject obj = getAtSpot(row, col);
+        if (obj instanceof Building) {
+            Building b = (Building) obj;
             UserInterface.showBuildingOptions(mainLayout, this, b.getxLength(), b.getyLength(),
                 b.getDailyPopulation(), row, col);
+        } else if (obj instanceof Parking) {
+            Parking p = (Parking) obj;
+            UserInterface.showBuildingOptions(mainLayout, this, p.getxLength(), p.getyLength(),
+                p.getParkingCapacity(), row, col);
         }
     }
 
@@ -319,6 +324,14 @@ public class Grid {
             return;
         }
         ((Building) obj).setDailyPopulation(newPop);
+    }
+
+    public void changeParkingCapacity(int row, int col, int newCap) {
+        GridObject obj = getAtSpot(row, col);
+        if (!(obj instanceof Parking)) {
+            return;
+        }
+        ((Parking) obj).setParkingCapacity(newCap);
     }
 
     public void changeBuildingSize(int row, int col, int newSizeX, int newSizeY) {
@@ -355,6 +368,9 @@ public class Grid {
         if (obj instanceof Building) {
             ((Building) obj).setxLength(newSizeX);
             ((Building) obj).setyLength(newSizeY);
+        } else {
+            ((Parking) obj).setxLength(newSizeX);
+            ((Parking) obj).setyLength(newSizeY);
         }
 
         // recursively delete the existing building and make a new one

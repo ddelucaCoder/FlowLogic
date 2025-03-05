@@ -611,6 +611,120 @@ public class UserInterface extends Application {
 
     }
 
+    public static void showParkingOptions(VBox mainLayout, Grid grid, int xLen, int yLen, int dailyPop, int row,
+                                           int col) {
+        Label titleLabel = new Label("Parking Options");
+        Label xLabel = new Label("xLength:");
+        TextField xLengthField = new TextField();
+        Label yLabel = new Label("yLength:");
+        TextField yLengthField = new TextField();
+        Label parkingLabel = new Label("parkingCapacity:");
+        TextField parkingField = new TextField();
+        Button submitButton = new Button("Submit Changes");
+        Button removeButton = new Button("Remove Building");
+        Button closeButton = new Button("Close Building Options");
+
+
+        // formatters
+        TextFormatter<String> numberFormatterX = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        TextFormatter<String> numberFormatterY = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        TextFormatter<String> numberFormatterPop = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        // add formatters to fields
+        xLengthField.setTextFormatter(numberFormatterX);
+        yLengthField.setTextFormatter(numberFormatterY);
+        parkingField.setTextFormatter(numberFormatterPop);
+
+        xLengthField.setText(Integer.toString(xLen));
+        yLengthField.setText(Integer.toString(yLen));
+        parkingField.setText(Integer.toString(dailyPop));
+
+        mainLayout.getChildren().add(titleLabel);
+        mainLayout.getChildren().add(xLabel);
+        mainLayout.getChildren().add(xLengthField);
+        mainLayout.getChildren().add(yLabel);
+        mainLayout.getChildren().add(yLengthField);
+        mainLayout.getChildren().add(parkingLabel);
+        mainLayout.getChildren().add(parkingField);
+        mainLayout.getChildren().add(submitButton);
+        mainLayout.getChildren().add(removeButton);
+        mainLayout.getChildren().add(closeButton);
+
+        submitButton.setOnAction(e -> {
+            int xLenNew = Integer.parseInt(xLengthField.getText());
+            int yLenNew = Integer.parseInt(yLengthField.getText());
+            int popNew = Integer.parseInt(parkingField.getText());
+            if (xLenNew > 0 && yLenNew > 0 && popNew >= 0) {
+                if (xLenNew != xLen || yLenNew != yLen) {
+                    grid.changeBuildingSize(row, col, xLenNew, yLenNew);
+                }
+                if (popNew != dailyPop) {
+                    grid.changeParkingCapacity(row, col, popNew);
+                }
+                mainLayout.getChildren().remove(titleLabel);
+                mainLayout.getChildren().remove(xLabel);
+                mainLayout.getChildren().remove(xLengthField);
+                mainLayout.getChildren().remove(yLabel);
+                mainLayout.getChildren().remove(yLengthField);
+                mainLayout.getChildren().remove(parkingLabel);
+                mainLayout.getChildren().remove(parkingField);
+                mainLayout.getChildren().remove(submitButton);
+                mainLayout.getChildren().remove(removeButton);
+                mainLayout.getChildren().remove(closeButton);
+
+                showParkingOptions(mainLayout, grid, xLenNew, yLenNew, popNew, row, col);
+                refreshGrid(GRID_SIZE);
+            }
+        });
+
+        removeButton.setOnAction(e -> {
+            grid.remove(row, col);
+            refreshGrid(GRID_SIZE);
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(xLabel);
+            mainLayout.getChildren().remove(xLengthField);
+            mainLayout.getChildren().remove(yLabel);
+            mainLayout.getChildren().remove(yLengthField);
+            mainLayout.getChildren().remove(parkingLabel);
+            mainLayout.getChildren().remove(parkingField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        });
+
+        closeButton.setOnAction(e -> {
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(xLabel);
+            mainLayout.getChildren().remove(xLengthField);
+            mainLayout.getChildren().remove(yLabel);
+            mainLayout.getChildren().remove(yLengthField);
+            mainLayout.getChildren().remove(parkingLabel);
+            mainLayout.getChildren().remove(parkingField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        });
+
+
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
