@@ -1,13 +1,12 @@
 package com.FlowLogic;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
@@ -22,6 +21,12 @@ import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Comparator;
 
 
 public class UserInterface extends Application {
@@ -52,6 +57,9 @@ public class UserInterface extends Application {
     public static Scale scale = new Scale();
 
     private static Stage stage;
+
+    // Save Directory Path
+    private static final String SAVE_DIRECTORY = "saves";
 
     @Override
     public void start(Stage primaryStage) throws Error{
@@ -101,7 +109,7 @@ public class UserInterface extends Application {
         stage.show();
     }
 
-    private static void setupBuildMenu(){
+    private void setupBuildMenu(){
         //Stops user from resizing the window
         stage.setResizable(false);
 
@@ -263,14 +271,75 @@ public class UserInterface extends Application {
         stage.show();
     }
 
-    private static void setupLoadMenu() {
+    private void setupLoadMenu() {
         VBox root = new VBox();
         root.setAlignment(Pos.CENTER);
-        loadGridButton(root, grid);
+
+        Label titleLabel = new Label("Load Saved Layout");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+
+        // Get all save files from the save directory
+        File[] saveFiles = getSaveFiles();
+
+        // Create "I don't see my file" button
+        Button browseButton = new Button("I don't see my file");
+        browseButton.setOnAction(e -> browseForExternalSaveFile());
+
+        if (saveFiles == null || saveFiles.length == 0) {
+            // No available save files
+            Label noFilesLabel = new Label("No save files found");
+            Button backButton = new Button("Back to Main Menu");
+            backButton.setOnAction(e -> start(stage));
+
+            root.getChildren().addAll(titleLabel, noFilesLabel, browseButton, backButton);
+        } else {
+            // Save files found
+            // Convert file array to observable list for ListView
+            ObservableList<String> fileNames = FXCollections.observableArrayList();
+            for (File file : saveFiles) {
+                fileNames.add(file.getName());
+            }
+
+            // Create ListView to show save files
+            ListView<String> saveFileListView = new ListView<>(fileNames);
+            saveFileListView.setPrefHeight(400);
+            saveFileListView.setPrefWidth(400);
+
+            HBox buttonBox = new HBox(20);
+            buttonBox.setAlignment(Pos.CENTER);
+
+            Button loadButton = new Button("Load Selected");
+            Button cancelButton = new Button("Cancel");
+
+            loadButton.setOnAction(e -> {
+                loadGridButton(root, grid);
+                String selectedFileName = saveFileListView.getSelectionModel().getSelectedItem();
+                if (selectedFileName != null) {
+                    File selectedFile = new File(SAVE_DIRECTORY + File.separator + selectedFileName);
+                    boolean loadSuccessful = grid.loadGridState(selectedFile.getAbsolutePath());
+
+                    if (loadSuccessful) {
+                        System.out.println("Grid loaded successfully from " + selectedFileName);
+                        setupBuildMenu();
+                    } else {
+                        // Show error message
+                        showErrorAlert("Failed to load grid from " + selectedFileName);
+                    }
+                } else {
+                    showErrorAlert("Please select a save file");
+                }
+            });
+
+            cancelButton.setOnAction(e -> start(stage));
+
+            buttonBox.getChildren().addAll(loadButton, browseButton, cancelButton);
+            root.getChildren().addAll(titleLabel, saveFileListView, buttonBox);
+        }
+
+        //loadGridButton(root, grid);
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         stage.setScene(scene);
         stage.show();
-
     }
 
     private static void createGridCells(Group gridGroup) {
@@ -361,10 +430,36 @@ public class UserInterface extends Application {
         Button saveButton = new Button("Save Current Layout");
         saveButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
 
-        // Add the button to the AnchorPane
+        // Add the button to the VBox
         mainLayout.getChildren().add(saveButton);
 
         saveButton.setOnAction(event -> {
+            // Show save dialog to get a name
+            TextInputDialog dialog = new TextInputDialog("layout");
+            dialog.setTitle("Save Layout");
+            dialog.setHeaderText("Enter a name for your layout");
+            dialog.setContentText("Name:");
+
+            createSaveDirectory();
+
+            dialog.showAndWait().ifPresent(name -> {
+
+                // Create filename with name and timestamp
+                String filename = name + ".json";
+                String filePath = SAVE_DIRECTORY + File.separator + filename;
+
+                boolean saveSuccessful = grid.saveGridState(filePath);
+
+                if (saveSuccessful) {
+                    showInfoAlert("Layout saved", "Layout saved successfully as " + filename);
+                    System.out.println("Grid saved successfully to " + filename);
+                } else {
+                    showErrorAlert("Failed to save layout to " + filename);
+                    System.out.println("Failed to save grid to " + filename);
+                }
+            });
+        });
+            /* OLD CODE
             // Create a file chooser dialog - select where to save it
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save Current Layout");
@@ -387,7 +482,7 @@ public class UserInterface extends Application {
                     System.out.println("Failed to save grid to " + file.getName());
                 }
             }
-        });
+             */
     }
 
     /**
@@ -397,41 +492,172 @@ public class UserInterface extends Application {
      * @param mainLayout The main AnchorPane layout
      * @param grid The Grid object containing the grid data to save
      */
-    public static void loadGridButton(VBox mainLayout, Grid grid) {
+    public void loadGridButton(VBox mainLayout, Grid grid) {
         // Create the button
         Button loadButton = new Button("Load Existing Layout");
         loadButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
 
-        // Add the button to the AnchorPane
+        // Add the button to the VBox
         mainLayout.getChildren().add(loadButton);
 
-        loadButton.setOnAction(event -> {
-            // Create a file chooser dialog - select where to save it
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Load Existing Layout");
-            fileChooser.getExtensionFilters().add(
-                    new FileChooser.ExtensionFilter("JSON Files", "*.json")
-            );
+        loadButton.setOnAction(event -> setupLoadMenu());
+    }
 
-            // Show the load dialog
-            File file = fileChooser.showOpenDialog(mainLayout.getScene().getWindow());
+    /**
+     * Creates the save directory if it doesn't exist
+     */
+    private static void createSaveDirectory() {
+        Path path = Paths.get(SAVE_DIRECTORY);
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+                System.out.println("Created save directory: " + path.toAbsolutePath());
+            } catch (Exception e) {
+                System.err.println("Failed to create save directory: " + e.getMessage());
+            }
+        }
+    }
 
-            if (file != null) {
-                // Call the grid's loadGridState method with the selected file path
-                boolean loadSuccessful = grid.loadGridState(file.getAbsolutePath());
+    /**
+     * Gets all JSON files from the save directory
+     *
+     * @return Array of save files, sorted by last modified date (newest first)
+     */
+    private static File[] getSaveFiles() {
+        File saveDir = new File(SAVE_DIRECTORY);
+        File[] files = saveDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
 
-                if (loadSuccessful) {
-                    // Insert any additional success logic here (popup?)
-                    System.out.println("Grid loaded successfully from " + file.getName());
-                    setupBuildMenu();
+        if (files != null && files.length > 0) {
+            // Sort files by last modified date (newest first)
+            Arrays.sort(files, Comparator.comparing(File::lastModified).reversed());
+        }
+
+        return files;
+    }
+
+    /**
+     * Shows an error alert dialog if something fails
+     */
+    private static void showErrorAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    /**
+     * Shows an information alert dialog when something succeeds
+     */
+    private static void showInfoAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    /**
+     * Opens file explorer to select a save file from anywhere on the system,
+     * then copies it to the save directory
+     *
+     * Used if the user's layout file, for whatever reason, is not in the correct directory
+     */
+    private void browseForExternalSaveFile() {
+        // Create save directory if it doesn't exist
+        createSaveDirectory();
+
+        // Create a file chooser dialog
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Browse for Save File");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("JSON Files", "*.json")
+        );
+
+        // Show the file dialog
+        File selectedFile = fileChooser.showOpenDialog(stage);
+
+        if (selectedFile != null) {
+            try {
+                // Create destination file path in save directory
+                String fileName = selectedFile.getName();
+                File destinationFile = new File(SAVE_DIRECTORY + File.separator + fileName);
+
+                // Check if file with same name already exists - ask to overwrite if it does
+                if (destinationFile.exists()) {
+                    Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmAlert.setTitle("File Already Exists");
+                    confirmAlert.setHeaderText("A file with the name '" + fileName + "' already exists in the save directory.");
+                    confirmAlert.setContentText("Do you want to replace it?");
+
+                    if (confirmAlert.showAndWait().get() == ButtonType.OK) {
+                        // User confirmed overwrite
+                        copyFile(selectedFile, destinationFile);
+                    } else {
+                        // User canceled overwrite - ask for a new name
+                        renameAndCopyFile(selectedFile);
+                        return;
+                    }
                 } else {
-                    // Insert any additional error logic here (popup?)
-                    System.out.println("Failed to load grid from " + file.getName());
+                    // No conflict, copy the file
+                    copyFile(selectedFile, destinationFile);
+                }
+
+                // Refresh the load menu to show the new file
+                setupLoadMenu();
+
+            } catch (Exception e) {
+                showErrorAlert("Error copying file: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Copies a file from source to destination
+     */
+    private void copyFile(File sourceFile, File destinationFile) throws IOException {
+        Files.copy(sourceFile.toPath(), destinationFile.toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        showInfoAlert("File Copied", "File '" + sourceFile.getName() +
+                "' has been copied to the save directory");
+    }
+
+    /**
+     * Asks the user for a new filename and copies the file with that name
+     */
+    private void renameAndCopyFile(File sourceFile) {
+        TextInputDialog dialog = new TextInputDialog(sourceFile.getName().replace(".json", "") + "_copy");
+        dialog.setTitle("Rename File");
+        dialog.setHeaderText("Please enter a new name for the file");
+        dialog.setContentText("New filename (without extension):");
+
+        dialog.showAndWait().ifPresent(newName -> {
+            if (!newName.isEmpty()) {
+                try {
+                    // Create destination file with new name
+                    File destinationFile = new File(SAVE_DIRECTORY + File.separator + newName + ".json");
+
+                    // Copy the file
+                    copyFile(sourceFile, destinationFile);
+
+                    // Refresh the load menu
+                    setupLoadMenu();
+
+                } catch (Exception e) {
+                    showErrorAlert("Error copying file: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         });
     }
 
+
+    /**
+     * This function goes through and recreates the grid cell by cell (this is maybe not ideal). It is also used when
+     * we need to resize the grid.
+     * @param newSize - the size of the grid
+     */
     public static void refreshGrid(int newSize) {
         GRID_SIZE = newSize;
         gridGroup.getChildren().clear();
@@ -443,6 +669,12 @@ public class UserInterface extends Application {
         scale.setX(maxZoom);
     }
 
+    /**
+     * shows option to show the grid resizing option
+     * @param mainLayout
+     * @param grid
+     */
+
     public static void hideResizeBox(VBox mainLayout, Grid grid) {
         Button showButton = new Button("Edit Grid Size");
         showButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
@@ -452,6 +684,12 @@ public class UserInterface extends Application {
             gridResizeBox(mainLayout, grid);
         });
     }
+
+    /**
+     * option to edit grid size
+     * @param mainLayout
+     * @param grid
+     */
 
     public static void gridResizeBox(VBox mainLayout, Grid grid) {
         Label instructionLabel = new Label("Enter a size for the grid:");

@@ -9,6 +9,8 @@ public class Intersection implements GridObject {
     private int colNum;
     private Image imageFile;
 
+    private int intersectionID;
+
     public Intersection(int rowNum, int colNum, Road[] roadList) {
         this.rowNum = rowNum;
         this.colNum = colNum;
@@ -23,6 +25,13 @@ public class Intersection implements GridObject {
         this.imageFile = new Image("file:Images/BasicIntersection.png");
     }
 
+    public int getIntersectionID() {
+        return intersectionID;
+    }
+
+    public void setIntersectionID(int intersectionID) {
+        this.intersectionID = intersectionID;
+    }
 
     public GridObject clone() {
         return new Intersection(this);
