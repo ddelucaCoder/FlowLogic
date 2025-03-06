@@ -652,6 +652,12 @@ public class UserInterface extends Application {
         });
     }
 
+
+    /**
+     * This function goes through and recreates the grid cell by cell (this is maybe not ideal). It is also used when
+     * we need to resize the grid.
+     * @param newSize - the size of the grid
+     */
     public static void refreshGrid(int newSize) {
         GRID_SIZE = newSize;
         gridGroup.getChildren().clear();
@@ -663,6 +669,12 @@ public class UserInterface extends Application {
         scale.setX(maxZoom);
     }
 
+    /**
+     * shows option to show the grid resizing option
+     * @param mainLayout
+     * @param grid
+     */
+
     public static void hideResizeBox(VBox mainLayout, Grid grid) {
         Button showButton = new Button("Edit Grid Size");
         showButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
@@ -672,6 +684,12 @@ public class UserInterface extends Application {
             gridResizeBox(mainLayout, grid);
         });
     }
+
+    /**
+     * option to edit grid size
+     * @param mainLayout
+     * @param grid
+     */
 
     public static void gridResizeBox(VBox mainLayout, Grid grid) {
         Label instructionLabel = new Label("Enter a size for the grid:");
