@@ -431,6 +431,7 @@ public class Grid {
      */
     public void placeObjectByImage(String imageFile, int rowNum, int colNum) {
         GridObject newObject = imgToObj.get(imageFile);
+        System.out.println(imageFile);
         addObject(newObject.clone(), rowNum, colNum);
     }
 
@@ -587,9 +588,11 @@ public class Grid {
 
         if (obj instanceof OneWayRoad oneWayRoad) {
             oneWayRoad.rotateRoad(newDirection);
+            updateIntersections(row, col, oneWayRoad);
             System.out.println("Changed Road Direction!\n");
         } else if (obj instanceof TwoWayRoad twoWayRoad) {
             twoWayRoad.rotateRoad(newDirection);
+            updateIntersections(row, col, twoWayRoad);
         }
 
     }

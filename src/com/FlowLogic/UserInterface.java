@@ -213,6 +213,7 @@ public class UserInterface extends Application {
             if (!(cell.getFill() instanceof ImagePattern)) {
                 cell.setFill(new ImagePattern(db.getImage()));
                 grid.placeObjectByImage(db.getString(), row, col);
+                System.out.println(db.getString());
             }
 
         });
@@ -960,10 +961,11 @@ public class UserInterface extends Application {
         mainLayout.getChildren().add(closeButton);
 
         upButt.setOnAction(e -> {
-            grid.changeRoadDirection(row, col, Direction.UP);
 
             Rectangle cell = grid.getFrontGrid()[row][col];
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImage.png")));
+            grid.placeObjectByImage("RoadImage.png", row, col);
+            grid.changeRoadDirection(row, col, Direction.UP);
             mainLayout.getChildren().remove(titleLabel);
             mainLayout.getChildren().remove(directionLabel);
             mainLayout.getChildren().remove(upButt);
@@ -978,10 +980,11 @@ public class UserInterface extends Application {
         });
 
        downButt.setOnAction(e -> {
-           grid.changeRoadDirection(row, col, Direction.DOWN);
 
            Rectangle cell = grid.getFrontGrid()[row][col];
            cell.setFill(new ImagePattern(new Image("file:Images/RoadImageDown.png")));
+           grid.placeObjectByImage("RoadImageDown.png", row, col);
+           grid.changeRoadDirection(row, col, Direction.DOWN);
            mainLayout.getChildren().remove(titleLabel);
            mainLayout.getChildren().remove(directionLabel);
            mainLayout.getChildren().remove(upButt);
@@ -996,10 +999,11 @@ public class UserInterface extends Application {
        });
 
        leftButt.setOnAction(e -> {
-           grid.changeRoadDirection(row, col, Direction.UP);
 
            Rectangle cell = grid.getFrontGrid()[row][col];
            cell.setFill(new ImagePattern(new Image("file:Images/RoadImageLeft.png")));
+           grid.placeObjectByImage("RoadImageLeft.png", row, col);
+           grid.changeRoadDirection(row, col, Direction.LEFT);
            mainLayout.getChildren().remove(titleLabel);
            mainLayout.getChildren().remove(directionLabel);
            mainLayout.getChildren().remove(upButt);
@@ -1014,10 +1018,11 @@ public class UserInterface extends Application {
        });
 
        rightButt.setOnAction(e -> {
-           grid.changeRoadDirection(row, col, Direction.UP);
 
            Rectangle cell = grid.getFrontGrid()[row][col];
            cell.setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
+           grid.placeObjectByImage("RoadImageUP.png", row, col);
+           grid.changeRoadDirection(row, col, Direction.RIGHT);
            mainLayout.getChildren().remove(titleLabel);
            mainLayout.getChildren().remove(directionLabel);
            mainLayout.getChildren().remove(upButt);

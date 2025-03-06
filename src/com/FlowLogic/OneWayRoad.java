@@ -66,11 +66,15 @@ public class OneWayRoad extends Road implements GridObject {
     public void updateGraphic() {
         if (this.getDirection() == Direction.UP) {
             this.imageFile = new Image("file:Images/RoadImage.png");
+            this.setOrientation(Orientation.VERTICAL);
         } else if (this.getDirection() == Direction.LEFT) {
+            this.setOrientation(Orientation.HORIZONTAL);
             this.imageFile = new Image("file:Images/RoadImageLeft");
         } else if (this.getDirection() == Direction.DOWN) {
+            this.setOrientation(Orientation.VERTICAL);
             this.imageFile = new Image("file:Images/RoadImageDown");
         } else if (this.getDirection() == Direction.RIGHT) {
+            this.setOrientation(Orientation.HORIZONTAL);
             this.imageFile = new Image("file:Images/RoadImageRight");
         }
     }
