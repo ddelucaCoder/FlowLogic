@@ -19,6 +19,7 @@ public class Road implements GridObject {
     private int rowNum;
     private int colNum;
 
+
     public Road (Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum) {
         this.orientation = orientation;
         this.speedLimit = speedLimit;
