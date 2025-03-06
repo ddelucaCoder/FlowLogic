@@ -40,6 +40,8 @@ public class Grid {
 
     public static int GRID_SIZE = 32;
 
+    private int numObjs = 0;
+
     //Allows for quick conversion from Image file to backend object
     public static HashMap<String, GridObject> imgToObj = new HashMap<>();
 
@@ -414,23 +416,46 @@ public class Grid {
 
     }
 
+
+    /**
+     * This function is called from the frontend when an image object is dropped onto the grid. It's purpose is to
+     * mimic that same action on the backend with the correct object.
+     * @param imageFile - the name of the image file dropped
+     * @param rowNum - row number where it was dropped
+     * @param colNum - the col number where it was dropped
+     */
     public void placeObjectByImage(String imageFile, int rowNum, int colNum) {
         GridObject newObject = imgToObj.get(imageFile);
         addObject(newObject.clone(), rowNum, colNum);
     }
 
-    public void select(int row, int col, VBox mainLayout) {
+    /**
+     * This function is called from the frontend when the user clicks on a square on the grid. It goes through the
+     * options of each type of thing that could be clicked and does the appropriate action.
+     * for each type of
+     * @param row
+     * @param col
+     * @param optionLayout
+     */
+
+    public void select(int row, int col, VBox optionLayout) {
         GridObject obj = getAtSpot(row, col);
         if (obj instanceof Building) {
             Building b = (Building) obj;
-            UserInterface.showBuildingOptions(mainLayout, this, b.getxLength(), b.getyLength(),
+            UserInterface.showBuildingOptions(optionLayout, this, b.getxLength(), b.getyLength(),
                 b.getDailyPopulation(), row, col);
         } else if (obj instanceof Parking) {
             Parking p = (Parking) obj;
-            UserInterface.showBuildingOptions(mainLayout, this, p.getxLength(), p.getyLength(),
+            UserInterface.showBuildingOptions(optionLayout, this, p.getxLength(), p.getyLength(),
                 p.getParkingCapacity(), row, col);
         }
     }
+
+    /**
+     * This function recursively removes all parts of the object at (row, col), even if it extends into other squares
+     * @param row - the row we want to delete at
+     * @param col - the col we want to delete at
+     */
 
     public void remove(int row, int col) {
         GridObject obj = getAtSpot(row, col);
@@ -453,6 +478,12 @@ public class Grid {
         }
     }
 
+    /**
+     * This changes the population of the building at (row, col)
+     * @param row
+     * @param col
+     * @param newPop
+     */
     public void changeDailyPopulationBuilding(int row, int col, int newPop) {
         GridObject obj = getAtSpot(row, col);
         if (!(obj instanceof Building)) {
@@ -461,6 +492,12 @@ public class Grid {
         ((Building) obj).setDailyPopulation(newPop);
     }
 
+    /**
+     * this changes the parking capacity at the parking lot at (row, col)
+     * @param row
+     * @param col
+     * @param newCap
+     */
     public void changeParkingCapacity(int row, int col, int newCap) {
         GridObject obj = getAtSpot(row, col);
         if (!(obj instanceof Parking)) {
@@ -468,6 +505,14 @@ public class Grid {
         }
         ((Parking) obj).setParkingCapacity(newCap);
     }
+
+    /**
+     * This function changes the size of the building at (row, col)
+     * @param row
+     * @param col
+     * @param newSizeX
+     * @param newSizeY
+     */
 
     public void changeBuildingSize(int row, int col, int newSizeX, int newSizeY) {
         GridObject obj = getAtSpot(row, col);
@@ -524,6 +569,99 @@ public class Grid {
                 frontGrid[row + k][col + i] = current;
             }
         }
+    }
+
+    public int[][] gridToGraph() {
+        int[][] graph = new int[numRows][numColumns];
+        ArrayList<Intersection> intersections = new ArrayList<>();
+        // count intersections
+        int numIntersections = 0;
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                if (getAtSpot(i, j) instanceof Intersection in) {
+                    in.setIntersectionID(numIntersections++);
+                    intersections.add(in);
+                }
+            }
+        }
+
+        // route between intersections
+        for (Intersection i : intersections) {
+            for (int k = 0; k < 4; k++) {
+                Road currentRoad = i.getRoadList()[k];
+                if (currentRoad == null) {
+                    continue;
+                }
+                int row = i.getRowNum();
+                int col = i.getColNum();
+                if ((row > 0) && (grid[row - 1][col] == currentRoad)) {
+                    if (currentRoad instanceof OneWayRoad) {
+                        if (((OneWayRoad) currentRoad).getDirection() == Direction.DOWN) {
+                            continue;
+                        }
+                    }
+                    // otherwise just follow it to its spot
+                    GridObject current = currentRoad;
+                    while (!(current instanceof Intersection)) {
+                        if (row == 0) {
+                            continue;
+                        }
+                        current = grid[row - 1][col];
+                        row--;
+                    }
+                    graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                } else if ((row <= numRows) && (grid[row + 1][col] == currentRoad)) {
+                    if (currentRoad instanceof OneWayRoad) {
+                        if (((OneWayRoad) currentRoad).getDirection() == Direction.UP) {
+                            continue;
+                        }
+                    }
+                    // otherwise just follow it to its spot
+                    GridObject current = currentRoad;
+                    while (!(current instanceof Intersection)) {
+                        if (row == 0) {
+                            continue;
+                        }
+                        current = grid[row + 1][col];
+                        row++;
+                    }
+                    graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                } else if ((col > 0) && (grid[row][col - 1] == currentRoad)) {
+                    if (currentRoad instanceof OneWayRoad) {
+                        if (((OneWayRoad) currentRoad).getDirection() == Direction.RIGHT) {
+                            continue;
+                        }
+                    }
+                    // otherwise just follow it to its spot
+                    GridObject current = currentRoad;
+                    while (!(current instanceof Intersection)) {
+                        if (row == 0) {
+                            continue;
+                        }
+                        current = grid[row][col - 1];
+                        col--;
+                    }
+                    graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                } else if ((col >= 0) && (grid[row][col + 1] == currentRoad)) {
+                    if (currentRoad instanceof OneWayRoad) {
+                        if (((OneWayRoad) currentRoad).getDirection() == Direction.LEFT) {
+                            continue;
+                        }
+                    }
+                    // otherwise just follow it to its spot
+                    GridObject current = currentRoad;
+                    while (!(current instanceof Intersection)) {
+                        if (row == 0) {
+                            continue;
+                        }
+                        current = grid[row][col + 1];
+                        col++;
+                    }
+                }
+            }
+        }
+
+        return graph;
     }
 
 
