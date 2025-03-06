@@ -170,10 +170,12 @@ public class Grid {
                         int xLength = properties.getInt("xLength");
                         int yLength = properties.getInt("yLength");
                         int dailyPopulation = properties.getInt("dailyPopulation");
+                        String color = properties.getString("color");
 
                         Building building = new Building(xLength, yLength, dailyPopulation);
                         building.setRowNum(row);
                         building.setColNum(col);
+                        building.setColor(color);
 
                         gridObject = building;
                         break;
@@ -386,6 +388,7 @@ public class Grid {
                         properties.put("xLength", building.getxLength());
                         properties.put("yLength", building.getyLength());
                         properties.put("dailyPopulation", building.getDailyPopulation());
+                        properties.put("color", building.getColor());
                     }
                     else if (obj instanceof Parking parking) {
                         properties.put("xLength", parking.getxLength());
