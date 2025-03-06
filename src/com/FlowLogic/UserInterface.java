@@ -963,6 +963,126 @@ public class UserInterface extends Application {
 
     }
 
+   public static void showRoadOptions(VBox mainLayout, Grid grid, int row, int col) {
+        Label titleLabel= new Label("Road Options");
+        Label directionLabel = new Label ("Direction:");
+        Button upButt = new Button("Up");
+        Button downButt = new Button("Down");
+        Button leftButt = new Button("Left");
+        Button rightButt = new Button("Right");
+        Button removeButton = new Button("Remove Road");
+        Button closeButton = new Button("Close Road Options");
+
+
+        mainLayout.getChildren().add(titleLabel);
+        mainLayout.getChildren().add(directionLabel);
+        mainLayout.getChildren().add(upButt);
+        mainLayout.getChildren().add(downButt);
+        mainLayout.getChildren().add(leftButt);
+        mainLayout.getChildren().add(rightButt);
+        mainLayout.getChildren().add(removeButton);
+        mainLayout.getChildren().add(closeButton);
+
+        upButt.setOnAction(e -> {
+            grid.changeRoadDirection(row, col, Direction.UP);
+
+            Rectangle cell = grid.getFrontGrid()[row][col];
+            cell.setFill(new ImagePattern(new Image("file:Images/RoadImage.png")));
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(directionLabel);
+            mainLayout.getChildren().remove(upButt);
+            mainLayout.getChildren().remove(downButt);
+            mainLayout.getChildren().remove(leftButt);
+            mainLayout.getChildren().remove(rightButt);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+
+            showRoadOptions(mainLayout, grid, row, col);
+            refreshGrid(GRID_SIZE);
+        });
+
+       downButt.setOnAction(e -> {
+           grid.changeRoadDirection(row, col, Direction.DOWN);
+
+           Rectangle cell = grid.getFrontGrid()[row][col];
+           cell.setFill(new ImagePattern(new Image("file:Images/RoadImageDown.png")));
+           mainLayout.getChildren().remove(titleLabel);
+           mainLayout.getChildren().remove(directionLabel);
+           mainLayout.getChildren().remove(upButt);
+           mainLayout.getChildren().remove(downButt);
+           mainLayout.getChildren().remove(leftButt);
+           mainLayout.getChildren().remove(rightButt);
+           mainLayout.getChildren().remove(removeButton);
+           mainLayout.getChildren().remove(closeButton);
+
+           showRoadOptions(mainLayout, grid, row, col);
+           refreshGrid(GRID_SIZE);
+       });
+
+       leftButt.setOnAction(e -> {
+           grid.changeRoadDirection(row, col, Direction.UP);
+
+           Rectangle cell = grid.getFrontGrid()[row][col];
+           cell.setFill(new ImagePattern(new Image("file:Images/RoadImageLeft.png")));
+           mainLayout.getChildren().remove(titleLabel);
+           mainLayout.getChildren().remove(directionLabel);
+           mainLayout.getChildren().remove(upButt);
+           mainLayout.getChildren().remove(downButt);
+           mainLayout.getChildren().remove(leftButt);
+           mainLayout.getChildren().remove(rightButt);
+           mainLayout.getChildren().remove(removeButton);
+           mainLayout.getChildren().remove(closeButton);
+
+           showRoadOptions(mainLayout, grid, row, col);
+           refreshGrid(GRID_SIZE);
+       });
+
+       rightButt.setOnAction(e -> {
+           grid.changeRoadDirection(row, col, Direction.UP);
+
+           Rectangle cell = grid.getFrontGrid()[row][col];
+           cell.setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
+           mainLayout.getChildren().remove(titleLabel);
+           mainLayout.getChildren().remove(directionLabel);
+           mainLayout.getChildren().remove(upButt);
+           mainLayout.getChildren().remove(downButt);
+           mainLayout.getChildren().remove(leftButt);
+           mainLayout.getChildren().remove(rightButt);
+           mainLayout.getChildren().remove(removeButton);
+           mainLayout.getChildren().remove(closeButton);
+
+           showRoadOptions(mainLayout, grid, row, col);
+           refreshGrid(GRID_SIZE);
+       });
+
+       removeButton.setOnAction(e -> {
+           grid.remove(row, col);
+           refreshGrid(GRID_SIZE);
+           mainLayout.getChildren().remove(titleLabel);
+           mainLayout.getChildren().remove(directionLabel);
+           mainLayout.getChildren().remove(upButt);
+           mainLayout.getChildren().remove(downButt);
+           mainLayout.getChildren().remove(leftButt);
+           mainLayout.getChildren().remove(rightButt);
+           mainLayout.getChildren().remove(removeButton);
+           mainLayout.getChildren().remove(closeButton);
+       });
+
+       closeButton.setOnAction(e -> {
+           mainLayout.getChildren().remove(titleLabel);
+           mainLayout.getChildren().remove(directionLabel);
+           mainLayout.getChildren().remove(upButt);
+           mainLayout.getChildren().remove(downButt);
+           mainLayout.getChildren().remove(leftButt);
+           mainLayout.getChildren().remove(rightButt);
+           mainLayout.getChildren().remove(removeButton);
+           mainLayout.getChildren().remove(closeButton);
+       });
+
+
+   }
+
+
     public static void main(String[] args) {
         launch(args);
     }

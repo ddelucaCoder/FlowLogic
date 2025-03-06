@@ -448,6 +448,8 @@ public class Grid {
             Parking p = (Parking) obj;
             UserInterface.showBuildingOptions(optionLayout, this, p.getxLength(), p.getyLength(),
                 p.getParkingCapacity(), row, col);
+        } else if (obj instanceof Road) {
+            UserInterface.showRoadOptions(optionLayout, this, row, col);
         }
     }
 
@@ -569,6 +571,22 @@ public class Grid {
                 frontGrid[row + k][col + i] = current;
             }
         }
+    }
+
+    public void changeRoadDirection(int row, int col, Direction newDirection) {
+        GridObject obj = getAtSpot(row, col);
+        if(!(obj instanceof Road)) {
+            // not a road
+            return;
+        }
+
+        if (obj instanceof OneWayRoad oneWayRoad) {
+            oneWayRoad.rotateRoad(newDirection);
+            System.out.println("Changed Road Direction!\n");
+        } else if (obj instanceof TwoWayRoad twoWayRoad) {
+            twoWayRoad.rotateRoad(newDirection);
+        }
+
     }
 
     public int[][] gridToGraph() {
