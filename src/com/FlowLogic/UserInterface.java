@@ -62,7 +62,7 @@ public class UserInterface extends Application {
     private static final String SAVE_DIRECTORY = "saves";
 
     @Override
-    public void start(Stage primaryStage) throws Error{
+    public void start(Stage primaryStage) throws Error {
         stage = primaryStage;
         stage.setTitle("FlowLogic");
 
@@ -459,30 +459,6 @@ public class UserInterface extends Application {
                 }
             });
         });
-            /* OLD CODE
-            // Create a file chooser dialog - select where to save it
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save Current Layout");
-            fileChooser.getExtensionFilters().add(
-                    new FileChooser.ExtensionFilter("JSON Files", "*.json")
-            );
-
-            // Show the save dialog
-            File file = fileChooser.showSaveDialog(mainLayout.getScene().getWindow());
-
-            if (file != null) {
-                // Call the grid's saveGridState method with the selected file path
-                boolean saveSuccessful = grid.saveGridState(file.getAbsolutePath());
-
-                if (saveSuccessful) {
-                    // Insert any additional success logic here (popup?)
-                    System.out.println("Grid saved successfully to " + file.getName());
-                } else {
-                    // Insert any additional error logic here (popup?)
-                    System.out.println("Failed to save grid to " + file.getName());
-                }
-            }
-             */
     }
 
     /**

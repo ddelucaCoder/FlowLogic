@@ -126,6 +126,11 @@ public class Building implements GridObject {
         this.dailyPopulation = dailyPopulation;
     }
 
+    public void setColor(String color) {
+        this.color = color;
+        updateImage();
+    }
+
     public GridObject clone() {
         return new Building(this);
     }

@@ -1,6 +1,8 @@
 package testing;
 
 import com.FlowLogic.*;
+import javafx.application.Platform;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +10,7 @@ import java.util.ArrayList;
 
 import static com.FlowLogic.Orientation.HORIZONTAL;
 import static com.FlowLogic.Orientation.VERTICAL;
+import static javafx.application.Application.launch;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -20,6 +23,13 @@ public class GridTest {
     void setUp() {
         grid = new Grid(numRows, numCols);
         Grid.GRID_SIZE = 32;
+    }
+    @BeforeAll
+    static void initToolkit() throws InterruptedException {
+        Thread initThread = new Thread(() -> Platform.startup(() -> {}));
+        initThread.setDaemon(true);
+        initThread.start();
+        initThread.join();  // Wait for JavaFX platform to initialize
     }
 
     @Test
@@ -137,6 +147,7 @@ public class GridTest {
     @Test
     void testIntersectionSnapping() {
         grid.resize(3, 3);
+        grid.testGridInit();
 
         // place roads around
         Road road1 = new Road(VERTICAL, 25, false, 0, 0, 1);
@@ -156,6 +167,7 @@ public class GridTest {
 
         // parallel roads should not form an intersection:
         grid = new Grid(3, 3);
+        grid.testGridInit();
 
         allRoads[0] = new Road(VERTICAL, 25, false, 0, 1, 0);
         allRoads[1] = new Road(VERTICAL, 25, false, 0, 1, 1);
@@ -173,6 +185,7 @@ public class GridTest {
 
         // but just one road different should:
         grid = new Grid(3, 3);
+        grid.testGridInit();
 
         allRoads[0] = new Road(HORIZONTAL, 25, false, 0, 1, 0);
         for (Road r : allRoads) {
@@ -186,6 +199,7 @@ public class GridTest {
         assertFalse(grid.getAtSpot(1, 2) instanceof Intersection);
 
         grid = new Grid(3, 3);
+        grid.testGridInit();
 
         allRoads[0] = new Road(VERTICAL, 25, false, 0, 1, 0);
         allRoads[1] = new Road(HORIZONTAL, 25, false, 0, 1, 1);
@@ -198,5 +212,128 @@ public class GridTest {
         assertTrue(grid.getAtSpot(1, 0) instanceof Intersection);
         assertFalse(grid.getAtSpot(1, 1) instanceof Intersection);
         assertTrue(grid.getAtSpot(1, 2) instanceof Intersection);
+    }
+
+    @Test
+    void testBasicGTG() {
+        grid = new Grid(3, 3);
+        grid.testGridInit();
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 0, 0, Direction.RIGHT, 1, new ArrayList<>()), 0, 0);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 0, 1, Direction.RIGHT, 1, new ArrayList<>()), 0, 1);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 0, 2, Direction.RIGHT, 1, new ArrayList<>()), 0, 2);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 2, 0, Direction.RIGHT, 1, new ArrayList<>()), 2, 0);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 2, 1, Direction.RIGHT, 1, new ArrayList<>()), 2, 1);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 2, 2, Direction.RIGHT, 1, new ArrayList<>()), 2, 2);
+        grid.addObject(new OneWayRoad(VERTICAL, 25, false,
+            0, 1, 0, Direction.UP, 1, new ArrayList<>()), 1, 0);
+        grid.addObject(new OneWayRoad(VERTICAL, 25, false,
+            0, 1, 2, Direction.DOWN, 1, new ArrayList<>()), 1, 2);
+
+
+
+        int[][] gtg = grid.gridToGraph();
+
+        int[][] expected = {{0, 1, 0, 0},
+                            {0, 0, 0, 1},
+                            {1, 0, 0, 1},
+                            {0, 0, 0, 0}};
+
+
+        for (int i = 0; i < gtg.length; i++) {
+            assertArrayEquals(expected[i], gtg[i]);
+        }
+
+    }
+
+    @Test
+    void testAdvancedGTG() {
+        grid = new Grid(4, 7);
+        grid.testGridInit();
+        grid.addObject(new TwoWayRoad(HORIZONTAL, 25, false,
+            0, 0, 0, new OneWayRoad(HORIZONTAL, Direction.LEFT), new OneWayRoad(HORIZONTAL, Direction.RIGHT)),
+            0, 0);
+        grid.addObject(new TwoWayRoad(HORIZONTAL, 25, false,
+                0, 0, 1, new OneWayRoad(HORIZONTAL, Direction.LEFT), new OneWayRoad(HORIZONTAL, Direction.RIGHT)),
+            0, 1);
+        grid.addObject(new TwoWayRoad(HORIZONTAL, 25, false,
+                0, 0, 2, new OneWayRoad(HORIZONTAL, Direction.LEFT), new OneWayRoad(HORIZONTAL, Direction.RIGHT)),
+            0, 2);
+        grid.addObject(new TwoWayRoad(HORIZONTAL, 25, false,
+                0, 0, 3, new OneWayRoad(HORIZONTAL, Direction.LEFT), new OneWayRoad(HORIZONTAL, Direction.RIGHT)),
+            0, 3);
+        grid.addObject(new TwoWayRoad(HORIZONTAL, 25, false,
+                0, 0, 4, new OneWayRoad(HORIZONTAL, Direction.LEFT), new OneWayRoad(HORIZONTAL, Direction.RIGHT)),
+            0, 4);
+
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 0, 5, Direction.LEFT, 1, new ArrayList<>()), 0, 5);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 0, 6, Direction.LEFT, 1, new ArrayList<>()), 0, 6);
+
+        grid.addObject(new OneWayRoad(VERTICAL, 25, false,
+            0, 1, 0, Direction.UP, 1, new ArrayList<>()), 1, 0);
+        grid.addObject(new OneWayRoad(VERTICAL, 25, false,
+            0, 2, 0, Direction.UP, 1, new ArrayList<>()), 2, 0);
+
+        grid.addObject(new OneWayRoad(VERTICAL, 25, false,
+            0, 1, 4, Direction.DOWN, 1, new ArrayList<>()), 1, 4);
+        grid.addObject(new OneWayRoad(VERTICAL, 25, false,
+            0, 2, 4, Direction.DOWN, 1, new ArrayList<>()), 2, 4);
+
+        grid.addObject(new TwoWayRoad(VERTICAL, 25, false,
+                0, 1, 6, new OneWayRoad(VERTICAL, Direction.UP), new OneWayRoad(VERTICAL, Direction.DOWN)),
+            1, 6);
+        grid.addObject(new TwoWayRoad(VERTICAL, 25, false,
+                0, 2, 6, new OneWayRoad(VERTICAL, Direction.UP), new OneWayRoad(VERTICAL, Direction.DOWN)),
+            2, 6);
+
+
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 3, 0, Direction.RIGHT, 1, new ArrayList<>()), 3, 0);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 3, 1, Direction.RIGHT, 1, new ArrayList<>()), 3, 1);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 3, 2, Direction.RIGHT, 1, new ArrayList<>()), 3, 2);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 3, 3, Direction.RIGHT, 1, new ArrayList<>()), 3, 3);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 3, 4, Direction.RIGHT, 1, new ArrayList<>()), 3, 4);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 3, 5, Direction.RIGHT, 1, new ArrayList<>()), 3, 5);
+        grid.addObject(new OneWayRoad(HORIZONTAL, 25, false,
+            0, 3, 6, Direction.RIGHT, 1, new ArrayList<>()), 3, 6);
+
+
+
+        int[][] gtg = grid.gridToGraph();
+
+        int[][] expected = {{0,1,0,0,0,0},
+                            {1,0,0,0,1,0},
+                            {0,1,0,0,0,1},
+                            {1,0,0,0,1,0},
+                            {0,0,0,0,0,1},
+                            {0,0,1,0,0,0}};
+
+        /*
+        for (int i = 0; i < gtg.length; i++) {
+            System.out.print("[ ");
+            for (int k = 0; k < gtg.length; k++) {
+                System.out.print(gtg[i][k] + ", ");
+            }
+            System.out.println("]");
+        }
+         */
+
+
+        for (int i = 0; i < gtg.length; i++) {
+            assertArrayEquals(expected[i], gtg[i]);
+        }
+
     }
 }
