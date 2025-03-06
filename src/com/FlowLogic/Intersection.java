@@ -60,7 +60,7 @@ public class Intersection implements GridObject {
 
     public void addRoad(Road road) {
         for (int i = 0; i < 4; i++) {
-            if (roadList[i] != null) {
+            if (roadList[i] == null) {
                 roadList[i] = road;
                 return;
             }

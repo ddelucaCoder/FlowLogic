@@ -18,13 +18,29 @@ public class TwoWayRoad extends Road {
         right.updateGraphic();
     }
 
+    public TwoWayRoad(Orientation orientation) {
+        super(orientation, 25, false, 0, 0, 0);
+        this.left = new OneWayRoad(Orientation.HORIZONTAL, Direction.LEFT);
+        this.right = new OneWayRoad(Orientation.HORIZONTAL, Direction.RIGHT);
+        left.updateGraphic();
+        right.updateGraphic();
+    }
+
+    public TwoWayRoad(TwoWayRoad t) {
+        super(t.getOrientation(), t.getSpeedLimit(), t.isInRoad(), t.getInCars(), t.getRowNum(), t.getColNum());
+        this.left = t.getLeft();
+        this.right = t.getRight();
+        left.updateGraphic();
+        right.updateGraphic();
+    }
+
     public void updateGraphic() {
         left.updateGraphic();
         right.updateGraphic();
     }
 
     public GridObject clone() {
-        return null;
+        return new TwoWayRoad(this);
     }
 
     public void rotateRoad(Direction direction) {

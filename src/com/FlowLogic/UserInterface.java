@@ -54,7 +54,7 @@ public class UserInterface extends Application {
     private static Stage stage;
 
     @Override
-    public void start(Stage primaryStage) throws Error{
+    public void start(Stage primaryStage) throws Error {
         stage = primaryStage;
         stage.setTitle("FlowLogic");
 
