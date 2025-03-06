@@ -397,7 +397,7 @@ public class Grid {
 
         // make sure its in bounds
 
-        if (row + newSizeY >= numRows || col + newSizeX >= numRows) {
+        if (row + newSizeY - 1 >= numRows || col + newSizeX - 1 >= numColumns) {
             return;
         }
 

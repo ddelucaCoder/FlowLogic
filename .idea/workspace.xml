@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Added gridToGraph Algorithm (not tested)">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Intersection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Intersection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/TwoWayRoad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/TwoWayRoad.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/testing/GridTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/testing/GridTest.java" afterDir="false" />
-    </list>
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Fixed grid to graph algo and tested it" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -182,7 +175,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741264615741</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Fixed grid to graph algo and tested it">
+      <option name="closed" value="true" />
+      <created>1741276291834</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1741276291835</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -253,6 +254,7 @@
     <MESSAGE value="Reformatted UI and improved drag and drop Efficiency" />
     <MESSAGE value="fixed building colors" />
     <MESSAGE value="Added gridToGraph Algorithm (not tested)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added gridToGraph Algorithm (not tested)" />
+    <MESSAGE value="Fixed grid to graph algo and tested it" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed grid to graph algo and tested it" />
   </component>
 </project>
