@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -280,13 +281,19 @@ public class UserInterface extends Application {
         // Get all save files from the save directory
         File[] saveFiles = getSaveFiles();
 
+        // Create "I don't see my file" button
+        Button browseButton = new Button("I don't see my file");
+        browseButton.setOnAction(e -> browseForExternalSaveFile());
+
         if (saveFiles == null || saveFiles.length == 0) {
+            // No available save files
             Label noFilesLabel = new Label("No save files found");
             Button backButton = new Button("Back to Main Menu");
             backButton.setOnAction(e -> start(stage));
 
-            root.getChildren().addAll(titleLabel, noFilesLabel, backButton);
+            root.getChildren().addAll(titleLabel, noFilesLabel, browseButton, backButton);
         } else {
+            // Save files found
             // Convert file array to observable list for ListView
             ObservableList<String> fileNames = FXCollections.observableArrayList();
             for (File file : saveFiles) {
@@ -325,7 +332,7 @@ public class UserInterface extends Application {
 
             cancelButton.setOnAction(e -> start(stage));
 
-            buttonBox.getChildren().addAll(loadButton, cancelButton);
+            buttonBox.getChildren().addAll(loadButton, browseButton, cancelButton);
             root.getChildren().addAll(titleLabel, saveFileListView, buttonBox);
         }
 
@@ -433,6 +440,8 @@ public class UserInterface extends Application {
             dialog.setHeaderText("Enter a name for your layout");
             dialog.setContentText("Name:");
 
+            createSaveDirectory();
+
             dialog.showAndWait().ifPresent(name -> {
 
                 // Create filename with name and timestamp
@@ -492,40 +501,6 @@ public class UserInterface extends Application {
         mainLayout.getChildren().add(loadButton);
 
         loadButton.setOnAction(event -> setupLoadMenu());
-        /*
-        // Create the button
-        Button loadButton = new Button("Load Existing Layout");
-        loadButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
-
-        // Add the button to the AnchorPane
-        mainLayout.getChildren().add(loadButton);
-
-        loadButton.setOnAction(event -> {
-            // Create a file chooser dialog - select where to save it
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Load Existing Layout");
-            fileChooser.getExtensionFilters().add(
-                    new FileChooser.ExtensionFilter("JSON Files", "*.json")
-            );
-
-            // Show the load dialog
-            File file = fileChooser.showOpenDialog(mainLayout.getScene().getWindow());
-
-            if (file != null) {
-                // Call the grid's loadGridState method with the selected file path
-                boolean loadSuccessful = grid.loadGridState(file.getAbsolutePath());
-
-                if (loadSuccessful) {
-                    // Insert any additional success logic here (popup?)
-                    System.out.println("Grid loaded successfully from " + file.getName());
-                    setupBuildMenu();
-                } else {
-                    // Insert any additional error logic here (popup?)
-                    System.out.println("Failed to load grid from " + file.getName());
-                }
-            }
-        });
-         */
     }
 
     /**
@@ -561,7 +536,7 @@ public class UserInterface extends Application {
     }
 
     /**
-     * Shows an error alert dialog
+     * Shows an error alert dialog if something fails
      */
     private static void showErrorAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -572,7 +547,7 @@ public class UserInterface extends Application {
     }
 
     /**
-     * Shows an information alert dialog
+     * Shows an information alert dialog when something succeeds
      */
     private static void showInfoAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -580,6 +555,101 @@ public class UserInterface extends Application {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    /**
+     * Opens file explorer to select a save file from anywhere on the system,
+     * then copies it to the save directory
+     *
+     * Used if the user's layout file, for whatever reason, is not in the correct directory
+     */
+    private void browseForExternalSaveFile() {
+        // Create save directory if it doesn't exist
+        createSaveDirectory();
+
+        // Create a file chooser dialog
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Browse for Save File");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("JSON Files", "*.json")
+        );
+
+        // Show the file dialog
+        File selectedFile = fileChooser.showOpenDialog(stage);
+
+        if (selectedFile != null) {
+            try {
+                // Create destination file path in save directory
+                String fileName = selectedFile.getName();
+                File destinationFile = new File(SAVE_DIRECTORY + File.separator + fileName);
+
+                // Check if file with same name already exists - ask to overwrite if it does
+                if (destinationFile.exists()) {
+                    Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmAlert.setTitle("File Already Exists");
+                    confirmAlert.setHeaderText("A file with the name '" + fileName + "' already exists in the save directory.");
+                    confirmAlert.setContentText("Do you want to replace it?");
+
+                    if (confirmAlert.showAndWait().get() == ButtonType.OK) {
+                        // User confirmed overwrite
+                        copyFile(selectedFile, destinationFile);
+                    } else {
+                        // User canceled overwrite - ask for a new name
+                        renameAndCopyFile(selectedFile);
+                        return;
+                    }
+                } else {
+                    // No conflict, copy the file
+                    copyFile(selectedFile, destinationFile);
+                }
+
+                // Refresh the load menu to show the new file
+                setupLoadMenu();
+
+            } catch (Exception e) {
+                showErrorAlert("Error copying file: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Copies a file from source to destination
+     */
+    private void copyFile(File sourceFile, File destinationFile) throws IOException {
+        Files.copy(sourceFile.toPath(), destinationFile.toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        showInfoAlert("File Copied", "File '" + sourceFile.getName() +
+                "' has been copied to the save directory");
+    }
+
+    /**
+     * Asks the user for a new filename and copies the file with that name
+     */
+    private void renameAndCopyFile(File sourceFile) {
+        TextInputDialog dialog = new TextInputDialog(sourceFile.getName().replace(".json", "") + "_copy");
+        dialog.setTitle("Rename File");
+        dialog.setHeaderText("Please enter a new name for the file");
+        dialog.setContentText("New filename (without extension):");
+
+        dialog.showAndWait().ifPresent(newName -> {
+            if (!newName.isEmpty()) {
+                try {
+                    // Create destination file with new name
+                    File destinationFile = new File(SAVE_DIRECTORY + File.separator + newName + ".json");
+
+                    // Copy the file
+                    copyFile(sourceFile, destinationFile);
+
+                    // Refresh the load menu
+                    setupLoadMenu();
+
+                } catch (Exception e) {
+                    showErrorAlert("Error copying file: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public static void refreshGrid(int newSize) {
