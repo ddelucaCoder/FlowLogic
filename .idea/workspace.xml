@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Reformatted UI and improved drag and drop Efficiency">
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Building.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Building.java" afterDir="false" />
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="fixed building colors">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Intersection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Intersection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,7 +164,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741039450242</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="fixed building colors">
+      <option name="closed" value="true" />
+      <created>1741208826528</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1741208826528</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -231,6 +241,7 @@
     <MESSAGE value="Added Road and intersection images" />
     <MESSAGE value="version for pull" />
     <MESSAGE value="Reformatted UI and improved drag and drop Efficiency" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reformatted UI and improved drag and drop Efficiency" />
+    <MESSAGE value="fixed building colors" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed building colors" />
   </component>
 </project>
