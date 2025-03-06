@@ -1,13 +1,12 @@
 package com.FlowLogic;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
@@ -22,6 +21,11 @@ import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Comparator;
 
 
 public class UserInterface extends Application {
@@ -52,6 +56,9 @@ public class UserInterface extends Application {
     public static Scale scale = new Scale();
 
     private static Stage stage;
+
+    // Save Directory Path
+    private static final String SAVE_DIRECTORY = "saves";
 
     @Override
     public void start(Stage primaryStage) throws Error{
@@ -101,7 +108,7 @@ public class UserInterface extends Application {
         stage.show();
     }
 
-    private static void setupBuildMenu(){
+    private void setupBuildMenu(){
         //Stops user from resizing the window
         stage.setResizable(false);
 
@@ -263,14 +270,69 @@ public class UserInterface extends Application {
         stage.show();
     }
 
-    private static void setupLoadMenu() {
+    private void setupLoadMenu() {
         VBox root = new VBox();
         root.setAlignment(Pos.CENTER);
-        loadGridButton(root, grid);
+
+        Label titleLabel = new Label("Load Saved Layout");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+
+        // Get all save files from the save directory
+        File[] saveFiles = getSaveFiles();
+
+        if (saveFiles == null || saveFiles.length == 0) {
+            Label noFilesLabel = new Label("No save files found");
+            Button backButton = new Button("Back to Main Menu");
+            backButton.setOnAction(e -> start(stage));
+
+            root.getChildren().addAll(titleLabel, noFilesLabel, backButton);
+        } else {
+            // Convert file array to observable list for ListView
+            ObservableList<String> fileNames = FXCollections.observableArrayList();
+            for (File file : saveFiles) {
+                fileNames.add(file.getName());
+            }
+
+            // Create ListView to show save files
+            ListView<String> saveFileListView = new ListView<>(fileNames);
+            saveFileListView.setPrefHeight(400);
+            saveFileListView.setPrefWidth(400);
+
+            HBox buttonBox = new HBox(20);
+            buttonBox.setAlignment(Pos.CENTER);
+
+            Button loadButton = new Button("Load Selected");
+            Button cancelButton = new Button("Cancel");
+
+            loadButton.setOnAction(e -> {
+                loadGridButton(root, grid);
+                String selectedFileName = saveFileListView.getSelectionModel().getSelectedItem();
+                if (selectedFileName != null) {
+                    File selectedFile = new File(SAVE_DIRECTORY + File.separator + selectedFileName);
+                    boolean loadSuccessful = grid.loadGridState(selectedFile.getAbsolutePath());
+
+                    if (loadSuccessful) {
+                        System.out.println("Grid loaded successfully from " + selectedFileName);
+                        setupBuildMenu();
+                    } else {
+                        // Show error message
+                        showErrorAlert("Failed to load grid from " + selectedFileName);
+                    }
+                } else {
+                    showErrorAlert("Please select a save file");
+                }
+            });
+
+            cancelButton.setOnAction(e -> start(stage));
+
+            buttonBox.getChildren().addAll(loadButton, cancelButton);
+            root.getChildren().addAll(titleLabel, saveFileListView, buttonBox);
+        }
+
+        //loadGridButton(root, grid);
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         stage.setScene(scene);
         stage.show();
-
     }
 
     private static void createGridCells(Group gridGroup) {
@@ -361,10 +423,34 @@ public class UserInterface extends Application {
         Button saveButton = new Button("Save Current Layout");
         saveButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
 
-        // Add the button to the AnchorPane
+        // Add the button to the VBox
         mainLayout.getChildren().add(saveButton);
 
         saveButton.setOnAction(event -> {
+            // Show save dialog to get a name
+            TextInputDialog dialog = new TextInputDialog("layout");
+            dialog.setTitle("Save Layout");
+            dialog.setHeaderText("Enter a name for your layout");
+            dialog.setContentText("Name:");
+
+            dialog.showAndWait().ifPresent(name -> {
+
+                // Create filename with name and timestamp
+                String filename = name + ".json";
+                String filePath = SAVE_DIRECTORY + File.separator + filename;
+
+                boolean saveSuccessful = grid.saveGridState(filePath);
+
+                if (saveSuccessful) {
+                    showInfoAlert("Layout saved", "Layout saved successfully as " + filename);
+                    System.out.println("Grid saved successfully to " + filename);
+                } else {
+                    showErrorAlert("Failed to save layout to " + filename);
+                    System.out.println("Failed to save grid to " + filename);
+                }
+            });
+        });
+            /* OLD CODE
             // Create a file chooser dialog - select where to save it
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save Current Layout");
@@ -387,7 +473,7 @@ public class UserInterface extends Application {
                     System.out.println("Failed to save grid to " + file.getName());
                 }
             }
-        });
+             */
     }
 
     /**
@@ -397,7 +483,16 @@ public class UserInterface extends Application {
      * @param mainLayout The main AnchorPane layout
      * @param grid The Grid object containing the grid data to save
      */
-    public static void loadGridButton(VBox mainLayout, Grid grid) {
+    public void loadGridButton(VBox mainLayout, Grid grid) {
+        // Create the button
+        Button loadButton = new Button("Load Existing Layout");
+        loadButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+
+        // Add the button to the VBox
+        mainLayout.getChildren().add(loadButton);
+
+        loadButton.setOnAction(event -> setupLoadMenu());
+        /*
         // Create the button
         Button loadButton = new Button("Load Existing Layout");
         loadButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
@@ -430,6 +525,61 @@ public class UserInterface extends Application {
                 }
             }
         });
+         */
+    }
+
+    /**
+     * Creates the save directory if it doesn't exist
+     */
+    private static void createSaveDirectory() {
+        Path path = Paths.get(SAVE_DIRECTORY);
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+                System.out.println("Created save directory: " + path.toAbsolutePath());
+            } catch (Exception e) {
+                System.err.println("Failed to create save directory: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Gets all JSON files from the save directory
+     *
+     * @return Array of save files, sorted by last modified date (newest first)
+     */
+    private static File[] getSaveFiles() {
+        File saveDir = new File(SAVE_DIRECTORY);
+        File[] files = saveDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
+
+        if (files != null && files.length > 0) {
+            // Sort files by last modified date (newest first)
+            Arrays.sort(files, Comparator.comparing(File::lastModified).reversed());
+        }
+
+        return files;
+    }
+
+    /**
+     * Shows an error alert dialog
+     */
+    private static void showErrorAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    /**
+     * Shows an information alert dialog
+     */
+    private static void showInfoAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public static void refreshGrid(int newSize) {
