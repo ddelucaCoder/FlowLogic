@@ -63,6 +63,8 @@ public class Grid {
         imgToObj.put("YellowBuilding.png", new Building("yellow"));
         imgToObj.put("GreenBuilding.png", new Building("green"));
         imgToObj.put("RedBuilding.png", new Building("red"));
+        imgToObj.put("TwoWayRoadRight.png", new TwoWayRoad(Orientation.HORIZONTAL));
+        imgToObj.put("TwoWayRoad.png", new TwoWayRoad(Orientation.VERTICAL));
 
     }
 
@@ -575,7 +577,7 @@ public class Grid {
     }
 
     public int[][] gridToGraph() {
-        int[][] graph = new int[numRows][numColumns];
+
         ArrayList<Intersection> intersections = new ArrayList<>();
         // count intersections
         int numIntersections = 0;
@@ -587,14 +589,12 @@ public class Grid {
                 }
             }
         }
+        int[][] graph = new int[numIntersections][numIntersections];
 
         // route between intersections
         for (Intersection i : intersections) {
             for (int k = 0; k < 4; k++) {
                 Road currentRoad = i.getRoadList()[k];
-                if (currentRoad == null) {
-                    continue;
-                }
                 int row = i.getRowNum();
                 int col = i.getColNum();
                 if ((row > 0) && (grid[row - 1][col] == currentRoad)) {
@@ -607,13 +607,15 @@ public class Grid {
                     GridObject current = currentRoad;
                     while (!(current instanceof Intersection)) {
                         if (row == 0) {
-                            continue;
+                            break;
                         }
                         current = grid[row - 1][col];
                         row--;
                     }
-                    graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
-                } else if ((row <= numRows) && (grid[row + 1][col] == currentRoad)) {
+                    if (current instanceof Intersection) {
+                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                    }
+                } else if ((row < numRows - 1) && (grid[row + 1][col] == currentRoad)) {
                     if (currentRoad instanceof OneWayRoad) {
                         if (((OneWayRoad) currentRoad).getDirection() == Direction.UP) {
                             continue;
@@ -622,13 +624,15 @@ public class Grid {
                     // otherwise just follow it to its spot
                     GridObject current = currentRoad;
                     while (!(current instanceof Intersection)) {
-                        if (row == 0) {
-                            continue;
+                        if (row == numRows - 1) {
+                            break;
                         }
                         current = grid[row + 1][col];
                         row++;
                     }
-                    graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                    if (current instanceof Intersection) {
+                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                    }
                 } else if ((col > 0) && (grid[row][col - 1] == currentRoad)) {
                     if (currentRoad instanceof OneWayRoad) {
                         if (((OneWayRoad) currentRoad).getDirection() == Direction.RIGHT) {
@@ -638,14 +642,16 @@ public class Grid {
                     // otherwise just follow it to its spot
                     GridObject current = currentRoad;
                     while (!(current instanceof Intersection)) {
-                        if (row == 0) {
-                            continue;
+                        if (col == 0) {
+                            break;
                         }
                         current = grid[row][col - 1];
                         col--;
                     }
-                    graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
-                } else if ((col >= 0) && (grid[row][col + 1] == currentRoad)) {
+                    if (current instanceof Intersection) {
+                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                    }
+                } else if ((col < numColumns - 1) && (grid[row][col + 1] == currentRoad)) {
                     if (currentRoad instanceof OneWayRoad) {
                         if (((OneWayRoad) currentRoad).getDirection() == Direction.LEFT) {
                             continue;
@@ -654,11 +660,15 @@ public class Grid {
                     // otherwise just follow it to its spot
                     GridObject current = currentRoad;
                     while (!(current instanceof Intersection)) {
-                        if (row == 0) {
-                            continue;
+                        if (col == numColumns - 1) {
+                            break;
                         }
                         current = grid[row][col + 1];
                         col++;
+
+                    }
+                    if (current instanceof Intersection) {
+                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
                     }
                 }
             }
@@ -751,6 +761,14 @@ public class Grid {
         Image intersection = new Image(imageFile.toURI().toString());
         ImagePattern intersectionPattern = new ImagePattern(intersection);
         frontGrid[rowNum][colNum].setFill(intersectionPattern);
+    }
+
+    public void testGridInit() {
+        for (int i = 0; i < numRows; i++) {
+            for (int k = 0; k < numColumns; k++) {
+                frontGrid[i][k] = new Rectangle();
+            }
+        }
     }
 
     private void checkIntersectionNeeded(int rowNum, int colNum, Road newRoad) {
