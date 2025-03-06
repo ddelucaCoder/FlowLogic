@@ -108,11 +108,61 @@ public class Grid {
                         int length = properties.getInt("length");
                         boolean isInRoad = properties.getBoolean("isInRoad");
                         int inCars = properties.getInt("inCars");
+                        Direction direction = Direction.valueOf(properties.getString("direction"));
+                        int numLanes = properties.getInt("numLanes");
+                        ArrayList<Vehicle> vehicleList = new ArrayList<>();
 
-                        Road road = new Road(orientation, speedLimit, isInRoad, inCars, row, col);
-                        road.setLength(length);
+                        /* Future Change: Check for saved vehicles. For now, not necessary
+                        // Check if there are saved vehicles
+                        if (properties.has("vehicleList")) {
+                            JSONArray vehiclesArray = properties.getJSONArray("vehicleList");
+                            for (int j = 0; j < vehiclesArray.length(); j++) {
+                                // Insert vehicle parsing here
+                            }
+                        }
+                        */
 
-                        gridObject = road;
+                        OneWayRoad oneWayRoad = new OneWayRoad(orientation, speedLimit, isInRoad, inCars, row, col, direction,
+                                numLanes, vehicleList);
+                        oneWayRoad.setLength(length);
+
+                        gridObject = oneWayRoad;
+                        break;
+                    case "TwoWayRoad":
+                        Orientation twoWayOrientation = Orientation.valueOf(properties.getString("orientation"));
+                        int twoWaySpeedLimit = properties.getInt("speedLimit");
+                        boolean twoWayIsInRoad = properties.getBoolean("isInRoad");
+                        int twoWayInCars = properties.getInt("inCars");
+
+                        // Create left and right one-way roads
+                        OneWayRoad leftRoad;
+                        OneWayRoad rightRoad;
+
+                        if (properties.has("left") && properties.has("right")) {
+                            JSONObject leftObject = properties.getJSONObject("left");
+                            JSONObject rightObject = properties.getJSONObject("right");
+
+                            Direction leftDirection = Direction.valueOf(leftObject.getString("direction"));
+                            Direction rightDirection = Direction.valueOf(rightObject.getString("direction"));
+
+                            leftRoad = new OneWayRoad(twoWayOrientation, leftDirection);
+                            rightRoad = new OneWayRoad(twoWayOrientation, rightDirection);
+                        }
+                        else {
+                            // Set Directions based on their orientation
+                            if (twoWayOrientation == Orientation.VERTICAL) {
+                                leftRoad = new OneWayRoad(twoWayOrientation, Direction.DOWN);
+                                rightRoad = new OneWayRoad(twoWayOrientation, Direction.UP);
+                            } else {
+                                leftRoad = new OneWayRoad(twoWayOrientation, Direction.LEFT);
+                                rightRoad = new OneWayRoad(twoWayOrientation, Direction.RIGHT);
+                            }
+                        }
+
+                        TwoWayRoad twoWayRoad = new TwoWayRoad(twoWayOrientation, twoWaySpeedLimit, twoWayIsInRoad,
+                                twoWayInCars, row, col, leftRoad, rightRoad);
+
+                        gridObject = twoWayRoad;
                         break;
                     case "Building":
                         int xLength = properties.getInt("xLength");
@@ -141,6 +191,25 @@ public class Grid {
                         // Roads will be connected during the second pass
                         Intersection intersection = new Intersection(row, col, new Road[4]);
                         gridObject = intersection;
+                        break;
+                    case "StopSign":
+                        // Create a stop sign with empty road list
+                        // Roads will be connected during the second pass
+                        StopSign stopSign = new StopSign(row, col, new Road[4]);
+                        gridObject = stopSign;
+                        break;
+                    case "StopLight":
+                        // Get stoplight properties
+                        int timingOne = properties.getInt("timingOne");
+                        int timingTwo = properties.getInt("timingTwo");
+                        int lightOneColor = properties.getInt("lightOneColor");
+                        int lightTwoColor = properties.getInt("lightTwoColor");
+
+                        // Create stoplight with empty road list
+                        // Roads will be connected during the second pass
+                        StopLight stopLight = new StopLight(null, null, timingOne, timingTwo,
+                                lightOneColor, lightTwoColor, new Road[4], row, col);
+                        gridObject = stopLight;
                         break;
                 }
                 // Add everything to the grid
@@ -175,6 +244,7 @@ public class Grid {
                     }
                 }
             }
+
             UserInterface.refreshGrid(numRows);
             synchronizeGrid();
             System.out.println("Successfully loaded grid from " + filename);
@@ -219,15 +289,80 @@ public class Grid {
                     JSONObject properties = new JSONObject();
 
                     // Add different properties based on object type
-                    if (obj instanceof Road) {
-                        Road road = (Road) obj;
+                    if (obj instanceof OneWayRoad road) {
                         properties.put("orientation", road.getOrientation());
                         properties.put("speedLimit", road.getSpeedLimit());
                         properties.put("length", road.getLength());
                         properties.put("isInRoad", road.isInRoad());
                         properties.put("inCars", road.getInCars());
-                    } else if (obj instanceof Intersection intersection) {
+                        properties.put("direction", road.getDirection());
+                        properties.put("numLanes", road.getNumLanes());
+                        properties.put("vehicleList", road.getVehicleList());
+                    }
+                    else if (obj instanceof TwoWayRoad road) {
+                        properties.put("orientation", road.getOrientation());
+                        properties.put("speedLimit", road.getSpeedLimit());
+                        properties.put("isInRoad", road.isInRoad());
+                        properties.put("inCars", road.getInCars());
 
+                        // Save left and right one-way roads
+                        JSONObject leftRoadJson = new JSONObject();
+                        if (road.getLeft() != null) {
+                            leftRoadJson.put("direction", road.getLeft().getDirection().toString());
+                            leftRoadJson.put("numLanes", road.getLeft().getNumLanes());
+                        }
+                        properties.put("left", leftRoadJson);
+
+                        JSONObject rightRoadJson = new JSONObject();
+                        if (road.getRight() != null) {
+                            rightRoadJson.put("direction", road.getRight().getDirection().toString());
+                            rightRoadJson.put("numLanes", road.getRight().getNumLanes());
+                        }
+                        properties.put("right", rightRoadJson);
+                    }
+                    else if (obj instanceof StopSign stopSign) {
+                        // Save the connected roads as an array of references
+                        JSONArray connectedRoads = new JSONArray();
+                        Road[] roadList = stopSign.getRoadList();
+
+                        if (roadList != null) {
+                            for (Road road : roadList) {
+                                if (road != null) {
+                                    JSONObject roadRef = new JSONObject();
+                                    roadRef.put("row", road.getRowNum());
+                                    roadRef.put("column", road.getColNum());
+                                    roadRef.put("orientation", road.getOrientation().toString());
+                                    connectedRoads.put(roadRef);
+                                }
+                            }
+                        }
+                        properties.put("connectedRoads", connectedRoads);
+                    }
+                    else if (obj instanceof StopLight stopLight) {
+                        // Save the connected roads as an array of references
+                        JSONArray connectedRoads = new JSONArray();
+                        Road[] roadList = stopLight.getRoadList();
+
+                        if (roadList != null) {
+                            for (Road road : roadList) {
+                                if (road != null) {
+                                    JSONObject roadRef = new JSONObject();
+                                    roadRef.put("row", road.getRowNum());
+                                    roadRef.put("column", road.getColNum());
+                                    roadRef.put("orientation", road.getOrientation().toString());
+                                    connectedRoads.put(roadRef);
+                                }
+                            }
+                        }
+                        properties.put("connectedRoads", connectedRoads);
+
+                        // Save stoplight-specific properties
+                        properties.put("timingOne", stopLight.getTimingOne());
+                        properties.put("timingTwo", stopLight.getTimingTwo());
+                        properties.put("lightOneColor", stopLight.getLightOneColor());
+                        properties.put("lightTwoColor", stopLight.getLightTwoColor());
+                    }
+                    else if (obj instanceof Intersection intersection) {
                         // Save the connected roads as an array of references
                         JSONArray connectedRoads = new JSONArray();
                         Road[] roadList = intersection.getRoadList();
