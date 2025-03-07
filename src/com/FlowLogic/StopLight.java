@@ -30,6 +30,21 @@ public class StopLight extends Intersection implements GridObject {
         this.greenRed4WayImage = new Image("file:Images/GreenRed4WayStopLight.png");
         this.yellowRed4WayImage = new Image("file:Images/YellowRed4WayStopLight.png");
         this.allRed4WayImage = new Image("file:Images/AllRed4WayStopLight.png");
+        this.imageFile = new Image("file:Images/RedGreen4WayStopLight.png");
+    }
+
+    public StopLight(StopLight s) {
+        super(s.getRowNum(), s.getColNum(), s.getRoadList());
+        this.lightOneColor = s.getLightOneColor(); // Vertical Light
+        this.lightTwoColor = s.getLightTwoColor(); // Horizontal Light
+        this.timingOne = s.getTimingOne();
+        this.timingTwo = s.getTimingTwo();
+        this.redGreen4WayImage = new Image("file:Images/RedGreen4WayStopLight.png");
+        this.redYellow4WayImage = new Image("file:Images/RedYellow4WayStopLight.png");
+        this.greenRed4WayImage = new Image("file:Images/GreenRed4WayStopLight.png");
+        this.yellowRed4WayImage = new Image("file:Images/YellowRed4WayStopLight.png");
+        this.allRed4WayImage = new Image("file:Images/AllRed4WayStopLight.png");
+        this.imageFile = new Image("file:Images/RedGreen4WayStopLight.png");
     }
 
 
@@ -42,7 +57,7 @@ public class StopLight extends Intersection implements GridObject {
     }
 
     public GridObject clone() {
-        return null;
+        return new StopLight(this);
     }
 
     /**

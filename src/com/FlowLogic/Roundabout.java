@@ -27,7 +27,12 @@ public class Roundabout implements GridObject {
      */
     public Roundabout(List<Boolean> availableSpots) {
         this.availableSpots = availableSpots;
-        this.imageFile = new Image("file:Images/roundabout");
+        this.imageFile = new Image("file:Images/roundabout.png");
+    }
+
+    public Roundabout(Roundabout r) {
+        this.availableSpots = r.getAvailableSpots();
+        this.imageFile = r.getImageFile();
     }
 
 
@@ -47,7 +52,7 @@ public class Roundabout implements GridObject {
         return numAvailableSpots;
     }
     public GridObject clone() {
-        return null;
+        return new Roundabout(this);
     }
 
     /**

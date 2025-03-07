@@ -11,10 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -65,7 +62,13 @@ public class Grid {
         imgToObj.put("RedBuilding.png", new Building("red"));
         imgToObj.put("TwoWayRoadRight.png", new TwoWayRoad(Orientation.HORIZONTAL));
         imgToObj.put("TwoWayRoad.png", new TwoWayRoad(Orientation.VERTICAL));
-
+        imgToObj.put("4WayStopSign.png", new StopSign(0, 0, new Road[4]));
+        imgToObj.put("AllRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
+        imgToObj.put("roundabout.png", new Roundabout(new ArrayList<>()));
+        imgToObj.put("YellowRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
+        imgToObj.put("RedYellow4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
+        imgToObj.put("GreenRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
+        imgToObj.put("RedGreen4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
     }
 
     /**
@@ -217,6 +220,11 @@ public class Grid {
                                 lightOneColor, lightTwoColor, new Road[4], row, col);
                         gridObject = stopLight;
                         break;
+                    case "Roundabout":
+                        Roundabout roundabout = new Roundabout(new ArrayList<>());
+                        gridObject = roundabout;
+                        break;
+                        //idk
                 }
                 // Add everything to the grid
                 if (gridObject != null) {
@@ -934,6 +942,7 @@ public class Grid {
         for (int i = 0; i < numRows; i++) {
             for (int k = 0; k < numColumns; k++) {
                 if (grid[i][k] != null) {
+                    System.out.println(i + " i " + k + " k");
                     frontGrid[i][k].setFill(new ImagePattern(grid[i][k].getImageFile()));
                 }
             }
