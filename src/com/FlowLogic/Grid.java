@@ -447,9 +447,9 @@ public class Grid {
      * This function is called from the frontend when the user clicks on a square on the grid. It goes through the
      * options of each type of thing that could be clicked and does the appropriate action.
      * for each type of
-     * @param row
-     * @param col
-     * @param optionLayout
+     * @param row - row to select at
+     * @param col - col to select at
+     * @param optionLayout - the layout window to be further passed
      */
 
     public void select(int row, int col, VBox optionLayout) {
@@ -460,7 +460,7 @@ public class Grid {
                 b.getDailyPopulation(), row, col);
         } else if (obj instanceof Parking) {
             Parking p = (Parking) obj;
-            UserInterface.showBuildingOptions(optionLayout, this, p.getxLength(), p.getyLength(),
+            UserInterface.showParkingOptions(optionLayout, this, p.getxLength(), p.getyLength(),
                 p.getParkingCapacity(), row, col);
         } else if (obj instanceof Road) {
             UserInterface.showRoadOptions(optionLayout, this, row, col);
@@ -496,9 +496,9 @@ public class Grid {
 
     /**
      * This changes the population of the building at (row, col)
-     * @param row
-     * @param col
-     * @param newPop
+     * @param row - the row of the building to change
+     * @param col - the col of the building to change
+     * @param newPop - the new population to set
      */
     public void changeDailyPopulationBuilding(int row, int col, int newPop) {
         GridObject obj = getAtSpot(row, col);
@@ -510,9 +510,9 @@ public class Grid {
 
     /**
      * this changes the parking capacity at the parking lot at (row, col)
-     * @param row
-     * @param col
-     * @param newCap
+     * @param row - row of the parking building to change
+     * @param col - col of the parking building to change
+     * @param newCap - the new capacity for the parking lot
      */
     public void changeParkingCapacity(int row, int col, int newCap) {
         GridObject obj = getAtSpot(row, col);
@@ -524,10 +524,11 @@ public class Grid {
 
     /**
      * This function changes the size of the building at (row, col)
-     * @param row
-     * @param col
-     * @param newSizeX
-     * @param newSizeY
+     * it grows down and to the right, and vise versa for shrinking
+     * @param row - row of the building to change
+     * @param col - col of the building to change
+     * @param newSizeX - new width of the building
+     * @param newSizeY - new height of the building
      */
 
     public void changeBuildingSize(int row, int col, int newSizeX, int newSizeY) {
@@ -800,6 +801,13 @@ public class Grid {
         }
     }
 
+
+    /**
+     * Checks to see if an intersection is needed at the given spot
+     * @param rowNum
+     * @param colNum
+     * @param newRoad
+     */
     private void checkIntersectionNeeded(int rowNum, int colNum, Road newRoad) {
         if (rowNum < 0 || colNum < 0 || rowNum >= numRows || colNum >= numColumns) {
             return;
