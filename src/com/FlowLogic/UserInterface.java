@@ -1063,6 +1063,92 @@ public class UserInterface extends Application {
 
    }
 
+    public static void showTrafficLightOptions(VBox mainLayout, Grid grid, int row, int col) {
+        Label titleLabel= new Label("Traffic Light Options");
+        Label verticalLabel = new Label ("Vertical Timing:");
+        TextField verticalField = new TextField();
+        Label horizontalLabel = new Label ("Horizontal Timing:");
+        TextField horizontalField = new TextField();
+        Button submitButton = new Button("Submit Changes");
+        Button removeButton = new Button("Remove Intersection");
+        Button closeButton = new Button("Close Traffic Light Options");
+
+        TextFormatter<String> numberFormatterVert = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        TextFormatter<String> numberFormatterHor = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        verticalField.setTextFormatter(numberFormatterVert);
+        horizontalField.setTextFormatter(numberFormatterHor);
+
+        StopLight light = (StopLight) grid.getAtSpot(row, col);
+
+        verticalField.setText(Integer.toString(light.getTimingOne()));
+        horizontalField.setText(Integer.toString(light.getTimingTwo()));
+
+
+        mainLayout.getChildren().add(titleLabel);
+        mainLayout.getChildren().add(verticalLabel);
+        mainLayout.getChildren().add(verticalField);
+        mainLayout.getChildren().add(horizontalLabel);
+        mainLayout.getChildren().add(horizontalField);
+        mainLayout.getChildren().add(submitButton);
+        mainLayout.getChildren().add(removeButton);
+        mainLayout.getChildren().add(closeButton);
+
+        submitButton.setOnAction(e -> {
+            int vert = Integer.parseInt(verticalField.getText());
+            int hor = Integer.parseInt(verticalField.getText());
+            grid.updateTiming(light, vert, hor);
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(verticalField);
+            mainLayout.getChildren().remove(verticalLabel);
+            mainLayout.getChildren().remove(horizontalLabel);
+            mainLayout.getChildren().remove(horizontalField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+            showTrafficLightOptions(mainLayout, grid, row, col);
+        });
+
+        removeButton.setOnAction(e -> {
+            grid.remove(row, col);
+            refreshGrid(GRID_SIZE);
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(verticalField);
+            mainLayout.getChildren().remove(verticalLabel);
+            mainLayout.getChildren().remove(horizontalLabel);
+            mainLayout.getChildren().remove(horizontalField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        });
+
+        closeButton.setOnAction(e -> {
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(verticalField);
+            mainLayout.getChildren().remove(verticalLabel);
+            mainLayout.getChildren().remove(horizontalLabel);
+            mainLayout.getChildren().remove(horizontalField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        });
+
+
+    }
+
 
     public static void main(String[] args) {
         launch(args);

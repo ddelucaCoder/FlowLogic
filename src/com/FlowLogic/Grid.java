@@ -1,5 +1,6 @@
 package com.FlowLogic;
 
+import com.sun.prism.paint.Stop;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
@@ -464,6 +465,8 @@ public class Grid {
                 p.getParkingCapacity(), row, col);
         } else if (obj instanceof Road) {
             UserInterface.showRoadOptions(optionLayout, this, row, col);
+        } else if (obj instanceof StopLight) {
+            UserInterface.showTrafficLightOptions(optionLayout, this, row, col);
         }
     }
 
@@ -956,6 +959,11 @@ public class Grid {
             }
         }
         UserInterface.refreshGrid(numRows);
+    }
+
+    public void updateTiming(StopLight s, int newTimingVertical, int newTimingHorizontal) {
+        s.setTimingOne(newTimingVertical);
+        s.setTimingOne(newTimingHorizontal);
     }
 
 }
