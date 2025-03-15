@@ -629,6 +629,62 @@ public class UserInterface extends Application {
         });
     }
 
+    /**
+     * This function will allow a user to rename a save file
+     *
+     * @param sourceFile The file that will be renamed
+     */
+    private void renameSaveFile(File sourceFile) {
+        // First check to ensure the file exists
+        if (!sourceFile.exists()) {
+            showErrorAlert("File does not exist: " + sourceFile.getAbsolutePath());
+        }
+
+        // Show the dialog to get the new name
+        TextInputDialog dialog = new TextInputDialog(sourceFile.getName().replace(".json", ""));
+        dialog.setTitle("Rename File");
+        dialog.setHeaderText("Please enter a new name for the file");
+        dialog.setContentText("New filename (without extension):");
+
+        dialog.showAndWait().ifPresent(newName -> {
+            if (!newName.isEmpty()) {
+                try {
+                    // Create the new file path
+                    String newFilePath = SAVE_DIRECTORY + File.separator + newName + ".json";
+                    File newFile = new File(newFilePath);
+
+                    // Check if a file with the new name already exists
+                    if (newFile.exists()) {
+                        // Check with user to ensure they are ok with overwriting it
+                        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                        confirmAlert.setTitle("File Already Exists");
+                        confirmAlert.setHeaderText("A file with the name '" + newName + ".json' already exists.");
+                        confirmAlert.setContentText("Do you want to overwrite it?");
+
+                        if (confirmAlert.showAndWait().get() != ButtonType.OK) {
+                            // User cancelled overwrite
+                            return;
+                        }
+                    }
+
+                    // Rename the file
+                    boolean success = newFile.renameTo(newFile);
+
+                    if (success) {
+                        showInfoAlert("File Renamed", "File successfully renamed to " + newName + ".json");
+                        // Refresh the load menu to show the updated file name
+                        setupLoadMenu();
+                    }
+                    else {
+                        showErrorAlert("Failed to rename file. Please try again.");
+                    }
+                } catch (Exception e) {
+                    showErrorAlert("Error renaming file: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
     /**
      * This function goes through and recreates the grid cell by cell (this is maybe not ideal). It is also used when
