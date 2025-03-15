@@ -27,6 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class UserInterface extends Application {
@@ -295,10 +297,15 @@ public class UserInterface extends Application {
             root.getChildren().addAll(titleLabel, noFilesLabel, browseButton, backButton);
         } else {
             // Save files found
+
+            // Create a map to store filename to File object mapping for easy access to renaming/deleting files
+            Map<String, File> fileMap = new HashMap<>();
+
             // Convert file array to observable list for ListView
             ObservableList<String> fileNames = FXCollections.observableArrayList();
             for (File file : saveFiles) {
                 fileNames.add(file.getName());
+                fileMap.put(file.getName(), file);
             }
 
             // Create ListView to show save files
@@ -310,8 +317,10 @@ public class UserInterface extends Application {
             buttonBox.setAlignment(Pos.CENTER);
 
             Button loadButton = new Button("Load Selected");
+            Button renameButton = new Button("Rename Selected");
             Button cancelButton = new Button("Cancel");
 
+            // Set the action of the Load Button
             loadButton.setOnAction(e -> {
                 loadGridButton(root, grid);
                 String selectedFileName = saveFileListView.getSelectionModel().getSelectedItem();
@@ -331,9 +340,20 @@ public class UserInterface extends Application {
                 }
             });
 
+            // Set the action of the rename button
+            renameButton.setOnAction((e -> {
+                String selectedFileName = saveFileListView.getSelectionModel().getSelectedItem();
+                if (selectedFileName != null) {
+                    File selectedFile = fileMap.get(selectedFileName);
+                    renameSaveFile(selectedFile);
+                } else {
+                    showErrorAlert("Please select a save file to rename");
+                }
+            }));
+
             cancelButton.setOnAction(e -> start(stage));
 
-            buttonBox.getChildren().addAll(loadButton, browseButton, cancelButton);
+            buttonBox.getChildren().addAll(loadButton, renameButton, browseButton, cancelButton);
             root.getChildren().addAll(titleLabel, saveFileListView, buttonBox);
         }
 
@@ -668,7 +688,7 @@ public class UserInterface extends Application {
                     }
 
                     // Rename the file
-                    boolean success = newFile.renameTo(newFile);
+                    boolean success = sourceFile.renameTo(newFile);
 
                     if (success) {
                         showInfoAlert("File Renamed", "File successfully renamed to " + newName + ".json");
