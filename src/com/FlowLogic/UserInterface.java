@@ -687,6 +687,37 @@ public class UserInterface extends Application {
     }
 
     /**
+     * This function will allow a user to delete a save file
+     *
+     * @param file The file that will be deleted
+     */
+    private void deleteSaveFile(File file) {
+        if (!file.exists()) {
+            showErrorAlert("File does not exist: " + file.getAbsolutePath());
+            return;
+        }
+
+        // Confirm deletion with the user
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirm Delete");
+        confirmAlert.setHeaderText("Are you sure you want to delete '" + file.getName() + "'?");
+        confirmAlert.setContentText("This action cannot be undone.");
+
+        if (confirmAlert.showAndWait().get() == ButtonType.OK) {
+            // User confirmed the deletion, delete the file
+            boolean success = file.delete();
+
+            if (success) {
+                showInfoAlert("File Deleted", "File '" + file.getName() + "' was successfully deleted.");
+                // Refresh the load menu to show the updated file list
+                setupLoadMenu();
+            } else {
+                showErrorAlert("Failed to delete file. Please try again.");
+            }
+        }
+    }
+
+    /**
      * This function goes through and recreates the grid cell by cell (this is maybe not ideal). It is also used when
      * we need to resize the grid.
      * @param newSize - the size of the grid
