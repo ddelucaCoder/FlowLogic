@@ -318,7 +318,23 @@ public class UserInterface extends Application {
 
             Button loadButton = new Button("Load Selected");
             Button renameButton = new Button("Rename Selected");
+            Button deleteButton = new Button("Delete Selected");
             Button cancelButton = new Button("Cancel");
+
+            // Initially disable the buttons until a selection is made
+            loadButton.setDisable(true);
+            renameButton.setDisable(true);
+            deleteButton.setDisable(true);
+
+            // Add a listener to the ListView's selection model
+            // This will make sure the buttons only show up when a file is selected
+            saveFileListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                // Enable/disable buttons based on whether an item is selected
+                boolean hasSelection = (newValue != null);
+                loadButton.setDisable(!hasSelection);
+                renameButton.setDisable(!hasSelection);
+                deleteButton.setDisable(!hasSelection);
+            });
 
             // Set the action of the Load Button
             loadButton.setOnAction(e -> {
@@ -351,9 +367,20 @@ public class UserInterface extends Application {
                 }
             }));
 
+            // Set the action of the delete button
+            deleteButton.setOnAction((e -> {
+                String selectedFileName = saveFileListView.getSelectionModel().getSelectedItem();
+                if (selectedFileName != null) {
+                    File selectedFile = fileMap.get(selectedFileName);
+                    deleteSaveFile(selectedFile);
+                } else {
+                    showErrorAlert("Please select a save file to delete");
+                }
+            }));
+
             cancelButton.setOnAction(e -> start(stage));
 
-            buttonBox.getChildren().addAll(loadButton, renameButton, browseButton, cancelButton);
+            buttonBox.getChildren().addAll(loadButton, renameButton, deleteButton, browseButton, cancelButton);
             root.getChildren().addAll(titleLabel, saveFileListView, buttonBox);
         }
 
