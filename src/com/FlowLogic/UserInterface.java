@@ -59,6 +59,7 @@ public class UserInterface extends Application {
     public static Scale scale = new Scale();
 
     private static Stage stage;
+    private static Scene lastScene;
 
     // Save Directory Path
     private static final String SAVE_DIRECTORY = "saves";
@@ -109,6 +110,7 @@ public class UserInterface extends Application {
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         stage.setScene(scene);
         stage.show();
+        lastScene = scene;
     }
 
     private void setupBuildMenu(){
@@ -250,6 +252,12 @@ public class UserInterface extends Application {
         loadGridButton(right, grid);
         // add the resize button to the top right
         hideResizeBox(right, grid);
+        Button menu = new Button("Menu");
+        menu.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+        menu.setOnAction(e -> {
+            start(stage);
+        });
+        right.getChildren().add(menu);
 
 
         gridContainer.setOnMouseClicked(event -> {
@@ -272,6 +280,7 @@ public class UserInterface extends Application {
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         stage.setScene(scene);
         stage.show();
+        lastScene = scene;
     }
 
     private void setupLoadMenu() {
@@ -292,7 +301,14 @@ public class UserInterface extends Application {
             // No available save files
             Label noFilesLabel = new Label("No save files found");
             Button backButton = new Button("Back to Main Menu");
-            backButton.setOnAction(e -> start(stage));
+            backButton.setOnAction(e -> {
+                if (lastScene != null) {
+                    stage.setScene(lastScene);
+                }
+                else {
+                    start(stage);
+                }
+            });
 
             root.getChildren().addAll(titleLabel, noFilesLabel, browseButton, backButton);
         } else {
@@ -378,7 +394,15 @@ public class UserInterface extends Application {
                 }
             }));
 
-            cancelButton.setOnAction(e -> start(stage));
+
+            cancelButton.setOnAction(e -> {
+                if (lastScene != null) {
+                    stage.setScene(lastScene);
+                }
+                else {
+                    start(stage);
+                }
+            });
 
             buttonBox.getChildren().addAll(loadButton, renameButton, deleteButton, browseButton, cancelButton);
             root.getChildren().addAll(titleLabel, saveFileListView, buttonBox);
@@ -1155,7 +1179,7 @@ public class UserInterface extends Application {
 
            Rectangle cell = grid.getFrontGrid()[row][col];
            cell.setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
-           grid.placeObjectByImage("RoadImageUP.png", row, col);
+           grid.placeObjectByImage("RoadImageRight.png", row, col);
            grid.changeRoadDirection(row, col, Direction.RIGHT);
            mainLayout.getChildren().remove(titleLabel);
            mainLayout.getChildren().remove(directionLabel);
