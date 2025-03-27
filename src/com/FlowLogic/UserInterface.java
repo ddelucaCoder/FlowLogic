@@ -27,6 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class UserInterface extends Application {
@@ -57,6 +59,7 @@ public class UserInterface extends Application {
     public static Scale scale = new Scale();
 
     private static Stage stage;
+    private static Scene lastScene;
 
     // Save Directory Path
     private static final String SAVE_DIRECTORY = "saves";
@@ -107,6 +110,7 @@ public class UserInterface extends Application {
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         stage.setScene(scene);
         stage.show();
+        lastScene = scene;
     }
 
     private void setupBuildMenu(){
@@ -290,6 +294,12 @@ public class UserInterface extends Application {
         loadGridButton(right, grid);
         // add the resize button to the top right
         hideResizeBox(right, grid);
+        Button menu = new Button("Menu");
+        menu.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+        menu.setOnAction(e -> {
+            start(stage);
+        });
+        right.getChildren().add(menu);
 
 
         gridContainer.setOnMouseClicked(event -> {
@@ -312,6 +322,7 @@ public class UserInterface extends Application {
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         stage.setScene(scene);
         stage.show();
+        lastScene = scene;
     }
 
     private void setupLoadMenu() {
@@ -332,15 +343,27 @@ public class UserInterface extends Application {
             // No available save files
             Label noFilesLabel = new Label("No save files found");
             Button backButton = new Button("Back to Main Menu");
-            backButton.setOnAction(e -> start(stage));
+            backButton.setOnAction(e -> {
+                if (lastScene != null) {
+                    stage.setScene(lastScene);
+                }
+                else {
+                    start(stage);
+                }
+            });
 
             root.getChildren().addAll(titleLabel, noFilesLabel, browseButton, backButton);
         } else {
             // Save files found
+
+            // Create a map to store filename to File object mapping for easy access to renaming/deleting files
+            Map<String, File> fileMap = new HashMap<>();
+
             // Convert file array to observable list for ListView
             ObservableList<String> fileNames = FXCollections.observableArrayList();
             for (File file : saveFiles) {
                 fileNames.add(file.getName());
+                fileMap.put(file.getName(), file);
             }
 
             // Create ListView to show save files
@@ -352,8 +375,26 @@ public class UserInterface extends Application {
             buttonBox.setAlignment(Pos.CENTER);
 
             Button loadButton = new Button("Load Selected");
+            Button renameButton = new Button("Rename Selected");
+            Button deleteButton = new Button("Delete Selected");
             Button cancelButton = new Button("Cancel");
 
+            // Initially disable the buttons until a selection is made
+            loadButton.setDisable(true);
+            renameButton.setDisable(true);
+            deleteButton.setDisable(true);
+
+            // Add a listener to the ListView's selection model
+            // This will make sure the buttons only show up when a file is selected
+            saveFileListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                // Enable/disable buttons based on whether an item is selected
+                boolean hasSelection = (newValue != null);
+                loadButton.setDisable(!hasSelection);
+                renameButton.setDisable(!hasSelection);
+                deleteButton.setDisable(!hasSelection);
+            });
+
+            // Set the action of the Load Button
             loadButton.setOnAction(e -> {
                 loadGridButton(root, grid);
                 String selectedFileName = saveFileListView.getSelectionModel().getSelectedItem();
@@ -373,9 +414,39 @@ public class UserInterface extends Application {
                 }
             });
 
-            cancelButton.setOnAction(e -> start(stage));
+            // Set the action of the rename button
+            renameButton.setOnAction((e -> {
+                String selectedFileName = saveFileListView.getSelectionModel().getSelectedItem();
+                if (selectedFileName != null) {
+                    File selectedFile = fileMap.get(selectedFileName);
+                    renameSaveFile(selectedFile);
+                } else {
+                    showErrorAlert("Please select a save file to rename");
+                }
+            }));
 
-            buttonBox.getChildren().addAll(loadButton, browseButton, cancelButton);
+            // Set the action of the delete button
+            deleteButton.setOnAction((e -> {
+                String selectedFileName = saveFileListView.getSelectionModel().getSelectedItem();
+                if (selectedFileName != null) {
+                    File selectedFile = fileMap.get(selectedFileName);
+                    deleteSaveFile(selectedFile);
+                } else {
+                    showErrorAlert("Please select a save file to delete");
+                }
+            }));
+
+
+            cancelButton.setOnAction(e -> {
+                if (lastScene != null) {
+                    stage.setScene(lastScene);
+                }
+                else {
+                    start(stage);
+                }
+            });
+
+            buttonBox.getChildren().addAll(loadButton, renameButton, deleteButton, browseButton, cancelButton);
             root.getChildren().addAll(titleLabel, saveFileListView, buttonBox);
         }
 
@@ -671,6 +742,93 @@ public class UserInterface extends Application {
         });
     }
 
+    /**
+     * This function will allow a user to rename a save file
+     *
+     * @param sourceFile The file that will be renamed
+     */
+    private void renameSaveFile(File sourceFile) {
+        // First check to ensure the file exists
+        if (!sourceFile.exists()) {
+            showErrorAlert("File does not exist: " + sourceFile.getAbsolutePath());
+        }
+
+        // Show the dialog to get the new name
+        TextInputDialog dialog = new TextInputDialog(sourceFile.getName().replace(".json", ""));
+        dialog.setTitle("Rename File");
+        dialog.setHeaderText("Please enter a new name for the file");
+        dialog.setContentText("New filename (without extension):");
+
+        dialog.showAndWait().ifPresent(newName -> {
+            if (!newName.isEmpty()) {
+                try {
+                    // Create the new file path
+                    String newFilePath = SAVE_DIRECTORY + File.separator + newName + ".json";
+                    File newFile = new File(newFilePath);
+
+                    // Check if a file with the new name already exists
+                    if (newFile.exists()) {
+                        // Check with user to ensure they are ok with overwriting it
+                        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                        confirmAlert.setTitle("File Already Exists");
+                        confirmAlert.setHeaderText("A file with the name '" + newName + ".json' already exists.");
+                        confirmAlert.setContentText("Do you want to overwrite it?");
+
+                        if (confirmAlert.showAndWait().get() != ButtonType.OK) {
+                            // User cancelled overwrite
+                            return;
+                        }
+                    }
+
+                    // Rename the file
+                    boolean success = sourceFile.renameTo(newFile);
+
+                    if (success) {
+                        showInfoAlert("File Renamed", "File successfully renamed to " + newName + ".json");
+                        // Refresh the load menu to show the updated file name
+                        setupLoadMenu();
+                    }
+                    else {
+                        showErrorAlert("Failed to rename file. Please try again.");
+                    }
+                } catch (Exception e) {
+                    showErrorAlert("Error renaming file: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * This function will allow a user to delete a save file
+     *
+     * @param file The file that will be deleted
+     */
+    private void deleteSaveFile(File file) {
+        if (!file.exists()) {
+            showErrorAlert("File does not exist: " + file.getAbsolutePath());
+            return;
+        }
+
+        // Confirm deletion with the user
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirm Delete");
+        confirmAlert.setHeaderText("Are you sure you want to delete '" + file.getName() + "'?");
+        confirmAlert.setContentText("This action cannot be undone.");
+
+        if (confirmAlert.showAndWait().get() == ButtonType.OK) {
+            // User confirmed the deletion, delete the file
+            boolean success = file.delete();
+
+            if (success) {
+                showInfoAlert("File Deleted", "File '" + file.getName() + "' was successfully deleted.");
+                // Refresh the load menu to show the updated file list
+                setupLoadMenu();
+            } else {
+                showErrorAlert("Failed to delete file. Please try again.");
+            }
+        }
+    }
 
     /**
      * This function goes through and recreates the grid cell by cell (this is maybe not ideal). It is also used when
@@ -1063,7 +1221,7 @@ public class UserInterface extends Application {
 
            Rectangle cell = grid.getFrontGrid()[row][col];
            cell.setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
-           grid.placeObjectByImage("RoadImageUP.png", row, col);
+           grid.placeObjectByImage("RoadImageRight.png", row, col);
            grid.changeRoadDirection(row, col, Direction.RIGHT);
            mainLayout.getChildren().remove(titleLabel);
            mainLayout.getChildren().remove(directionLabel);
@@ -1104,6 +1262,92 @@ public class UserInterface extends Application {
 
 
    }
+
+    public static void showTrafficLightOptions(VBox mainLayout, Grid grid, int row, int col) {
+        Label titleLabel= new Label("Traffic Light Options");
+        Label verticalLabel = new Label ("Vertical Timing:");
+        TextField verticalField = new TextField();
+        Label horizontalLabel = new Label ("Horizontal Timing:");
+        TextField horizontalField = new TextField();
+        Button submitButton = new Button("Submit Changes");
+        Button removeButton = new Button("Remove Intersection");
+        Button closeButton = new Button("Close Traffic Light Options");
+
+        TextFormatter<String> numberFormatterVert = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        TextFormatter<String> numberFormatterHor = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        verticalField.setTextFormatter(numberFormatterVert);
+        horizontalField.setTextFormatter(numberFormatterHor);
+
+        StopLight light = (StopLight) grid.getAtSpot(row, col);
+
+        verticalField.setText(Integer.toString(light.getTimingOne()));
+        horizontalField.setText(Integer.toString(light.getTimingTwo()));
+
+
+        mainLayout.getChildren().add(titleLabel);
+        mainLayout.getChildren().add(verticalLabel);
+        mainLayout.getChildren().add(verticalField);
+        mainLayout.getChildren().add(horizontalLabel);
+        mainLayout.getChildren().add(horizontalField);
+        mainLayout.getChildren().add(submitButton);
+        mainLayout.getChildren().add(removeButton);
+        mainLayout.getChildren().add(closeButton);
+
+        submitButton.setOnAction(e -> {
+            int vert = Integer.parseInt(verticalField.getText());
+            int hor = Integer.parseInt(verticalField.getText());
+            grid.updateTiming(light, vert, hor);
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(verticalField);
+            mainLayout.getChildren().remove(verticalLabel);
+            mainLayout.getChildren().remove(horizontalLabel);
+            mainLayout.getChildren().remove(horizontalField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+            showTrafficLightOptions(mainLayout, grid, row, col);
+        });
+
+        removeButton.setOnAction(e -> {
+            grid.remove(row, col);
+            refreshGrid(GRID_SIZE);
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(verticalField);
+            mainLayout.getChildren().remove(verticalLabel);
+            mainLayout.getChildren().remove(horizontalLabel);
+            mainLayout.getChildren().remove(horizontalField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        });
+
+        closeButton.setOnAction(e -> {
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(verticalField);
+            mainLayout.getChildren().remove(verticalLabel);
+            mainLayout.getChildren().remove(horizontalLabel);
+            mainLayout.getChildren().remove(horizontalField);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        });
+
+
+    }
 
 
     public static void main(String[] args) {

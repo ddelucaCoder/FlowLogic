@@ -3,10 +3,10 @@ package com.FlowLogic;
 import javafx.scene.image.Image;
 
 public class StopLight extends Intersection implements GridObject {
-    private int timingOne;
-    private int timingTwo;
-    private int lightOneColor;
-    private int lightTwoColor;
+    private int timingOne; // vertical light (top-bottom)
+    private int timingTwo; // horizontal light (left-right)
+    private int lightOneColor; // vertical light (top-bottom)
+    private int lightTwoColor; // horizontal light (left-right)
     final int RED = 0;
     final int YELLOW = 1;
     final int GREEN = 2;
@@ -19,6 +19,8 @@ public class StopLight extends Intersection implements GridObject {
     private Image yellowRed4WayImage;
     private Image allRed4WayImage;
 
+    private int timer;
+
     public StopLight(Road roadOne, Road roadTwo, int timingOne, int timingTwo, int lightOneColor, int lightTwoColor, Road[] roadList, int rowNum, int colNum) {
         super(rowNum, colNum, roadList);
         this.lightOneColor = lightOneColor; // Vertical Light
@@ -30,6 +32,21 @@ public class StopLight extends Intersection implements GridObject {
         this.greenRed4WayImage = new Image("file:Images/GreenRed4WayStopLight.png");
         this.yellowRed4WayImage = new Image("file:Images/YellowRed4WayStopLight.png");
         this.allRed4WayImage = new Image("file:Images/AllRed4WayStopLight.png");
+        this.imageFile = new Image("file:Images/RedGreen4WayStopLight.png");
+    }
+
+    public StopLight(StopLight s) {
+        super(s.getRowNum(), s.getColNum(), s.getRoadList());
+        this.lightOneColor = s.getLightOneColor(); // Vertical Light
+        this.lightTwoColor = s.getLightTwoColor(); // Horizontal Light
+        this.timingOne = s.getTimingOne();
+        this.timingTwo = s.getTimingTwo();
+        this.redGreen4WayImage = new Image("file:Images/RedGreen4WayStopLight.png");
+        this.redYellow4WayImage = new Image("file:Images/RedYellow4WayStopLight.png");
+        this.greenRed4WayImage = new Image("file:Images/GreenRed4WayStopLight.png");
+        this.yellowRed4WayImage = new Image("file:Images/YellowRed4WayStopLight.png");
+        this.allRed4WayImage = new Image("file:Images/AllRed4WayStopLight.png");
+        this.imageFile = new Image("file:Images/RedGreen4WayStopLight.png");
     }
 
 
@@ -42,7 +59,7 @@ public class StopLight extends Intersection implements GridObject {
     }
 
     public GridObject clone() {
-        return null;
+        return new StopLight(this);
     }
 
     /**
@@ -91,6 +108,21 @@ public class StopLight extends Intersection implements GridObject {
             }
         }
         return true;
+    }
+
+    /**
+     * Called by the simulation to get and change the state of the light at hand
+     * @return true if there was a change, false otherwise
+     */
+    public boolean tick() {
+        timer--;
+        if (timer <= 0) {
+            // set the image to yellow light or green light
+            // set the timer to a new time
+            timer = 5; // TODO: change this to a realistic time
+            return true;
+        }
+        return false;
     }
 
     // getters and setters

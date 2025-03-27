@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="for pull">
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Fixed grid to graph algo and tested it">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,19 +46,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;isaac-dev&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "dom__dev",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="UI" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.FlowLogic.UserInterface" />
@@ -83,7 +82,6 @@
       <workItem from="1740443332602" duration="4938000" />
       <workItem from="1740664465878" duration="1514000" />
       <workItem from="1740752532896" duration="1056000" />
-      <workItem from="1743085972387" duration="4938000" />
     </task>
     <task id="LOCAL-00001" summary="implemented onewayroad class">
       <option name="closed" value="true" />
@@ -188,23 +186,7 @@
       <option name="project" value="LOCAL" />
       <updated>1741276291835</updated>
     </task>
-    <task id="LOCAL-00014" summary="Implemented intersection updates when direction of a road is changed">
-      <option name="closed" value="true" />
-      <created>1741288647930</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1741288647930</updated>
-    </task>
-    <task id="LOCAL-00015" summary="for pull">
-      <option name="closed" value="true" />
-      <created>1741358496777</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1741358496777</updated>
-    </task>
-    <option name="localTasksCounter" value="16" />
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -249,7 +231,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/main" />
+                        <option value="isaac-dev" />
                       </list>
                     </value>
                   </entry>
@@ -276,19 +258,6 @@
     <MESSAGE value="fixed building colors" />
     <MESSAGE value="Added gridToGraph Algorithm (not tested)" />
     <MESSAGE value="Fixed grid to graph algo and tested it" />
-    <MESSAGE value="Implemented intersection updates when direction of a road is changed" />
-    <MESSAGE value="for pull" />
-    <option name="LAST_COMMIT_MESSAGE" value="for pull" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java</url>
-          <line>215</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed grid to graph algo and tested it" />
   </component>
 </project>

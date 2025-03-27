@@ -1,5 +1,6 @@
 package com.FlowLogic;
 
+import com.sun.prism.paint.Stop;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
@@ -11,10 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -65,7 +63,13 @@ public class Grid {
         imgToObj.put("RedBuilding.png", new Building("red"));
         imgToObj.put("TwoWayRoadRight.png", new TwoWayRoad(Orientation.HORIZONTAL));
         imgToObj.put("TwoWayRoad.png", new TwoWayRoad(Orientation.VERTICAL));
-
+        imgToObj.put("4WayStopSign.png", new StopSign(0, 0, new Road[4]));
+        imgToObj.put("AllRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
+        imgToObj.put("roundabout.png", new Roundabout(new ArrayList<>()));
+        imgToObj.put("YellowRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
+        imgToObj.put("RedYellow4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
+        imgToObj.put("GreenRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
+        imgToObj.put("RedGreen4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
     }
 
     /**
@@ -217,6 +221,11 @@ public class Grid {
                                 lightOneColor, lightTwoColor, new Road[4], row, col);
                         gridObject = stopLight;
                         break;
+                    case "Roundabout":
+                        Roundabout roundabout = new Roundabout(new ArrayList<>());
+                        gridObject = roundabout;
+                        break;
+                        //idk
                 }
                 // Add everything to the grid
                 if (gridObject != null) {
@@ -449,9 +458,9 @@ public class Grid {
      * This function is called from the frontend when the user clicks on a square on the grid. It goes through the
      * options of each type of thing that could be clicked and does the appropriate action.
      * for each type of
-     * @param row
-     * @param col
-     * @param optionLayout
+     * @param row - row to select at
+     * @param col - col to select at
+     * @param optionLayout - the layout window to be further passed
      */
 
     public void select(int row, int col, VBox optionLayout) {
@@ -462,10 +471,12 @@ public class Grid {
                 b.getDailyPopulation(), row, col);
         } else if (obj instanceof Parking) {
             Parking p = (Parking) obj;
-            UserInterface.showBuildingOptions(optionLayout, this, p.getxLength(), p.getyLength(),
+            UserInterface.showParkingOptions(optionLayout, this, p.getxLength(), p.getyLength(),
                 p.getParkingCapacity(), row, col);
         } else if (obj instanceof Road) {
             UserInterface.showRoadOptions(optionLayout, this, row, col);
+        } else if (obj instanceof StopLight) {
+            UserInterface.showTrafficLightOptions(optionLayout, this, row, col);
         }
     }
 
@@ -498,9 +509,9 @@ public class Grid {
 
     /**
      * This changes the population of the building at (row, col)
-     * @param row
-     * @param col
-     * @param newPop
+     * @param row - the row of the building to change
+     * @param col - the col of the building to change
+     * @param newPop - the new population to set
      */
     public void changeDailyPopulationBuilding(int row, int col, int newPop) {
         GridObject obj = getAtSpot(row, col);
@@ -512,9 +523,9 @@ public class Grid {
 
     /**
      * this changes the parking capacity at the parking lot at (row, col)
-     * @param row
-     * @param col
-     * @param newCap
+     * @param row - row of the parking building to change
+     * @param col - col of the parking building to change
+     * @param newCap - the new capacity for the parking lot
      */
     public void changeParkingCapacity(int row, int col, int newCap) {
         GridObject obj = getAtSpot(row, col);
@@ -526,10 +537,11 @@ public class Grid {
 
     /**
      * This function changes the size of the building at (row, col)
-     * @param row
-     * @param col
-     * @param newSizeX
-     * @param newSizeY
+     * it grows down and to the right, and vise versa for shrinking
+     * @param row - row of the building to change
+     * @param col - col of the building to change
+     * @param newSizeX - new width of the building
+     * @param newSizeY - new height of the building
      */
 
     public void changeBuildingSize(int row, int col, int newSizeX, int newSizeY) {
@@ -802,6 +814,13 @@ public class Grid {
         }
     }
 
+
+    /**
+     * Checks to see if an intersection is needed at the given spot
+     * @param rowNum
+     * @param colNum
+     * @param newRoad
+     */
     private void checkIntersectionNeeded(int rowNum, int colNum, Road newRoad) {
         if (rowNum < 0 || colNum < 0 || rowNum >= numRows || colNum >= numColumns) {
             return;
@@ -944,11 +963,17 @@ public class Grid {
         for (int i = 0; i < numRows; i++) {
             for (int k = 0; k < numColumns; k++) {
                 if (grid[i][k] != null) {
+                    System.out.println(i + " i " + k + " k");
                     frontGrid[i][k].setFill(new ImagePattern(grid[i][k].getImageFile()));
                 }
             }
         }
         UserInterface.refreshGrid(numRows);
+    }
+
+    public void updateTiming(StopLight s, int newTimingVertical, int newTimingHorizontal) {
+        s.setTimingOne(newTimingVertical);
+        s.setTimingOne(newTimingHorizontal);
     }
 
 }

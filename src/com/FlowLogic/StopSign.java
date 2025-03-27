@@ -11,7 +11,12 @@ public class StopSign extends Intersection {
 
     public StopSign(int rowNum, int colNum, Road[] roads) {
         super(rowNum, colNum, roads);
-        this.imageFile = new Image("file:Images/4WayStopSign");
+        this.imageFile = new Image("file:Images/4WayStopSign.png");
+    }
+
+    public StopSign(StopSign s) {
+        super(s.getRowNum(), s.getColNum(), s.getRoadList());
+        this.imageFile = new Image("file:Images/4WayStopSign.png");
     }
 
 
@@ -46,7 +51,7 @@ public class StopSign extends Intersection {
 
     public GridObject clone() {
 
-        return null;
+        return new StopSign(this);
     }
     @Override
     public Image getImageFile() {
