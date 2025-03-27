@@ -9,7 +9,7 @@ public class Intersection implements GridObject {
     private int colNum;
     private Image imageFile;
 
-    private int intersectionID;
+    private int intersectionID = -1;
 
     public Intersection(int rowNum, int colNum, Road[] roadList) {
         this.rowNum = rowNum;

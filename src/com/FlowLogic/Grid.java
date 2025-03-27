@@ -40,6 +40,8 @@ public class Grid {
 
     private int numObjs = 0;
 
+    ArrayList<Intersection> intersections;
+
     //Allows for quick conversion from Image file to backend object
     public static HashMap<String, GridObject> imgToObj = new HashMap<>();
 
@@ -619,16 +621,39 @@ public class Grid {
 
     }
 
+    /**
+     * This is a recursive function that sets all touching intersections to have the same ID
+     * @param value - the value of the ID
+     * @param row - row location of the intersection to check around
+     * @param col - col location of the intersection to check around
+     */
+    private void groupIntersections(int value, int row, int col) {
+        if (row < 0 || row >= numRows) return;
+        if (col < 0 || col >= numColumns) return;
+        if (!(getAtSpot(row, col) instanceof Intersection)) return;
+        Intersection i = (Intersection) getAtSpot(row, col);
+        if (i.getIntersectionID() != -1) return;
+
+        i.setIntersectionID(value);
+        groupIntersections(value, row + 1, col);
+        groupIntersections(value, row - 1, col);
+        groupIntersections(value, row, col + 1);
+        groupIntersections(value, row, col - 1);
+
+    }
+
     public int[][] gridToGraph() {
 
-        ArrayList<Intersection> intersections = new ArrayList<>();
+        intersections = new ArrayList<>();
         // count intersections
         int numIntersections = 0;
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numColumns; j++) {
                 if (getAtSpot(i, j) instanceof Intersection in) {
-                    in.setIntersectionID(numIntersections++);
-                    intersections.add(in);
+                    if (in.getIntersectionID() == -1) {
+                        groupIntersections(numIntersections++, i, j);
+                        intersections.add(in);
+                    }
                 }
             }
         }
@@ -646,17 +671,19 @@ public class Grid {
                             continue;
                         }
                     }
+                    int len = 0;
                     // otherwise just follow it to its spot
                     GridObject current = currentRoad;
                     while (!(current instanceof Intersection)) {
                         if (row == 0) {
                             break;
                         }
+                        len++;
                         current = grid[row - 1][col];
                         row--;
                     }
                     if (current instanceof Intersection) {
-                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = len;
                     }
                 } else if ((row < numRows - 1) && (grid[row + 1][col] == currentRoad)) {
                     if (currentRoad instanceof OneWayRoad) {
@@ -666,15 +693,17 @@ public class Grid {
                     }
                     // otherwise just follow it to its spot
                     GridObject current = currentRoad;
+                    int len = 0;
                     while (!(current instanceof Intersection)) {
                         if (row == numRows - 1) {
                             break;
                         }
                         current = grid[row + 1][col];
+                        len++;
                         row++;
                     }
                     if (current instanceof Intersection) {
-                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = len;
                     }
                 } else if ((col > 0) && (grid[row][col - 1] == currentRoad)) {
                     if (currentRoad instanceof OneWayRoad) {
@@ -684,15 +713,17 @@ public class Grid {
                     }
                     // otherwise just follow it to its spot
                     GridObject current = currentRoad;
+                    int len = 0;
                     while (!(current instanceof Intersection)) {
                         if (col == 0) {
                             break;
                         }
                         current = grid[row][col - 1];
+                        len++;
                         col--;
                     }
                     if (current instanceof Intersection) {
-                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = len;
                     }
                 } else if ((col < numColumns - 1) && (grid[row][col + 1] == currentRoad)) {
                     if (currentRoad instanceof OneWayRoad) {
@@ -702,16 +733,18 @@ public class Grid {
                     }
                     // otherwise just follow it to its spot
                     GridObject current = currentRoad;
+                    int len = 0;
                     while (!(current instanceof Intersection)) {
                         if (col == numColumns - 1) {
                             break;
                         }
                         current = grid[row][col + 1];
+                        len++;
                         col++;
 
                     }
                     if (current instanceof Intersection) {
-                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = 1;
+                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = len;
                     }
                 }
             }
