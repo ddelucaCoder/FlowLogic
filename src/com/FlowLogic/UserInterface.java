@@ -202,6 +202,7 @@ public class UserInterface extends Application {
         gridContainer.setOnDragDropped(event -> {
             //Fills the cell with the image
             Dragboard db = event.getDragboard();
+            Image dbImage = db.getImage();
             // Get the mouse click coordinates
             double x = (event.getX() - offsetX) / scale.getX();
             double y = (event.getY() - offsetY) / scale.getY();
@@ -210,12 +211,53 @@ public class UserInterface extends Application {
             int row = (int) (y / CELL_SIZE);
             int col = (int) (x / CELL_SIZE);
             Rectangle cell = grid.getFrontGrid()[row][col];
-            if (!(cell.getFill() instanceof ImagePattern)) {
-                cell.setFill(new ImagePattern(db.getImage()));
+            // Check to see if it is a two-way road
+            if (grid.isTwoWayRoad(db.getString())) {
+                System.out.println("This is a two way road\n");
+                // add the two roads to the graph
+                int row2;
+                int col2;
+                Rectangle cell2;
+                if(db.getString().equals("TwoWayRoad.png")) {
+                    // add up and down one-ways
+                    col2 = col + 1;
+                    cell2 = grid.getFrontGrid()[row][col2];
+                    Image image = new Image("file:Images/RoadImage.png");
+                    if (!(cell2.getFill() instanceof ImagePattern)) {
+                        cell2.setFill(new ImagePattern(image));
+                        grid.placeObjectByImage("RoadImage.png", row, col2);
+                        System.out.println(image.getUrl());
+                    }
+                    dbImage = new Image("file:Images/RoadImageDown.png");
+                    if (!(cell.getFill() instanceof ImagePattern)) {
+                        cell.setFill(new ImagePattern(dbImage));
+                        grid.placeObjectByImage("RoadImageDown.png", row, col);
+                        System.out.println(dbImage.getUrl());
+                    }
+                } else {
+                    // add left and right one-ways
+                    row2 = row + 1;
+                    cell2 = grid.getFrontGrid()[row2][col];
+                    Image image = new Image("file:Images/RoadImageRight.png");
+                    if (!(cell2.getFill() instanceof ImagePattern)) {
+                        cell2.setFill(new ImagePattern(image));
+                        grid.placeObjectByImage("RoadImageRight.png", row2, col);
+                        System.out.println(image.getUrl());
+                    }
+                    dbImage = new Image("file:Images/RoadImageLeft.png");
+                    if (!(cell.getFill() instanceof ImagePattern)) {
+                        cell.setFill(new ImagePattern(dbImage));
+                        grid.placeObjectByImage("RoadImageLeft.png", row, col);
+                        System.out.println(dbImage.getUrl());
+                    }
+                }
+            } else if (!(cell.getFill() instanceof ImagePattern)) {
+                cell.setFill(new ImagePattern(dbImage));
                 grid.placeObjectByImage(db.getString(), row, col);
                 System.out.println(db.getString());
             }
 
+            // Update container classes for roads
         });
 
         GridPane left = new GridPane();

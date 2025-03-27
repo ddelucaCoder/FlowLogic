@@ -436,6 +436,16 @@ public class Grid {
     }
 
     /**
+     * This function checks an image file to see if it is a two-way road
+     */
+    public boolean isTwoWayRoad(String imageFile) {
+        return switch (imageFile) {
+            case "TwoWayRoad.png", "TwoWayRoadRight.png" -> true;
+            default -> false;
+        };
+    }
+
+    /**
      * This function is called from the frontend when the user clicks on a square on the grid. It goes through the
      * options of each type of thing that could be clicked and does the appropriate action.
      * for each type of
