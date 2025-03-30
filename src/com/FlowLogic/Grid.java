@@ -118,6 +118,7 @@ public class Grid {
                         int inCars = properties.getInt("inCars");
                         Direction direction = Direction.valueOf(properties.getString("direction"));
                         int numLanes = properties.getInt("numLanes");
+                        String name = properties.getString("name");
                         ArrayList<Vehicle> vehicleList = new ArrayList<>();
 
                         /* Future Change: Check for saved vehicles. For now, not necessary
@@ -133,6 +134,7 @@ public class Grid {
                         OneWayRoad oneWayRoad = new OneWayRoad(orientation, speedLimit, isInRoad, inCars, row, col, direction,
                                 numLanes, vehicleList);
                         oneWayRoad.setLength(length);
+                        oneWayRoad.setName(name);
 
                         gridObject = oneWayRoad;
                         break;
@@ -141,6 +143,7 @@ public class Grid {
                         int twoWaySpeedLimit = properties.getInt("speedLimit");
                         boolean twoWayIsInRoad = properties.getBoolean("isInRoad");
                         int twoWayInCars = properties.getInt("inCars");
+                        String twoWayName = properties.getString("name");
 
                         // Create left and right one-way roads
                         OneWayRoad leftRoad;
@@ -169,6 +172,7 @@ public class Grid {
 
                         TwoWayRoad twoWayRoad = new TwoWayRoad(twoWayOrientation, twoWaySpeedLimit, twoWayIsInRoad,
                                 twoWayInCars, row, col, leftRoad, rightRoad);
+                        twoWayRoad.setName(twoWayName);
 
                         gridObject = twoWayRoad;
                         break;
@@ -177,11 +181,13 @@ public class Grid {
                         int yLength = properties.getInt("yLength");
                         int dailyPopulation = properties.getInt("dailyPopulation");
                         String color = properties.getString("color");
+                        String buildingName = properties.getString("name");
 
                         Building building = new Building(xLength, yLength, dailyPopulation);
                         building.setRowNum(row);
                         building.setColNum(col);
                         building.setColor(color);
+                        building.setName(buildingName);
 
                         gridObject = building;
                         break;
@@ -313,6 +319,7 @@ public class Grid {
                         properties.put("direction", road.getDirection());
                         properties.put("numLanes", road.getNumLanes());
                         properties.put("vehicleList", road.getVehicleList());
+                        properties.put("name", road.getName());
                     }
                     else if (obj instanceof TwoWayRoad road) {
                         properties.put("orientation", road.getOrientation());
@@ -334,6 +341,8 @@ public class Grid {
                             rightRoadJson.put("numLanes", road.getRight().getNumLanes());
                         }
                         properties.put("right", rightRoadJson);
+
+                        properties.put("name", road.getName());
                     }
                     else if (obj instanceof StopSign stopSign) {
                         // Save the connected roads as an array of references
@@ -400,6 +409,7 @@ public class Grid {
                         properties.put("yLength", building.getyLength());
                         properties.put("dailyPopulation", building.getDailyPopulation());
                         properties.put("color", building.getColor());
+                        properties.put("name", building.getName());
                     }
                     else if (obj instanceof Parking parking) {
                         properties.put("xLength", parking.getxLength());
