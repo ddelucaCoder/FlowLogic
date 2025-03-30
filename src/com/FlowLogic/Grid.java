@@ -474,10 +474,104 @@ public class Grid {
             UserInterface.showParkingOptions(optionLayout, this, p.getxLength(), p.getyLength(),
                 p.getParkingCapacity(), row, col);
         } else if (obj instanceof Road) {
-            UserInterface.showRoadOptions(optionLayout, this, row, col);
+            if (UserInterface.isEntireRoadSelectionEnabled()) {
+                // Get all connected road tiles
+                Set<int[]> connectedRoads = getConnectedRoadTiles(row, col);
+                UserInterface.showRoadOptions(optionLayout, this, row, col, connectedRoads);
+            }
+            else {
+                // This calls a single element set for only the selected tile
+                UserInterface.showRoadOptions(optionLayout, this, row, col);
+            }
         } else if (obj instanceof StopLight) {
             UserInterface.showTrafficLightOptions(optionLayout, this, row, col);
         }
+    }
+
+    /**
+     * Function to find all connected road tiles that have the same direction and orientation
+     * Used to select the entirety of a road.
+     * @param row Starting row coordinate
+     * @param col Starting column coordinate
+     * @return set of coordinates [row, col] of all connected matching road tiles
+     */
+    public Set<int[]> getConnectedRoadTiles(int row, int col) {
+        GridObject startObject = getAtSpot(row, col);
+
+        if (!(startObject instanceof Road)) {
+            return new HashSet<>(); // Not a road, return
+        }
+
+        Road startRoad = (Road) startObject;
+        Orientation roadOrientation = startRoad.getOrientation();
+        Direction roadDirection = null;
+
+        // Get direction for one-way roads
+        if (startRoad instanceof OneWayRoad) {
+            roadDirection = ((OneWayRoad) startRoad).getDirection();
+        }
+
+        // Set to store visited coordinates
+        Set<int[]> visited = new HashSet<>();
+        // Queue for BFS traversal
+        Queue<int[]> queue = new LinkedList<>();
+
+        // Start from the provided position
+        queue.add(new int[]{row, col});
+
+        while (!queue.isEmpty()) {
+            int[] current = queue.poll();
+            int currentRow = current[0];
+            int currentCol = current[1];
+
+            // Skip the tile if it is already visited or goes out of range of the current grid
+            if (currentRow < 0 ||
+                    currentRow >= numRows ||
+                    currentCol < 0 ||
+                    currentCol >= numColumns ||
+                    contains(visited, current)) {
+                continue;
+            }
+
+            GridObject obj = getAtSpot(currentRow, currentCol);
+
+            // Check if this is a matching road
+            if (obj instanceof Road road) {
+
+                // Check if orientation matches
+                if (road.getOrientation() != roadOrientation) {
+                    continue;
+                }
+
+                // For one-way roads, check if direction matches
+                if (roadDirection != null && road instanceof OneWayRoad &&
+                        ((OneWayRoad) road).getDirection() != roadDirection) {
+                    continue;
+                }
+
+                // Add to visited
+                visited.add(current);
+
+                // Add adjacent tiles to queue
+                queue.add(new int[]{currentRow - 1, currentCol}); // Up
+                queue.add(new int[]{currentRow + 1, currentCol}); // Down
+                queue.add(new int[]{currentRow, currentCol - 1}); // Left
+                queue.add(new int[]{currentRow, currentCol + 1}); // Right
+            }
+        }
+        return visited;
+    }
+
+    /**
+     * Helper method to check if a set of coordinates contains a specific coordinate
+     */
+    private boolean contains(Set<int[]> set, int[] coord) {
+        for (int[] item : set) {
+            if (item[0] == coord[0] && item[1] == coord[1]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

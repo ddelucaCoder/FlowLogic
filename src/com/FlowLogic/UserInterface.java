@@ -3,6 +3,7 @@ package com.FlowLogic;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -25,10 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class UserInterface extends Application {
@@ -60,6 +58,7 @@ public class UserInterface extends Application {
 
     private static Stage stage;
     private static Scene lastScene;
+    private static CheckBox selectEntireRoadCheckbox;
 
     // Save Directory Path
     private static final String SAVE_DIRECTORY = "saves";
@@ -301,6 +300,17 @@ public class UserInterface extends Application {
         });
         right.getChildren().add(menu);
 
+        // Add a checkbox under the menu button
+        selectEntireRoadCheckbox = new CheckBox("Toggle Select Entire Road");
+        selectEntireRoadCheckbox.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
+        selectEntireRoadCheckbox.setPadding(new Insets(10, 0, 0, 10)); // Add some padding
+        selectEntireRoadCheckbox.setOnAction(event -> {
+            boolean isSelected = selectEntireRoadCheckbox.isSelected();
+            System.out.println("Select Entire Road is now: " + (isSelected ? "ON" : "OFF"));
+            // Additional functionality can be added here later
+        });
+        right.getChildren().add(selectEntireRoadCheckbox);
+
 
         gridContainer.setOnMouseClicked(event -> {
             if (!pan){
@@ -323,6 +333,15 @@ public class UserInterface extends Application {
         stage.setScene(scene);
         stage.show();
         lastScene = scene;
+    }
+
+    /**
+     * Helper function that returns the status of the "Select Entire Road" checkbox
+     * @return boolean indicating true if the checkbox is checked, false otherwise
+     */
+    public static boolean isEntireRoadSelectionEnabled() {
+        // Return the current state of the checkbox
+        return selectEntireRoadCheckbox != null && selectEntireRoadCheckbox.isSelected();
     }
 
     private void setupLoadMenu() {
@@ -1136,11 +1155,17 @@ public class UserInterface extends Application {
             mainLayout.getChildren().remove(removeButton);
             mainLayout.getChildren().remove(closeButton);
         });
-
-
     }
 
-   public static void showRoadOptions(VBox mainLayout, Grid grid, int row, int col) {
+    /**
+     * Function for showing road objects when a single road is selected
+     *
+     * @param mainLayout - Layout pane you are working with
+     * @param grid - current grid object
+     * @param row - row of the selected object
+     * @param col - column of the selected object
+     */
+    public static void showRoadOptions(VBox mainLayout, Grid grid, int row, int col) {
         Label titleLabel= new Label("Road Options");
         Label directionLabel = new Label ("Direction:");
         Button upButt = new Button("Up");
@@ -1179,89 +1204,203 @@ public class UserInterface extends Application {
             refreshGrid(GRID_SIZE);
         });
 
-       downButt.setOnAction(e -> {
+        downButt.setOnAction(e -> {
 
-           Rectangle cell = grid.getFrontGrid()[row][col];
-           cell.setFill(new ImagePattern(new Image("file:Images/RoadImageDown.png")));
-           grid.placeObjectByImage("RoadImageDown.png", row, col);
-           grid.changeRoadDirection(row, col, Direction.DOWN);
-           mainLayout.getChildren().remove(titleLabel);
-           mainLayout.getChildren().remove(directionLabel);
-           mainLayout.getChildren().remove(upButt);
-           mainLayout.getChildren().remove(downButt);
-           mainLayout.getChildren().remove(leftButt);
-           mainLayout.getChildren().remove(rightButt);
-           mainLayout.getChildren().remove(removeButton);
-           mainLayout.getChildren().remove(closeButton);
+            Rectangle cell = grid.getFrontGrid()[row][col];
+            cell.setFill(new ImagePattern(new Image("file:Images/RoadImageDown.png")));
+            grid.placeObjectByImage("RoadImageDown.png", row, col);
+            grid.changeRoadDirection(row, col, Direction.DOWN);
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(directionLabel);
+            mainLayout.getChildren().remove(upButt);
+            mainLayout.getChildren().remove(downButt);
+            mainLayout.getChildren().remove(leftButt);
+            mainLayout.getChildren().remove(rightButt);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
 
-           showRoadOptions(mainLayout, grid, row, col);
-           refreshGrid(GRID_SIZE);
-       });
+            showRoadOptions(mainLayout, grid, row, col);
+            refreshGrid(GRID_SIZE);
+        });
 
-       leftButt.setOnAction(e -> {
+        leftButt.setOnAction(e -> {
 
-           Rectangle cell = grid.getFrontGrid()[row][col];
-           cell.setFill(new ImagePattern(new Image("file:Images/RoadImageLeft.png")));
-           grid.placeObjectByImage("RoadImageLeft.png", row, col);
-           grid.changeRoadDirection(row, col, Direction.LEFT);
-           mainLayout.getChildren().remove(titleLabel);
-           mainLayout.getChildren().remove(directionLabel);
-           mainLayout.getChildren().remove(upButt);
-           mainLayout.getChildren().remove(downButt);
-           mainLayout.getChildren().remove(leftButt);
-           mainLayout.getChildren().remove(rightButt);
-           mainLayout.getChildren().remove(removeButton);
-           mainLayout.getChildren().remove(closeButton);
+            Rectangle cell = grid.getFrontGrid()[row][col];
+            cell.setFill(new ImagePattern(new Image("file:Images/RoadImageLeft.png")));
+            grid.placeObjectByImage("RoadImageLeft.png", row, col);
+            grid.changeRoadDirection(row, col, Direction.LEFT);
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(directionLabel);
+            mainLayout.getChildren().remove(upButt);
+            mainLayout.getChildren().remove(downButt);
+            mainLayout.getChildren().remove(leftButt);
+            mainLayout.getChildren().remove(rightButt);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
 
-           showRoadOptions(mainLayout, grid, row, col);
-           refreshGrid(GRID_SIZE);
-       });
+            showRoadOptions(mainLayout, grid, row, col);
+            refreshGrid(GRID_SIZE);
+        });
 
-       rightButt.setOnAction(e -> {
+        rightButt.setOnAction(e -> {
 
-           Rectangle cell = grid.getFrontGrid()[row][col];
-           cell.setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
-           grid.placeObjectByImage("RoadImageRight.png", row, col);
-           grid.changeRoadDirection(row, col, Direction.RIGHT);
-           mainLayout.getChildren().remove(titleLabel);
-           mainLayout.getChildren().remove(directionLabel);
-           mainLayout.getChildren().remove(upButt);
-           mainLayout.getChildren().remove(downButt);
-           mainLayout.getChildren().remove(leftButt);
-           mainLayout.getChildren().remove(rightButt);
-           mainLayout.getChildren().remove(removeButton);
-           mainLayout.getChildren().remove(closeButton);
+            Rectangle cell = grid.getFrontGrid()[row][col];
+            cell.setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
+            grid.placeObjectByImage("RoadImageRight.png", row, col);
+            grid.changeRoadDirection(row, col, Direction.RIGHT);
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(directionLabel);
+            mainLayout.getChildren().remove(upButt);
+            mainLayout.getChildren().remove(downButt);
+            mainLayout.getChildren().remove(leftButt);
+            mainLayout.getChildren().remove(rightButt);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
 
-           showRoadOptions(mainLayout, grid, row, col);
-           refreshGrid(GRID_SIZE);
-       });
+            showRoadOptions(mainLayout, grid, row, col);
+            refreshGrid(GRID_SIZE);
+        });
 
-       removeButton.setOnAction(e -> {
-           grid.remove(row, col);
-           refreshGrid(GRID_SIZE);
-           mainLayout.getChildren().remove(titleLabel);
-           mainLayout.getChildren().remove(directionLabel);
-           mainLayout.getChildren().remove(upButt);
-           mainLayout.getChildren().remove(downButt);
-           mainLayout.getChildren().remove(leftButt);
-           mainLayout.getChildren().remove(rightButt);
-           mainLayout.getChildren().remove(removeButton);
-           mainLayout.getChildren().remove(closeButton);
-       });
+        removeButton.setOnAction(e -> {
+            grid.remove(row, col);
+            refreshGrid(GRID_SIZE);
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(directionLabel);
+            mainLayout.getChildren().remove(upButt);
+            mainLayout.getChildren().remove(downButt);
+            mainLayout.getChildren().remove(leftButt);
+            mainLayout.getChildren().remove(rightButt);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        });
 
-       closeButton.setOnAction(e -> {
-           mainLayout.getChildren().remove(titleLabel);
-           mainLayout.getChildren().remove(directionLabel);
-           mainLayout.getChildren().remove(upButt);
-           mainLayout.getChildren().remove(downButt);
-           mainLayout.getChildren().remove(leftButt);
-           mainLayout.getChildren().remove(rightButt);
-           mainLayout.getChildren().remove(removeButton);
-           mainLayout.getChildren().remove(closeButton);
-       });
+        closeButton.setOnAction(e -> {
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(directionLabel);
+            mainLayout.getChildren().remove(upButt);
+            mainLayout.getChildren().remove(downButt);
+            mainLayout.getChildren().remove(leftButt);
+            mainLayout.getChildren().remove(rightButt);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        });
+    }
 
+    /**
+     * Function for showing road objects when multiple road tiles are selected
+     *
+     * @param mainLayout - Layout pane you are working with
+     * @param grid - current grid object
+     * @param row - row of the selected object
+     * @param col - column of the selected object
+     * @param connectedRoads - set of the selected road objects
+     */
+    public static void showRoadOptions(VBox mainLayout, Grid grid, int row, int col, Set<int[]> connectedRoads) {
+        Label titleLabel = new Label("Road Options");
+        Button flipDirectionButton = new Button("Flip Road Direction");
+        Button renameRoadButton = new Button("Rename Road");
+        Button removeButton = new Button("Remove Road");
+        Button closeButton = new Button("Close Road Options");
 
-   }
+        // Label showing number of selected road tiles
+        Label selectedTilesLabel;
+        if (connectedRoads.size() > 1) {
+            selectedTilesLabel = new Label("Selected Road Tiles: " + connectedRoads.size());
+            mainLayout.getChildren().add(selectedTilesLabel);
+        } else {
+            selectedTilesLabel = null;
+        }
+
+        mainLayout.getChildren().add(titleLabel);
+        mainLayout.getChildren().add(flipDirectionButton);
+        mainLayout.getChildren().add(renameRoadButton);
+        mainLayout.getChildren().add(removeButton);
+        mainLayout.getChildren().add(closeButton);
+
+        // Helper function to clear options menu
+        Runnable clearMenu = () -> {
+            mainLayout.getChildren().remove(titleLabel);
+            if (selectedTilesLabel != null) {
+                mainLayout.getChildren().remove(selectedTilesLabel);
+            }
+            mainLayout.getChildren().remove(flipDirectionButton);
+            mainLayout.getChildren().remove(renameRoadButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+        };
+
+        flipDirectionButton.setOnAction(e -> {
+            // For each connected road tile, flip its direction
+            for (int[] coord : connectedRoads) {
+                int r = coord[0];
+                int c = coord[1];
+                GridObject obj = grid.getAtSpot(r, c);
+
+                if (obj instanceof Road) {
+                    Direction currentDirection = null;
+                    Direction newDirection = null;
+
+                    // Get current direction
+                    if (obj instanceof OneWayRoad) {
+                        currentDirection = ((OneWayRoad) obj).getDirection();
+
+                        // Determine the opposite direction
+                        switch (currentDirection) {
+                            case UP:
+                                newDirection = Direction.DOWN;
+                                grid.getFrontGrid()[r][c].setFill(new ImagePattern(new Image("file:Images/RoadImageDown.png")));
+                                break;
+                            case DOWN:
+                                newDirection = Direction.UP;
+                                grid.getFrontGrid()[r][c].setFill(new ImagePattern(new Image("file:Images/RoadImage.png")));
+                                break;
+                            case LEFT:
+                                newDirection = Direction.RIGHT;
+                                grid.getFrontGrid()[r][c].setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
+                                break;
+                            case RIGHT:
+                                newDirection = Direction.LEFT;
+                                grid.getFrontGrid()[r][c].setFill(new ImagePattern(new Image("file:Images/RoadImageLeft.png")));
+                                break;
+                        }
+
+                        // Apply the new direction
+                        if (newDirection != null) {
+                            grid.changeRoadDirection(r, c, newDirection);
+                        }
+                    }
+                    // TODO: Implement Road Flip for Two Way Roads
+                }
+            }
+
+            clearMenu.run();
+            showRoadOptions(mainLayout, grid, row, col, grid.getConnectedRoadTiles(row, col));
+            refreshGrid(GRID_SIZE);
+        });
+
+        renameRoadButton.setOnAction(e -> {
+            // This functionality is not implemented yet
+            // Just show a message indicating it's not implemented
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Not Implemented");
+            alert.setHeaderText("Rename Road");
+            alert.setContentText("This feature is not implemented yet.");
+            alert.showAndWait();
+        });
+
+        removeButton.setOnAction(e -> {
+            // Remove all connected road tiles
+            for (int[] coord : connectedRoads) {
+                grid.remove(coord[0], coord[1]);
+            }
+            refreshGrid(GRID_SIZE);
+            clearMenu.run();
+        });
+
+        closeButton.setOnAction(e -> {
+            clearMenu.run();
+        });
+    }
 
     public static void showTrafficLightOptions(VBox mainLayout, Grid grid, int row, int col) {
         Label titleLabel= new Label("Traffic Light Options");
