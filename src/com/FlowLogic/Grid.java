@@ -135,6 +135,7 @@ public class Grid {
                                 numLanes, vehicleList);
                         oneWayRoad.setLength(length);
                         oneWayRoad.setName(name);
+                        oneWayRoad.setInRoad(properties.getBoolean("inRoad"));
 
                         gridObject = oneWayRoad;
                         break;
@@ -320,6 +321,7 @@ public class Grid {
                         properties.put("numLanes", road.getNumLanes());
                         properties.put("vehicleList", road.getVehicleList());
                         properties.put("name", road.getName());
+                        properties.put("inRoad", road.getInRoad());
                     }
                     else if (obj instanceof TwoWayRoad road) {
                         properties.put("orientation", road.getOrientation());

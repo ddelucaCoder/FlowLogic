@@ -1318,16 +1318,33 @@ public class UserInterface extends Application {
         Button rightButt = new Button("Change Direction Right");
         Button removeButton = new Button("Remove Road");
         Button closeButton = new Button("Close Road Options");
+        CheckBox inRoad = new CheckBox("Make Input Road");
+
+        VBox options = new VBox();
 
 
-        mainLayout.getChildren().add(titleLabel);
-        mainLayout.getChildren().add(renameButt);
-        mainLayout.getChildren().add(upButt);
-        mainLayout.getChildren().add(downButt);
-        mainLayout.getChildren().add(leftButt);
-        mainLayout.getChildren().add(rightButt);
-        mainLayout.getChildren().add(removeButton);
-        mainLayout.getChildren().add(closeButton);
+        options.getChildren().add(titleLabel);
+        options.getChildren().add(renameButt);
+        options.getChildren().add(upButt);
+        options.getChildren().add(downButt);
+        options.getChildren().add(leftButt);
+        options.getChildren().add(rightButt);
+        options.getChildren().add(removeButton);
+        options.getChildren().add(closeButton);
+
+        OneWayRoad road = (OneWayRoad) grid.getGrid()[row][col];
+        if ((row == 0 && road.getDirection() == Direction.DOWN) ||
+                (row == grid.getNumRows() - 1 && road.getDirection() == Direction.UP) ||
+                (col == 0 && road.getDirection() == Direction.RIGHT) ||
+                (col == grid.getNumColumns() - 1 && road.getDirection() == Direction.LEFT))
+        {
+            if (((OneWayRoad) grid.getGrid()[row][col]).getInRoad()) {
+                inRoad.setSelected(true);
+            }
+            options.getChildren().add(inRoad);
+        }
+
+        mainLayout.getChildren().add(options);
 
         upButt.setOnAction(e -> {
 
@@ -1335,14 +1352,7 @@ public class UserInterface extends Application {
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImage.png")));
             grid.placeObjectByImage("RoadImage.png", row, col);
             grid.changeRoadDirection(row, col, Direction.UP);
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(upButt);
-            mainLayout.getChildren().remove(downButt);
-            mainLayout.getChildren().remove(leftButt);
-            mainLayout.getChildren().remove(rightButt);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
-            mainLayout.getChildren().remove(renameButt);
+            mainLayout.getChildren().remove(options);
 
 
             showRoadOptions(mainLayout, grid, row, col);
@@ -1355,15 +1365,7 @@ public class UserInterface extends Application {
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImageDown.png")));
             grid.placeObjectByImage("RoadImageDown.png", row, col);
             grid.changeRoadDirection(row, col, Direction.DOWN);
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(upButt);
-            mainLayout.getChildren().remove(downButt);
-            mainLayout.getChildren().remove(leftButt);
-            mainLayout.getChildren().remove(rightButt);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
-            mainLayout.getChildren().remove(renameButt);
-
+            mainLayout.getChildren().remove(options);
 
             showRoadOptions(mainLayout, grid, row, col);
             refreshGrid(GRID_SIZE);
@@ -1375,14 +1377,7 @@ public class UserInterface extends Application {
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImageLeft.png")));
             grid.placeObjectByImage("RoadImageLeft.png", row, col);
             grid.changeRoadDirection(row, col, Direction.LEFT);
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(upButt);
-            mainLayout.getChildren().remove(downButt);
-            mainLayout.getChildren().remove(leftButt);
-            mainLayout.getChildren().remove(rightButt);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
-            mainLayout.getChildren().remove(renameButt);
+            mainLayout.getChildren().remove(options);
 
 
             showRoadOptions(mainLayout, grid, row, col);
@@ -1395,14 +1390,7 @@ public class UserInterface extends Application {
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
             grid.placeObjectByImage("RoadImageRight.png", row, col);
             grid.changeRoadDirection(row, col, Direction.RIGHT);
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(upButt);
-            mainLayout.getChildren().remove(downButt);
-            mainLayout.getChildren().remove(leftButt);
-            mainLayout.getChildren().remove(rightButt);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
-            mainLayout.getChildren().remove(renameButt);
+            mainLayout.getChildren().remove(options);
 
             showRoadOptions(mainLayout, grid, row, col);
             refreshGrid(GRID_SIZE);
@@ -1411,28 +1399,13 @@ public class UserInterface extends Application {
         removeButton.setOnAction(e -> {
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(upButt);
-            mainLayout.getChildren().remove(downButt);
-            mainLayout.getChildren().remove(leftButt);
-            mainLayout.getChildren().remove(rightButt);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
-            mainLayout.getChildren().remove(renameButt);
+            mainLayout.getChildren().remove(options);
 
         });
 
         renameButt.setOnAction(e -> {
             openRoadRenameDialog((Road)obj);
-
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(upButt);
-            mainLayout.getChildren().remove(downButt);
-            mainLayout.getChildren().remove(leftButt);
-            mainLayout.getChildren().remove(rightButt);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
-            mainLayout.getChildren().remove(renameButt);
+            mainLayout.getChildren().remove(options);
 
 
             showRoadOptions(mainLayout, grid, row, col);
@@ -1440,14 +1413,15 @@ public class UserInterface extends Application {
         });
 
         closeButton.setOnAction(e -> {
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(upButt);
-            mainLayout.getChildren().remove(downButt);
-            mainLayout.getChildren().remove(leftButt);
-            mainLayout.getChildren().remove(rightButt);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
-            mainLayout.getChildren().remove(renameButt);
+            mainLayout.getChildren().remove(options);
+        });
+
+        inRoad.setOnAction(event -> {
+            if (inRoad.isSelected()) {
+                road.setInRoad(true);
+            } else {
+                road.setInRoad(false);
+            }
         });
     }
 
