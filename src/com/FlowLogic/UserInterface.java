@@ -1075,16 +1075,17 @@ public class UserInterface extends Application {
 
     public static void showParkingOptions(VBox mainLayout, Grid grid, int xLen, int yLen, int dailyPop, int row,
                                            int col) {
+        System.out.println("Old Parking Capacity: " + dailyPop);
         Label titleLabel = new Label("Parking Options");
         Label xLabel = new Label("xLength:");
         TextField xLengthField = new TextField();
         Label yLabel = new Label("yLength:");
         TextField yLengthField = new TextField();
-        Label parkingLabel = new Label("parkingCapacity:");
+        Label parkingLabel = new Label("Parking Capacity:");
         TextField parkingField = new TextField();
         Button submitButton = new Button("Submit Changes");
-        Button removeButton = new Button("Remove Building");
-        Button closeButton = new Button("Close Building Options");
+        Button removeButton = new Button("Remove Parking");
+        Button closeButton = new Button("Close Parking Options");
 
 
         // formatters
