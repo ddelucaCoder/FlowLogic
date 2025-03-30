@@ -4,12 +4,9 @@ import javafx.scene.image.Image;
 
 /**
  * Class definition file for com.FlowLogic.Building objects
- * Purdue University
- *
- * @author Dylan Mitchell
- * @version February 18, 2025
  */
 public class Building implements GridObject {
+    String name;
     int rowNum;
     int colNum;
     int xLength, yLength, dailyPopulation;
@@ -29,6 +26,7 @@ public class Building implements GridObject {
         this.yLength = yLength;
         this.dailyPopulation = dailyPopulation;
         imageFile = new Image("file:Images/RedBuilding.png");
+        this.name = "Building";
     }
 
     public Building(int xLength, int yLength, int dailyPopulation) {
@@ -38,6 +36,7 @@ public class Building implements GridObject {
         this.yLength = yLength;
         this.dailyPopulation = dailyPopulation;
         imageFile = new Image("file:Images/RedBuilding.png");
+        this.name = "Building";
     }
 
     public Building() {
@@ -45,6 +44,7 @@ public class Building implements GridObject {
         this.yLength = 1;
         this.dailyPopulation = 0;
         this.color = "red";
+        this.name = "Building";
         updateImage();
     }
 
@@ -53,6 +53,7 @@ public class Building implements GridObject {
         this.xLength = 1;
         this.yLength = 1;
         this.dailyPopulation = 0;
+        this.name = "Building";
         updateImage();
     }
 
@@ -63,6 +64,7 @@ public class Building implements GridObject {
         this.yLength = b.getyLength();
         this.dailyPopulation = b.getDailyPopulation();
         this.color = b.getColor();
+        this.name = "Building";
         updateImage();
     }
 
@@ -151,4 +153,11 @@ public class Building implements GridObject {
         return imageFile;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

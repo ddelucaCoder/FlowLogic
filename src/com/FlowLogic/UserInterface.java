@@ -933,13 +933,18 @@ public class UserInterface extends Application {
 
     public static void showBuildingOptions(VBox mainLayout, Grid grid, int xLen, int yLen, int dailyPop, int row,
                                            int col) {
-        Label titleLabel = new Label("Building Options");
+        // Get the building object
+        GridObject obj = grid.getAtSpot(row, col);
+        String name = ((Building)obj).getName();
+
+        Label titleLabel = new Label(name + " Options");
         Label xLabel = new Label("xLength:");
         TextField xLengthField = new TextField();
         Label yLabel = new Label("yLength:");
         TextField yLengthField = new TextField();
         Label populationLabel = new Label("dailyPopulation:");
         TextField populationField = new TextField();
+        Button renameButton = new Button("Rename Building");
         Button submitButton = new Button("Submit Changes");
         Button removeButton = new Button("Remove Building");
         Button closeButton = new Button("Close Building Options");
@@ -984,8 +989,28 @@ public class UserInterface extends Application {
         mainLayout.getChildren().add(populationLabel);
         mainLayout.getChildren().add(populationField);
         mainLayout.getChildren().add(submitButton);
+        mainLayout.getChildren().add(renameButton);
         mainLayout.getChildren().add(removeButton);
         mainLayout.getChildren().add(closeButton);
+
+        renameButton.setOnAction(e-> {
+            openBuildingRenameDialog((Building)obj);
+
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(xLabel);
+            mainLayout.getChildren().remove(xLengthField);
+            mainLayout.getChildren().remove(yLabel);
+            mainLayout.getChildren().remove(yLengthField);
+            mainLayout.getChildren().remove(populationLabel);
+            mainLayout.getChildren().remove(populationField);
+            mainLayout.getChildren().remove(renameButton);
+            mainLayout.getChildren().remove(submitButton);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+
+            showBuildingOptions(mainLayout, grid, xLen, yLen, dailyPop, row, col);
+            refreshGrid(GRID_SIZE);
+        });
 
         submitButton.setOnAction(e -> {
             int xLenNew = Integer.parseInt(xLengthField.getText());
@@ -1005,6 +1030,7 @@ public class UserInterface extends Application {
                 mainLayout.getChildren().remove(yLengthField);
                 mainLayout.getChildren().remove(populationLabel);
                 mainLayout.getChildren().remove(populationField);
+                mainLayout.getChildren().remove(renameButton);
                 mainLayout.getChildren().remove(submitButton);
                 mainLayout.getChildren().remove(removeButton);
                 mainLayout.getChildren().remove(closeButton);
@@ -1024,6 +1050,7 @@ public class UserInterface extends Application {
             mainLayout.getChildren().remove(yLengthField);
             mainLayout.getChildren().remove(populationLabel);
             mainLayout.getChildren().remove(populationField);
+            mainLayout.getChildren().remove(renameButton);
             mainLayout.getChildren().remove(submitButton);
             mainLayout.getChildren().remove(removeButton);
             mainLayout.getChildren().remove(closeButton);
@@ -1037,6 +1064,7 @@ public class UserInterface extends Application {
             mainLayout.getChildren().remove(yLengthField);
             mainLayout.getChildren().remove(populationLabel);
             mainLayout.getChildren().remove(populationField);
+            mainLayout.getChildren().remove(renameButton);
             mainLayout.getChildren().remove(submitButton);
             mainLayout.getChildren().remove(removeButton);
             mainLayout.getChildren().remove(closeButton);
@@ -1158,6 +1186,117 @@ public class UserInterface extends Application {
     }
 
     /**
+     * Opens a dialog allowing the user to rename a building
+     *
+     * @param building The building object to rename
+     * @return true if the rename was successful, false otherwise
+     */
+    private static boolean openBuildingRenameDialog(Building building) {
+        if (building == null) {
+            showErrorAlert("No building selected to rename");
+            return false;
+        }
+
+        // Create a dialog to get the new road name
+        TextInputDialog dialog = new TextInputDialog(building.getName());
+        dialog.setTitle("Rename Building");
+        dialog.setHeaderText("Enter a new name for this building");
+        dialog.setContentText("Building name:");
+
+        // Show the dialog and wait for user input
+        dialog.showAndWait().ifPresent(newName -> {
+            if (!newName.isEmpty()) {
+                building.setName(newName);
+                System.out.println("Building renamed to: " + newName);
+            }
+        });
+
+        return true;
+    }
+
+    /**
+     * Opens a dialog allowing the user to rename a road
+     *
+     * @param road The Road object to rename
+     * @return true if the rename was successful, false otherwise
+     */
+    private static boolean openRoadRenameDialog(Road road) {
+        if (road == null) {
+            showErrorAlert("No road selected to rename");
+            return false;
+        }
+
+        // Create a dialog to get the new road name
+        TextInputDialog dialog = new TextInputDialog(road.getName());
+        dialog.setTitle("Rename Road");
+        dialog.setHeaderText("Enter a new name for this road");
+        dialog.setContentText("Road name:");
+
+        // Show the dialog and wait for user input
+        dialog.showAndWait().ifPresent(newName -> {
+            if (!newName.isEmpty()) {
+                road.setName(newName);
+                System.out.println("Road renamed to: " + newName);
+            }
+        });
+
+        return true;
+    }
+
+    /**
+     * Shows options for road renaming for a group of connected road tiles
+     *
+     * @param mainLayout The VBox layout to add UI elements to
+     * @param grid The Grid containing the road objects
+     * @param connectedRoads Set of road coordinates to be renamed
+     * @return true if successful, false otherwise
+     */
+    public static boolean renameConnectedRoads(VBox mainLayout, Grid grid, Set<int[]> connectedRoads) {
+        if (connectedRoads == null || connectedRoads.isEmpty()) {
+            showErrorAlert("No roads selected to rename");
+            return false;
+        }
+
+        // Get the first road to determine the current name
+        int[] firstCoord = connectedRoads.iterator().next();
+        Road firstRoad = (Road) grid.getAtSpot(firstCoord[0], firstCoord[1]);
+
+        if (firstRoad == null) {
+            showErrorAlert("Selected tile is not a road");
+            return false;
+        }
+
+        String currentName = firstRoad.getName();
+
+        // Create a dialog to get the new road name
+        TextInputDialog dialog = new TextInputDialog(currentName);
+        dialog.setTitle("Rename Road");
+        dialog.setHeaderText("Enter a new name for " + (connectedRoads.size() > 1 ?
+                "these " + connectedRoads.size() + " road tiles" :
+                "this road tile"));
+        dialog.setContentText("Road name:");
+
+        // Show the dialog and process the result
+        dialog.showAndWait().ifPresent(newName -> {
+            if (!newName.isEmpty()) {
+                // Apply the new name to all connected road tiles
+                for (int[] coord : connectedRoads) {
+                    GridObject obj = grid.getAtSpot(coord[0], coord[1]);
+                    if (obj instanceof Road) {
+                        ((Road) obj).setName(newName);
+                    }
+                }
+
+                System.out.println("Renamed " + connectedRoads.size() +
+                        " road tiles to: " + newName);
+            }
+        });
+
+        return true;
+    }
+
+
+    /**
      * Function for showing road objects when a single road is selected
      *
      * @param mainLayout - Layout pane you are working with
@@ -1166,18 +1305,22 @@ public class UserInterface extends Application {
      * @param col - column of the selected object
      */
     public static void showRoadOptions(VBox mainLayout, Grid grid, int row, int col) {
-        Label titleLabel= new Label("Road Options");
-        Label directionLabel = new Label ("Direction:");
-        Button upButt = new Button("Up");
-        Button downButt = new Button("Down");
-        Button leftButt = new Button("Left");
-        Button rightButt = new Button("Right");
+        // Get the road object
+        GridObject obj = grid.getAtSpot(row, col);
+        String name = ((Road)obj).getName();
+
+        Label titleLabel = new Label(name + " Options");
+        Button renameButt = new Button("Rename Road");
+        Button upButt = new Button("Change Direction Up");
+        Button downButt = new Button("Change Direction Down");
+        Button leftButt = new Button("Change Direction Left");
+        Button rightButt = new Button("Change Direction Right");
         Button removeButton = new Button("Remove Road");
         Button closeButton = new Button("Close Road Options");
 
 
         mainLayout.getChildren().add(titleLabel);
-        mainLayout.getChildren().add(directionLabel);
+        mainLayout.getChildren().add(renameButt);
         mainLayout.getChildren().add(upButt);
         mainLayout.getChildren().add(downButt);
         mainLayout.getChildren().add(leftButt);
@@ -1192,13 +1335,14 @@ public class UserInterface extends Application {
             grid.placeObjectByImage("RoadImage.png", row, col);
             grid.changeRoadDirection(row, col, Direction.UP);
             mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(directionLabel);
             mainLayout.getChildren().remove(upButt);
             mainLayout.getChildren().remove(downButt);
             mainLayout.getChildren().remove(leftButt);
             mainLayout.getChildren().remove(rightButt);
             mainLayout.getChildren().remove(removeButton);
             mainLayout.getChildren().remove(closeButton);
+            mainLayout.getChildren().remove(renameButt);
+
 
             showRoadOptions(mainLayout, grid, row, col);
             refreshGrid(GRID_SIZE);
@@ -1211,13 +1355,14 @@ public class UserInterface extends Application {
             grid.placeObjectByImage("RoadImageDown.png", row, col);
             grid.changeRoadDirection(row, col, Direction.DOWN);
             mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(directionLabel);
             mainLayout.getChildren().remove(upButt);
             mainLayout.getChildren().remove(downButt);
             mainLayout.getChildren().remove(leftButt);
             mainLayout.getChildren().remove(rightButt);
             mainLayout.getChildren().remove(removeButton);
             mainLayout.getChildren().remove(closeButton);
+            mainLayout.getChildren().remove(renameButt);
+
 
             showRoadOptions(mainLayout, grid, row, col);
             refreshGrid(GRID_SIZE);
@@ -1230,13 +1375,14 @@ public class UserInterface extends Application {
             grid.placeObjectByImage("RoadImageLeft.png", row, col);
             grid.changeRoadDirection(row, col, Direction.LEFT);
             mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(directionLabel);
             mainLayout.getChildren().remove(upButt);
             mainLayout.getChildren().remove(downButt);
             mainLayout.getChildren().remove(leftButt);
             mainLayout.getChildren().remove(rightButt);
             mainLayout.getChildren().remove(removeButton);
             mainLayout.getChildren().remove(closeButton);
+            mainLayout.getChildren().remove(renameButt);
+
 
             showRoadOptions(mainLayout, grid, row, col);
             refreshGrid(GRID_SIZE);
@@ -1249,13 +1395,13 @@ public class UserInterface extends Application {
             grid.placeObjectByImage("RoadImageRight.png", row, col);
             grid.changeRoadDirection(row, col, Direction.RIGHT);
             mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(directionLabel);
             mainLayout.getChildren().remove(upButt);
             mainLayout.getChildren().remove(downButt);
             mainLayout.getChildren().remove(leftButt);
             mainLayout.getChildren().remove(rightButt);
             mainLayout.getChildren().remove(removeButton);
             mainLayout.getChildren().remove(closeButton);
+            mainLayout.getChildren().remove(renameButt);
 
             showRoadOptions(mainLayout, grid, row, col);
             refreshGrid(GRID_SIZE);
@@ -1265,24 +1411,42 @@ public class UserInterface extends Application {
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
             mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(directionLabel);
             mainLayout.getChildren().remove(upButt);
             mainLayout.getChildren().remove(downButt);
             mainLayout.getChildren().remove(leftButt);
             mainLayout.getChildren().remove(rightButt);
             mainLayout.getChildren().remove(removeButton);
             mainLayout.getChildren().remove(closeButton);
+            mainLayout.getChildren().remove(renameButt);
+
+        });
+
+        renameButt.setOnAction(e -> {
+            openRoadRenameDialog((Road)obj);
+
+            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(upButt);
+            mainLayout.getChildren().remove(downButt);
+            mainLayout.getChildren().remove(leftButt);
+            mainLayout.getChildren().remove(rightButt);
+            mainLayout.getChildren().remove(removeButton);
+            mainLayout.getChildren().remove(closeButton);
+            mainLayout.getChildren().remove(renameButt);
+
+
+            showRoadOptions(mainLayout, grid, row, col);
+            refreshGrid(GRID_SIZE);
         });
 
         closeButton.setOnAction(e -> {
             mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(directionLabel);
             mainLayout.getChildren().remove(upButt);
             mainLayout.getChildren().remove(downButt);
             mainLayout.getChildren().remove(leftButt);
             mainLayout.getChildren().remove(rightButt);
             mainLayout.getChildren().remove(removeButton);
             mainLayout.getChildren().remove(closeButton);
+            mainLayout.getChildren().remove(renameButt);
         });
     }
 
@@ -1296,7 +1460,17 @@ public class UserInterface extends Application {
      * @param connectedRoads - set of the selected road objects
      */
     public static void showRoadOptions(VBox mainLayout, Grid grid, int row, int col, Set<int[]> connectedRoads) {
-        Label titleLabel = new Label("Road Options");
+        // Get the first road to determine the name
+        String roadName = "Road";
+        if (!connectedRoads.isEmpty()) {
+            int[] firstCoord = connectedRoads.iterator().next();
+            GridObject obj = grid.getAtSpot(firstCoord[0], firstCoord[1]);
+            if (obj instanceof Road) {
+                roadName = ((Road) obj).getName();
+            }
+        }
+
+        final Label[] titleLabel = {new Label(roadName + " Options")};
         Button flipDirectionButton = new Button("Flip Road Direction");
         Button renameRoadButton = new Button("Rename Road");
         Button removeButton = new Button("Remove Road");
@@ -1311,7 +1485,7 @@ public class UserInterface extends Application {
             selectedTilesLabel = null;
         }
 
-        mainLayout.getChildren().add(titleLabel);
+        mainLayout.getChildren().add(titleLabel[0]);
         mainLayout.getChildren().add(flipDirectionButton);
         mainLayout.getChildren().add(renameRoadButton);
         mainLayout.getChildren().add(removeButton);
@@ -1319,7 +1493,7 @@ public class UserInterface extends Application {
 
         // Helper function to clear options menu
         Runnable clearMenu = () -> {
-            mainLayout.getChildren().remove(titleLabel);
+            mainLayout.getChildren().remove(titleLabel[0]);
             if (selectedTilesLabel != null) {
                 mainLayout.getChildren().remove(selectedTilesLabel);
             }
@@ -1379,13 +1553,28 @@ public class UserInterface extends Application {
         });
 
         renameRoadButton.setOnAction(e -> {
-            // This functionality is not implemented yet
-            // Just show a message indicating it's not implemented
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Not Implemented");
-            alert.setHeaderText("Rename Road");
-            alert.setContentText("This feature is not implemented yet.");
-            alert.showAndWait();
+            // Use the new renameConnectedRoads function
+            boolean renameSuccessful = renameConnectedRoads(mainLayout, grid, connectedRoads);
+
+            if (renameSuccessful) {
+                // Update the title label with the new name (get from first road)
+                if (!connectedRoads.isEmpty()) {
+                    int[] firstCoord = connectedRoads.iterator().next();
+                    GridObject obj = grid.getAtSpot(firstCoord[0], firstCoord[1]);
+                    if (obj instanceof Road) {
+                        String newName = ((Road) obj).getName();
+
+                        // Replace the label with updated title
+                        mainLayout.getChildren().remove(titleLabel[0]);
+                        titleLabel[0] = new Label(newName + " Options");
+                        mainLayout.getChildren().add(5, titleLabel[0]);
+                    }
+                }
+            }
+
+            clearMenu.run();
+            showRoadOptions(mainLayout, grid, row, col, grid.getConnectedRoadTiles(row, col));
+            refreshGrid(GRID_SIZE);
         });
 
         removeButton.setOnAction(e -> {

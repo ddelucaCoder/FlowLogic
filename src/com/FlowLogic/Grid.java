@@ -480,7 +480,6 @@ public class Grid {
                 UserInterface.showRoadOptions(optionLayout, this, row, col, connectedRoads);
             }
             else {
-                // This calls a single element set for only the selected tile
                 UserInterface.showRoadOptions(optionLayout, this, row, col);
             }
         } else if (obj instanceof StopLight) {

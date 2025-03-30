@@ -9,7 +9,7 @@ import javafx.scene.image.Image;
  * by the user.
  */
 public class Road implements GridObject {
-
+    private String name;
     private Orientation orientation;
     private int speedLimit;
     private int length;
@@ -32,8 +32,7 @@ public class Road implements GridObject {
         this.imageFile = new Image("file:Images/RoadImage.png");
         this.inLaneList = false;
         this.laneContainer = null;
-
-
+        this.name = "Road";
     }
 
     @Override
@@ -124,4 +123,11 @@ public class Road implements GridObject {
         return laneContainer;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
