@@ -62,6 +62,7 @@ public class UserInterface extends Application {
 
     // Save Directory Path
     private static final String SAVE_DIRECTORY = "saves";
+    private static VBox options = new VBox();
 
     @Override
     public void start(Stage primaryStage) throws Error {
@@ -327,6 +328,9 @@ public class UserInterface extends Application {
             }
             pan = false;
         });
+
+        right.getChildren().add(options);
+
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -933,6 +937,7 @@ public class UserInterface extends Application {
 
     public static void showBuildingOptions(VBox mainLayout, Grid grid, int xLen, int yLen, int dailyPop, int row,
                                            int col) {
+        options.getChildren().clear();
         // Get the building object
         GridObject obj = grid.getAtSpot(row, col);
         String name = ((Building)obj).getName();
@@ -981,33 +986,21 @@ public class UserInterface extends Application {
         yLengthField.setText(Integer.toString(yLen));
         populationField.setText(Integer.toString(dailyPop));
 
-        mainLayout.getChildren().add(titleLabel);
-        mainLayout.getChildren().add(xLabel);
-        mainLayout.getChildren().add(xLengthField);
-        mainLayout.getChildren().add(yLabel);
-        mainLayout.getChildren().add(yLengthField);
-        mainLayout.getChildren().add(populationLabel);
-        mainLayout.getChildren().add(populationField);
-        mainLayout.getChildren().add(submitButton);
-        mainLayout.getChildren().add(renameButton);
-        mainLayout.getChildren().add(removeButton);
-        mainLayout.getChildren().add(closeButton);
+        options.getChildren().add(titleLabel);
+        options.getChildren().add(xLabel);
+        options.getChildren().add(xLengthField);
+        options.getChildren().add(yLabel);
+        options.getChildren().add(yLengthField);
+        options.getChildren().add(populationLabel);
+        options.getChildren().add(populationField);
+        options.getChildren().add(submitButton);
+        options.getChildren().add(renameButton);
+        options.getChildren().add(removeButton);
+        options.getChildren().add(closeButton);
 
         renameButton.setOnAction(e-> {
             openBuildingRenameDialog((Building)obj);
-
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(xLabel);
-            mainLayout.getChildren().remove(xLengthField);
-            mainLayout.getChildren().remove(yLabel);
-            mainLayout.getChildren().remove(yLengthField);
-            mainLayout.getChildren().remove(populationLabel);
-            mainLayout.getChildren().remove(populationField);
-            mainLayout.getChildren().remove(renameButton);
-            mainLayout.getChildren().remove(submitButton);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
-
+            options.getChildren().clear();
             showBuildingOptions(mainLayout, grid, xLen, yLen, dailyPop, row, col);
             refreshGrid(GRID_SIZE);
         });
@@ -1023,18 +1016,7 @@ public class UserInterface extends Application {
                 if (popNew != dailyPop) {
                     grid.changeDailyPopulationBuilding(row, col, popNew);
                 }
-                mainLayout.getChildren().remove(titleLabel);
-                mainLayout.getChildren().remove(xLabel);
-                mainLayout.getChildren().remove(xLengthField);
-                mainLayout.getChildren().remove(yLabel);
-                mainLayout.getChildren().remove(yLengthField);
-                mainLayout.getChildren().remove(populationLabel);
-                mainLayout.getChildren().remove(populationField);
-                mainLayout.getChildren().remove(renameButton);
-                mainLayout.getChildren().remove(submitButton);
-                mainLayout.getChildren().remove(removeButton);
-                mainLayout.getChildren().remove(closeButton);
-
+                options.getChildren().clear();
                 showBuildingOptions(mainLayout, grid, xLenNew, yLenNew, popNew, row, col);
                 refreshGrid(GRID_SIZE);
             }
@@ -1043,31 +1025,11 @@ public class UserInterface extends Application {
         removeButton.setOnAction(e -> {
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(xLabel);
-            mainLayout.getChildren().remove(xLengthField);
-            mainLayout.getChildren().remove(yLabel);
-            mainLayout.getChildren().remove(yLengthField);
-            mainLayout.getChildren().remove(populationLabel);
-            mainLayout.getChildren().remove(populationField);
-            mainLayout.getChildren().remove(renameButton);
-            mainLayout.getChildren().remove(submitButton);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
+            options.getChildren().clear();
         });
 
         closeButton.setOnAction(e -> {
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(xLabel);
-            mainLayout.getChildren().remove(xLengthField);
-            mainLayout.getChildren().remove(yLabel);
-            mainLayout.getChildren().remove(yLengthField);
-            mainLayout.getChildren().remove(populationLabel);
-            mainLayout.getChildren().remove(populationField);
-            mainLayout.getChildren().remove(renameButton);
-            mainLayout.getChildren().remove(submitButton);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
+            options.getChildren().clear();
         });
 
 
@@ -1075,6 +1037,7 @@ public class UserInterface extends Application {
 
     public static void showParkingOptions(VBox mainLayout, Grid grid, int xLen, int yLen, int dailyPop, int row,
                                            int col) {
+        options.getChildren().clear();
         System.out.println("Old Parking Capacity: " + dailyPop);
         Label titleLabel = new Label("Parking Options");
         Label xLabel = new Label("xLength:");
@@ -1119,16 +1082,16 @@ public class UserInterface extends Application {
         yLengthField.setText(Integer.toString(yLen));
         parkingField.setText(Integer.toString(dailyPop));
 
-        mainLayout.getChildren().add(titleLabel);
-        mainLayout.getChildren().add(xLabel);
-        mainLayout.getChildren().add(xLengthField);
-        mainLayout.getChildren().add(yLabel);
-        mainLayout.getChildren().add(yLengthField);
-        mainLayout.getChildren().add(parkingLabel);
-        mainLayout.getChildren().add(parkingField);
-        mainLayout.getChildren().add(submitButton);
-        mainLayout.getChildren().add(removeButton);
-        mainLayout.getChildren().add(closeButton);
+        options.getChildren().add(titleLabel);
+        options.getChildren().add(xLabel);
+        options.getChildren().add(xLengthField);
+        options.getChildren().add(yLabel);
+        options.getChildren().add(yLengthField);
+        options.getChildren().add(parkingLabel);
+        options.getChildren().add(parkingField);
+        options.getChildren().add(submitButton);
+        options.getChildren().add(removeButton);
+        options.getChildren().add(closeButton);
 
         submitButton.setOnAction(e -> {
             int xLenNew = Integer.parseInt(xLengthField.getText());
@@ -1141,16 +1104,8 @@ public class UserInterface extends Application {
                 if (popNew != dailyPop) {
                     grid.changeParkingCapacity(row, col, popNew);
                 }
-                mainLayout.getChildren().remove(titleLabel);
-                mainLayout.getChildren().remove(xLabel);
-                mainLayout.getChildren().remove(xLengthField);
-                mainLayout.getChildren().remove(yLabel);
-                mainLayout.getChildren().remove(yLengthField);
-                mainLayout.getChildren().remove(parkingLabel);
-                mainLayout.getChildren().remove(parkingField);
-                mainLayout.getChildren().remove(submitButton);
-                mainLayout.getChildren().remove(removeButton);
-                mainLayout.getChildren().remove(closeButton);
+                options.getChildren().clear();
+
 
                 showParkingOptions(mainLayout, grid, xLenNew, yLenNew, popNew, row, col);
                 refreshGrid(GRID_SIZE);
@@ -1160,29 +1115,11 @@ public class UserInterface extends Application {
         removeButton.setOnAction(e -> {
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(xLabel);
-            mainLayout.getChildren().remove(xLengthField);
-            mainLayout.getChildren().remove(yLabel);
-            mainLayout.getChildren().remove(yLengthField);
-            mainLayout.getChildren().remove(parkingLabel);
-            mainLayout.getChildren().remove(parkingField);
-            mainLayout.getChildren().remove(submitButton);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
+            options.getChildren().clear();
         });
 
         closeButton.setOnAction(e -> {
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(xLabel);
-            mainLayout.getChildren().remove(xLengthField);
-            mainLayout.getChildren().remove(yLabel);
-            mainLayout.getChildren().remove(yLengthField);
-            mainLayout.getChildren().remove(parkingLabel);
-            mainLayout.getChildren().remove(parkingField);
-            mainLayout.getChildren().remove(submitButton);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
+            options.getChildren().clear();
         });
     }
 
@@ -1306,6 +1243,7 @@ public class UserInterface extends Application {
      * @param col - column of the selected object
      */
     public static void showRoadOptions(VBox mainLayout, Grid grid, int row, int col) {
+        options.getChildren().clear();
         // Get the road object
         GridObject obj = grid.getAtSpot(row, col);
         String name = ((Road)obj).getName();
@@ -1319,9 +1257,6 @@ public class UserInterface extends Application {
         Button removeButton = new Button("Remove Road");
         Button closeButton = new Button("Close Road Options");
         CheckBox inRoad = new CheckBox("Make Input Road");
-
-        VBox options = new VBox();
-
 
         options.getChildren().add(titleLabel);
         options.getChildren().add(renameButt);
@@ -1344,15 +1279,13 @@ public class UserInterface extends Application {
             options.getChildren().add(inRoad);
         }
 
-        mainLayout.getChildren().add(options);
-
         upButt.setOnAction(e -> {
 
             Rectangle cell = grid.getFrontGrid()[row][col];
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImage.png")));
             grid.placeObjectByImage("RoadImage.png", row, col);
             grid.changeRoadDirection(row, col, Direction.UP);
-            mainLayout.getChildren().remove(options);
+            options.getChildren().clear();
 
 
             showRoadOptions(mainLayout, grid, row, col);
@@ -1365,7 +1298,7 @@ public class UserInterface extends Application {
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImageDown.png")));
             grid.placeObjectByImage("RoadImageDown.png", row, col);
             grid.changeRoadDirection(row, col, Direction.DOWN);
-            mainLayout.getChildren().remove(options);
+            options.getChildren().clear();
 
             showRoadOptions(mainLayout, grid, row, col);
             refreshGrid(GRID_SIZE);
@@ -1377,7 +1310,7 @@ public class UserInterface extends Application {
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImageLeft.png")));
             grid.placeObjectByImage("RoadImageLeft.png", row, col);
             grid.changeRoadDirection(row, col, Direction.LEFT);
-            mainLayout.getChildren().remove(options);
+            options.getChildren().clear();
 
 
             showRoadOptions(mainLayout, grid, row, col);
@@ -1390,7 +1323,7 @@ public class UserInterface extends Application {
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
             grid.placeObjectByImage("RoadImageRight.png", row, col);
             grid.changeRoadDirection(row, col, Direction.RIGHT);
-            mainLayout.getChildren().remove(options);
+            options.getChildren().clear();
 
             showRoadOptions(mainLayout, grid, row, col);
             refreshGrid(GRID_SIZE);
@@ -1399,13 +1332,13 @@ public class UserInterface extends Application {
         removeButton.setOnAction(e -> {
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
-            mainLayout.getChildren().remove(options);
+            options.getChildren().clear();
 
         });
 
         renameButt.setOnAction(e -> {
             openRoadRenameDialog((Road)obj);
-            mainLayout.getChildren().remove(options);
+            options.getChildren().clear();
 
 
             showRoadOptions(mainLayout, grid, row, col);
@@ -1413,7 +1346,7 @@ public class UserInterface extends Application {
         });
 
         closeButton.setOnAction(e -> {
-            mainLayout.getChildren().remove(options);
+            options.getChildren().clear();
         });
 
         inRoad.setOnAction(event -> {
@@ -1567,6 +1500,7 @@ public class UserInterface extends Application {
     }
 
     public static void showTrafficLightOptions(VBox mainLayout, Grid grid, int row, int col) {
+        options.getChildren().clear();
         Label titleLabel= new Label("Traffic Light Options");
         Label verticalLabel = new Label ("Vertical Timing:");
         TextField verticalField = new TextField();
@@ -1599,54 +1533,31 @@ public class UserInterface extends Application {
         horizontalField.setText(Integer.toString(light.getTimingTwo()));
 
 
-        mainLayout.getChildren().add(titleLabel);
-        mainLayout.getChildren().add(verticalLabel);
-        mainLayout.getChildren().add(verticalField);
-        mainLayout.getChildren().add(horizontalLabel);
-        mainLayout.getChildren().add(horizontalField);
-        mainLayout.getChildren().add(submitButton);
-        mainLayout.getChildren().add(removeButton);
-        mainLayout.getChildren().add(closeButton);
+        options.getChildren().add(titleLabel);
+        options.getChildren().add(verticalLabel);
+        options.getChildren().add(verticalField);
+        options.getChildren().add(horizontalLabel);
+        options.getChildren().add(horizontalField);
+        options.getChildren().add(submitButton);
+        options.getChildren().add(removeButton);
+        options.getChildren().add(closeButton);
 
         submitButton.setOnAction(e -> {
             int vert = Integer.parseInt(verticalField.getText());
             int hor = Integer.parseInt(verticalField.getText());
             grid.updateTiming(light, vert, hor);
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(verticalField);
-            mainLayout.getChildren().remove(verticalLabel);
-            mainLayout.getChildren().remove(horizontalLabel);
-            mainLayout.getChildren().remove(horizontalField);
-            mainLayout.getChildren().remove(submitButton);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
+            options.getChildren().clear();
             showTrafficLightOptions(mainLayout, grid, row, col);
         });
 
         removeButton.setOnAction(e -> {
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(verticalField);
-            mainLayout.getChildren().remove(verticalLabel);
-            mainLayout.getChildren().remove(horizontalLabel);
-            mainLayout.getChildren().remove(horizontalField);
-            mainLayout.getChildren().remove(submitButton);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
+            options.getChildren().clear();
         });
 
         closeButton.setOnAction(e -> {
-            mainLayout.getChildren().remove(titleLabel);
-            mainLayout.getChildren().remove(verticalField);
-            mainLayout.getChildren().remove(verticalLabel);
-            mainLayout.getChildren().remove(horizontalLabel);
-            mainLayout.getChildren().remove(horizontalField);
-            mainLayout.getChildren().remove(submitButton);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
+            options.getChildren().clear();
         });
 
 
