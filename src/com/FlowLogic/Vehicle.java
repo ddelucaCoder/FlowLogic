@@ -7,6 +7,9 @@ public class Vehicle {
     ArrayList<Intersection> intersectionPath;
     ArrayList<Direction> directionPath;
 
+    int startRoadID;
+    int endRoadID;
+
     public Vehicle() {
     }
 
@@ -21,7 +24,7 @@ public class Vehicle {
         }
     }
 
-    public void modifiedDjikstras(int[][] adjMatrix, int startID, int target, ArrayList<Intersection> intersections) {
+    private void modifiedDjikstras(int[][] adjMatrix, int startID, int target, ArrayList<Intersection> intersections) {
         //set up djikstra's algorithm
         int n = adjMatrix.length;
         int[] distance = new int[n];
@@ -69,6 +72,11 @@ public class Vehicle {
             }
         }
         return minIndex;
+    }
+
+    public void findPath(int[][] adjMatrix, ArrayList<Intersection> intersections) {
+        modifiedDjikstras(adjMatrix, startRoadID, endRoadID, intersections);
+
     }
 
 
