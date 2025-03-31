@@ -8,14 +8,16 @@ public class TwoWayRoad extends Road {
     private OneWayRoad right;
     private int rowNum;
     private int colNum;
+    private Image imageFile;
 
 
     public TwoWayRoad(Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum, OneWayRoad left, OneWayRoad right) {
         super(orientation, speedLimit, isInRoad, inCars, rowNum, colNum);
         this.left = left;
         this.right = right;
-        left.updateGraphic();
-        right.updateGraphic();
+        //left.updateGraphic();
+        //right.updateGraphic();
+        updateGraphic();
     }
 
     public TwoWayRoad(Orientation orientation) {
@@ -35,8 +37,13 @@ public class TwoWayRoad extends Road {
     }
 
     public void updateGraphic() {
-        left.updateGraphic();
-        right.updateGraphic();
+        //left.updateGraphic();
+        //right.updateGraphic();
+        if (this.getOrientation() == Orientation.VERTICAL) {
+                this.imageFile = new Image("file:Images/TwoWayRoad.png");
+        } else if (this.getOrientation() == Orientation.HORIZONTAL) {
+                this.imageFile = new Image("file:Images/TwoWayRoadRight.png");
+        }
     }
 
     public GridObject clone() {

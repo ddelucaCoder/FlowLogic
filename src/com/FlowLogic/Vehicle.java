@@ -1,4 +1,8 @@
 package com.FlowLogic;
+import javafx.util.Pair;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 import java.util.ArrayList;
 
@@ -12,6 +16,7 @@ public class Vehicle {
 
     public Vehicle() {
     }
+
 
     private void getArrayListsFromDjikstras(int[] previous, int start, int target,
                                             ArrayList<Intersection> intersections) {
@@ -78,6 +83,4 @@ public class Vehicle {
         modifiedDjikstras(adjMatrix, startRoadID, endRoadID, intersections);
 
     }
-
-
 }

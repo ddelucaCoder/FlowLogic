@@ -9,7 +9,7 @@ import javafx.scene.image.Image;
  * by the user.
  */
 public class Road implements GridObject {
-
+    private String name;
     private Orientation orientation;
     private int speedLimit;
     private int length;
@@ -18,9 +18,11 @@ public class Road implements GridObject {
     private Image imageFile;
     private int rowNum;
     private int colNum;
+    private boolean inLaneList;
+    private MultiLaneConnect laneContainer;
 
 
-    public Road (Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum) {
+    public Road(Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum) {
         this.orientation = orientation;
         this.speedLimit = speedLimit;
         this.isInRoad = isInRoad;
@@ -28,14 +30,16 @@ public class Road implements GridObject {
         this.rowNum = rowNum;
         this.colNum = colNum;
         this.imageFile = new Image("file:Images/RoadImage.png");
-
-
+        this.inLaneList = false;
+        this.laneContainer = null;
+        this.name = "Road";
     }
 
     @Override
     public int getRowNum() {
         return rowNum;
     }
+
     public GridObject clone() {
         return null;
     }
@@ -101,5 +105,29 @@ public class Road implements GridObject {
 
     public void setImageFile(Image imageFile) {
         this.imageFile = imageFile;
+    }
+
+    public void setLaneContainer(MultiLaneConnect laneContainer) {
+        this.laneContainer = laneContainer;
+    }
+
+    public boolean isInLaneList() {
+        return inLaneList;
+    }
+
+    public void setInLaneList(boolean inLaneList) {
+        this.inLaneList = inLaneList;
+    }
+
+    public MultiLaneConnect getLaneContainer() {
+        return laneContainer;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
