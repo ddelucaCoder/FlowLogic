@@ -114,15 +114,15 @@ public class StopLight extends Intersection implements GridObject {
      * Called by the simulation to get and change the state of the light at hand
      * @return true if there was a change, false otherwise
      */
-    public boolean tick() {
+    public Step tick() {
         timer--;
         if (timer <= 0) {
             // set the image to yellow light or green light
             // set the timer to a new time
             timer = 5; // TODO: change this to a realistic time
-            return true;
+            return null;
         }
-        return false;
+        return null;
     }
 
     // getters and setters

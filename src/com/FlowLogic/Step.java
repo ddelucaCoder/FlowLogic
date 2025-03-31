@@ -1,31 +1,27 @@
 package com.FlowLogic;
 
 public class Step {
-    double xPos;
-    double yPos;
-    double xInc;
-    double yInc;
+    GridObject oldObject;
+    GridObject newObject;
 
-    public Step(double xPos, double yPos, double xInc, double yInc) {
-        this.xPos = xPos;
-        this.yPos = yPos;
-        this.xInc = xInc;
-        this.yInc = yInc;
+    public Step(GridObject oldObject, GridObject newObject) {
+        this.oldObject = oldObject;
+        this.newObject = newObject;
     }
 
-    public double getxPos() {
-        return xPos;
+    public GridObject getOldObject() {
+        return oldObject;
     }
 
-    public double getyPos() {
-        return yPos;
+    public void setOldObject(GridObject oldObject) {
+        this.oldObject = oldObject;
     }
 
-    public double getxInc() {
-        return xInc;
+    public GridObject getNewObject() {
+        return newObject;
     }
 
-    public double getyInc() {
-        return yInc;
+    public void setNewObject(GridObject newObject) {
+        this.newObject = newObject;
     }
 }
