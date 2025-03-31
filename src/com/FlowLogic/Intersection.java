@@ -83,4 +83,8 @@ public class Intersection implements GridObject {
     public void setImageFile(Image imageFile) {
         this.imageFile = imageFile;
     }
+
+    public Step tick() {
+        return null;
+    }
 }

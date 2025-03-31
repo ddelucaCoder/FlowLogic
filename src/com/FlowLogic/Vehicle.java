@@ -14,9 +14,26 @@ public class Vehicle {
     int startRoadID;
     int endRoadID;
 
+    int timeIn;
+
     public Vehicle() {
     }
 
+    public Step tick() {
+        return null;
+    }
+
+    public void generatePath() {
+
+    }
+
+    public void setInOut(ArrayList<GridObject> entrances, ArrayList<GridObject> destinations) {
+
+    }
+
+    public void setTimeIn(int timeIn) {
+        this.timeIn = timeIn;
+    }
 
     private void getArrayListsFromDjikstras(int[] previous, int start, int target,
                                             ArrayList<Intersection> intersections) {
