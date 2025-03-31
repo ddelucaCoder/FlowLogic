@@ -6,6 +6,8 @@ import java.util.Random;
 
 import java.util.ArrayList;
 
+import static com.FlowLogic.Direction.*;
+
 public class Vehicle {
 
     ArrayList<Intersection> intersectionPath;
@@ -17,18 +19,17 @@ public class Vehicle {
     int timeIn;
 
     public Vehicle() {
+
     }
 
     public Step tick() {
+        // TODO: add car logic
         return null;
     }
 
-    public void generatePath() {
-
-    }
-
-    public void setInOut(ArrayList<GridObject> entrances, ArrayList<GridObject> destinations) {
-
+    public void setInOut(Road r, Road d) {
+        startRoadID = r.getIntersectionID();
+        endRoadID = d.getIntersectionID();
     }
 
     public void setTimeIn(int timeIn) {
@@ -38,9 +39,21 @@ public class Vehicle {
     private void getArrayListsFromDjikstras(int[] previous, int start, int target,
                                             ArrayList<Intersection> intersections) {
         while (target != start) {
-            // add target intersection
+            // add target intersections
+            Intersection last = intersectionPath.get(0);
+            Intersection newest = intersections.get(target);
             intersectionPath.add(0, intersections.get(target));
-            // TODO: figure out directions
+
+            if (last.getColNum() < newest.getColNum()) {
+                directionPath.add(LEFT);
+            } else if (last.getColNum() > newest.getColNum()) {
+                directionPath.add(RIGHT);
+            } else if (last.getRowNum() < newest.getRowNum()) {
+                directionPath.add(UP);
+            } else {
+                directionPath.add(DOWN);
+            }
+
 
             target = previous[target];
         }
@@ -98,6 +111,5 @@ public class Vehicle {
 
     public void findPath(int[][] adjMatrix, ArrayList<Intersection> intersections) {
         modifiedDjikstras(adjMatrix, startRoadID, endRoadID, intersections);
-
     }
 }

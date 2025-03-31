@@ -1,6 +1,7 @@
 package com.FlowLogic;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class TrafficController {
 
@@ -10,14 +11,26 @@ public class TrafficController {
 
     private int totalTime;
 
-    private ArrayList<GridObject> destinations;
-    private ArrayList<GridObject> entrances;
+    private ArrayList<Road> destinations;
+    private ArrayList<Road> entrances;
 
+    private Grid grid;
 
-    // TODO: set up frame and step classes
+    private final Random random = new Random();
 
     public TrafficController() {
 
+    }
+
+    private Road getRandomInRoad() {
+        // get random in roads
+        int randInd = random.nextInt(entrances.size());
+        return entrances.get(randInd);
+    }
+    private Road getRandomDestination() {
+        // get random in roads
+        int randInd = random.nextInt(destinations.size());
+        return destinations.get(randInd);
     }
 
     public Simulation runSimulation() {
@@ -27,9 +40,9 @@ public class TrafficController {
 
         // get each car's route
         for (Vehicle v : vehicles) {
-            v.setInOut(entrances, destinations);
+            v.setInOut(getRandomInRoad(), getRandomDestination());
             v.setTimeIn((int) (Math.random() *  totalTime));
-            v.generatePath();
+            v.findPath(grid.gridToGraph(), grid.intersections);
         }
 
         // run simulation

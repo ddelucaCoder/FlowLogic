@@ -21,6 +21,8 @@ public class Road implements GridObject {
     private boolean inLaneList;
     private MultiLaneConnect laneContainer;
 
+    private int intersectionID = -1;
+
 
     public Road(Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum) {
         this.orientation = orientation;
@@ -33,6 +35,14 @@ public class Road implements GridObject {
         this.inLaneList = false;
         this.laneContainer = null;
         this.name = "Road";
+    }
+
+    public void setIntersectionID(int intersectionID) {
+        this.intersectionID = intersectionID;
+    }
+
+    public int getIntersectionID() {
+        return intersectionID;
     }
 
     @Override
