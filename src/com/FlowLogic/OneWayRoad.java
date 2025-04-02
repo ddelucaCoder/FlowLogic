@@ -20,6 +20,8 @@ public class OneWayRoad extends Road implements GridObject {
     private Image imageFile;
 
 
+
+
     public OneWayRoad(Orientation orientation, int speedLimit, boolean isInRoad, int inCars, int rowNum, int colNum, Direction direction, int numLanes, ArrayList<Vehicle> vehicleList) {
         super(orientation, speedLimit, isInRoad, inCars, rowNum, colNum);
         this.direction = direction;

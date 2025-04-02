@@ -454,6 +454,57 @@ public class Grid {
         };
     }
 
+    public MultiLaneConnect mergeRoads(int rowNum, int colNum) {
+        // get road from spot and create multilane for it
+        GridObject obj = getAtSpot(rowNum, colNum);
+        Road mainRoad;
+        MultiLaneConnect container;
+        if (obj instanceof Road) {
+            mainRoad = (Road) obj;
+        } else {
+            System.out.println("mergeRoads error: No road here to merge\n");
+            return null;
+        }
+        if (mainRoad.getLaneContainer() != null) {
+            container = mainRoad.getLaneContainer();
+        } else {
+            container = new MultiLaneConnect();
+            mainRoad.setLaneContainer(container);
+            container.addRoadToList(mainRoad);
+        }
+        // get roads around it in same direction and add to multilane
+        // check all 4 directions around
+        if (!(mainRoad instanceof OneWayRoad oneRoad)) {
+            System.out.println("mergeRoads error: Not a one way road\n");
+            return null;
+        }
+        Direction oneDir = oneRoad.getDirection();
+        if (oneDir == Direction.UP || oneDir == Direction.DOWN) {
+            // check up and down obj to see if it is a road
+            obj = getAtSpot(rowNum, colNum + 1);
+            if (obj instanceof OneWayRoad checkRoad) {
+                if (checkRoad.getDirection() == oneDir) {
+                    // add to multi lane
+                    // if multilane already exists, move all roads into new multilane
+                    if (checkRoad.getLaneContainer() != null) {
+                        List<Road> lanes = checkRoad.getLaneContainer().getLaneList();
+                        for (Road road : lanes) {
+                            road.setLaneContainer(container);
+                            container.addRoadToList(road);
+                        }
+                    } else {
+                        // not in a multilane yet
+                        checkRoad.setLaneContainer(container);
+                        container.addRoadToList(checkRoad);
+                    }
+                }
+            }
+        } else if (oneDir == Direction.RIGHT || oneDir == Direction.LEFT) {
+
+        }
+        return container;
+    }
+
     /**
      * This function is called from the frontend when the user clicks on a square on the grid. It goes through the
      * options of each type of thing that could be clicked and does the appropriate action.
