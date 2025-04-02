@@ -469,6 +469,80 @@ public class Grid {
     }
 
     /**
+     * This function is used to find and merge lanes that are next to the road in the location defined
+     * by the coordinates. This returns the multilaneConnect object that all of the roads next to each
+     * other will be contained by
+     * @param rowNum
+     * @param colNum
+     * @return
+     */
+    public MultiLaneConnect mergeRoads(int rowNum, int colNum) {
+        // get road from spot and create multilane for it
+        GridObject obj = getAtSpot(rowNum, colNum);
+        Road mainRoad;
+        MultiLaneConnect container;
+        if (obj instanceof Road) {
+            mainRoad = (Road) obj;
+        } else {
+            System.out.println("mergeRoads error: No road here to merge\n");
+            return null;
+        }
+        if (mainRoad.getLaneContainer() != null) {
+            container = mainRoad.getLaneContainer();
+        } else {
+            container = new MultiLaneConnect();
+            mainRoad.setLaneContainer(container);
+            container.addRoadToList(mainRoad);
+        }
+        // get roads around it in same direction and add to multilane
+        // check all 4 directions around
+        if (!(mainRoad instanceof OneWayRoad oneRoad)) {
+            System.out.println("mergeRoads error: Not a one way road\n");
+            return null;
+        }
+        Direction oneDir = oneRoad.getDirection();
+        if (oneDir == Direction.UP || oneDir == Direction.DOWN) {
+            // check up and down obj to see if it is a road
+            obj = getAtSpot(rowNum, colNum + 1);
+            mergeHelper(obj, container, oneDir);
+            obj = getAtSpot(rowNum, colNum - 1);
+            mergeHelper(obj, container, oneDir);
+        } else if (oneDir == Direction.RIGHT || oneDir == Direction.LEFT) {
+            obj = getAtSpot(rowNum + 1, colNum);
+            mergeHelper(obj, container, oneDir);
+            obj = getAtSpot(rowNum - 1, colNum);
+            mergeHelper(obj, container, oneDir);
+        }
+        return container;
+    }
+
+    /**
+     * This is a helper function that checks if the obj direction
+     * @param obj
+     * @param container
+     * @param oneDir
+     */
+    private void mergeHelper(GridObject obj, MultiLaneConnect container, Direction oneDir) {
+        if (obj instanceof OneWayRoad checkRoad) {
+            if (checkRoad.getDirection() == oneDir) {
+                // add to multi lane
+                // if multilane already exists, move all roads into new multilane
+                if (checkRoad.getLaneContainer() != null) {
+                    List<Road> lanes = checkRoad.getLaneContainer().getLaneList();
+                    for (Road road : lanes) {
+                        road.setLaneContainer(container);
+                        container.addRoadToList(road);
+                    }
+                } else {
+                    // not in a multilane yet
+                    checkRoad.setLaneContainer(container);
+                    container.addRoadToList(checkRoad);
+                }
+            }
+        }
+    }
+
+    /**
      * This function is called from the frontend when the user clicks on a square on the grid. It goes through the
      * options of each type of thing that could be clicked and does the appropriate action.
      * for each type of

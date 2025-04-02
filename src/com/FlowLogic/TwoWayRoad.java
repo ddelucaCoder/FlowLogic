@@ -66,6 +66,23 @@ public class TwoWayRoad extends Road {
         }
     }
 
+    public MultiLaneConnect combineRoad() {
+        // check to see if either road has an existing multilane
+        MultiLaneConnect multi;
+        if (this.left.getLaneContainer() != null) {
+            multi = this.left.getLaneContainer();
+            multi.addRoadToList(right);
+        } else if (this.right.getLaneContainer() != null) {
+            multi = this.right.getLaneContainer();
+            multi.addRoadToList(left);
+        } else {
+            multi = new MultiLaneConnect();
+            multi.addRoadToList(left);
+            multi.addRoadToList(right);
+        }
+        return multi;
+    }
+
 
 
     public OneWayRoad getLeft() {

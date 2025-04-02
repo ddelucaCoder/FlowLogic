@@ -15,6 +15,7 @@ public class MultiLaneConnect {
 
     public void addRoadToList(Road road) {
         laneList.add(road);
+        road.setLaneContainer(this);
     }
 
     public void removeRoadFromList(Road road) {
