@@ -1,14 +1,20 @@
 package com.FlowLogic;
+import javafx.scene.paint.Stop;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
+import static com.FlowLogic.CarState.*;
 import static com.FlowLogic.Direction.*;
 
 public class Vehicle {
+
+    int length;
+    int width;
 
     ArrayList<Intersection> intersectionPath;
     ArrayList<Direction> directionPath;
@@ -18,13 +24,285 @@ public class Vehicle {
 
     int timeIn;
 
-    public Vehicle() {
+    int x;
+    int y;
 
+    int speed;
+
+    CarState state;
+
+    Direction direction;
+
+    Intersection currentIntersection;
+
+    int angle = 0;
+
+    int curRotation = 0; // ASSUME THIS IS DEGREES
+
+    private final int TURN_RATE = 1;
+    private final int FOLLOWING_DISTANCE = 10;
+    private final int SLOW_DECEL = 2;
+    private final int FAST_DECEL = 6;
+
+    private final int ACCEL = 3;
+
+    public Vehicle() {
+        // Initialize collections as empty ArrayLists
+        this.intersectionPath = new ArrayList<Intersection>();
+        this.directionPath = new ArrayList<Direction>();
+
+        // Initialize primitive types with default values
+        this.startRoadID = 0;
+        this.endRoadID = 0;
+        this.timeIn = 0;
+        this.x = 0;
+        this.y = 0;
+        this.speed = 0;
+
+        // Initialize object references to null
+        this.state = null;
+        this.direction = null;
+        this.currentIntersection = null;
     }
 
-    public Step tick() {
-        // TODO: add car logic
+    public Vehicle(Vehicle v) {
+        // Clone the ArrayList collections using new instances
+        this.intersectionPath = new ArrayList<>(v.intersectionPath);
+        this.directionPath = new ArrayList<>(v.directionPath);
+
+        this.angle = v.angle;
+        this.width = v.width;
+        this.length = v.length;
+        this.curRotation = v.curRotation;
+
+        // Copy primitive values
+        this.startRoadID = v.startRoadID;
+        this.endRoadID = v.endRoadID;
+        this.timeIn = v.timeIn;
+        this.x = v.x;
+        this.y = v.y;
+        this.speed = v.speed;
+
+        // Copy enum value
+        this.state = v.state;
+        this.direction = v.direction;
+
+        // Reference to the same intersection object
+        // If deep copying is needed, you'd need a copy constructor for Intersection
+        this.currentIntersection = v.currentIntersection;
+    }
+
+    private void spawn() {
+        // TODO: spawn car in
+        // set x and y
+        int coords[] = Grid.getRealCoords(this.intersectionPath.get(0));
+        int spawnX = coords[0]; // TODO: COORDINATES
+        int spawnY = coords[1]; // TODO: COORDINATES
+        // set speed
+        speed = 0;
+        // set direction
+        direction = directionPath.get(1);
+        // set state
+        state = FORWARD;
+
+        // rotate the car
+
+        //ASSUME 0 IS UP
+        switch (direction) {
+            case UP -> curRotation = 0;
+            case RIGHT -> curRotation = 90;
+            case DOWN -> curRotation = 180;
+            case LEFT -> curRotation = 270;
+        }
+    }
+
+    /**
+     * This function moves the vehicle forward by the correct amount
+     */
+    private void moveForward() {
+        int xVel = 0;
+        int yVel = 0;
+        switch (direction) {
+            case UP -> yVel = -speed;
+            case RIGHT -> xVel = speed;
+            case DOWN -> yVel = speed;
+            case LEFT -> xVel = -speed;
+        }
+        x += xVel;
+        y += yVel;
+    }
+
+    /**
+     * This function gets the object that the car is on top of
+     * @param g - the grid object
+     * @return the road object that the car is on
+     */
+
+    private GridObject getCurrentGridObject(Grid g) {
+        return g.getSpotRealCoords(x, y);
+    }
+
+    private GridObject getCurrentGridObject(Grid g, int[] coords) {
+        return g.getSpotRealCoords(coords[0], coords[1]);
+    }
+
+
+    /**
+     * Speeds up the car by the constant amount ACCEL
+     */
+    private void accelerate() {
+        speed += ACCEL;
+    }
+
+    private boolean decelerate(Grid g) {
+        // check if car in front
+        // TODO: Check in front for car
+        // check if car nearing intersection
+        if ((getCurrentGridObject(g, front(20)) instanceof StopSign ||
+            getCurrentGridObject(g, front(40)) instanceof StopSign)
+            && speed > 10) {
+            speed -= SLOW_DECEL;
+            return true;
+        } else if ((getCurrentGridObject(g, front(10)) instanceof StopSign ||
+                   getCurrentGridObject(g, front(5)) instanceof StopSign)
+                   && speed > 8) {
+            speed -= FAST_DECEL;
+            if (speed <= 5) {
+                speed = 5;
+            }
+            if (getCurrentGridObject(g, front(5)) instanceof StopSign s) {
+                speed = 0;
+                s.getQueue().add(this);
+                if (directionPath.get(1) != direction) {
+                    state = STOPPED_TURNING;
+                } else {
+                    state = STOPPED_FORWARD;
+                }
+            }
+            return true;
+        }
+
+        // if we are super close to the stop sign, then stop
+
+        if (getCurrentGridObject(g, front(5)) instanceof StopSign s) {
+            speed = 0;
+            s.getQueue().add(this);
+            if (directionPath.get(1) != direction) {
+                state = STOPPED_TURNING;
+            } else {
+                state = STOPPED_FORWARD;
+            }
+            return true;
+        }
+        // TODO: stoplight logic
+        return false;
+    }
+
+    private Step turnRight() {
+        Vehicle past = new Vehicle(this);
+        // first move the vehicle to the center of the block
+
+        // our intersection coords
+        Intersection i = intersectionPath.get(0);
+        int[] intersectionCoords = Grid.getRealCoords(i);
+
+        // move to center
+        this.x = intersectionCoords[0] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.width);
+        this.y = intersectionCoords[1] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.length);
+
+        // TODO: check the angles
+
+        curRotation += TURN_RATE;
+
+        if (curRotation % 90 == 0) {
+            // done turning
+            state = FORWARD;
+            intersectionPath.remove(0);
+            directionPath.remove(0);
+        }
+
+        return new Step(past, this);
+    }
+
+    private Step turnLeft() {
+        Vehicle past = new Vehicle(this);
+        // first move the vehicle to the center of the block
+
+        // our intersection coords
+        Intersection i = intersectionPath.get(0);
+        int[] intersectionCoords = Grid.getRealCoords(i);
+
+        // move to center
+        this.x = intersectionCoords[0] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.width);
+        this.y = intersectionCoords[1] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.length);
+
+        // TODO: check the angles
+
+        curRotation -= TURN_RATE;
+
+        if (curRotation % 90 == 0) {
+            // done turning
+            state = FORWARD;
+            intersectionPath.remove(0);
+            directionPath.remove(0);
+        }
+
+        return new Step(past, this);
+    }
+
+
+    public Step tick(Grid g) {
+        // STATE MACHINE
+        if (state == NOT_SPAWNED) {
+            this.timeIn--;
+            if (this.timeIn <= 0) {
+                this.spawn();
+                return new Step(null, this);
+            }
+            return null;
+        } else if (state == FORWARD) {
+            if (getCurrentGridObject(g) instanceof Road
+                && ((Road) getCurrentGridObject(g)).getSpeedLimit() >= speed
+                && !decelerate(g)) {
+                accelerate();
+            }
+            if (state == FORWARD) {
+                moveForward();
+            }
+        } else if (state == STOPPED_FORWARD) {
+            if (currentIntersection instanceof StopLight) {
+                // TODO: Stoplight logic
+                // check if were moving
+            }
+        } else if (state == STOPPED_TURNING) {
+            if (currentIntersection instanceof StopLight) {
+                // TODO: Stoplight logic
+            }
+        } else if (state == TURNING) {
+            Direction next = directionPath.get(1);
+            if ((next == RIGHT && direction == UP)
+                || (next == DOWN && direction == RIGHT)
+                || (next == UP && direction == LEFT)
+                || (next == LEFT && direction == DOWN)) {
+                return this.turnLeft();
+            } else if ((direction == RIGHT && next == UP)
+                || (direction == DOWN && next == RIGHT)
+                || (direction == UP && next == LEFT)
+                || (direction == LEFT && next == DOWN)) {
+                return this.turnRight();
+            }
+
+        }
         return null;
+    }
+
+    public void stopSignLetGo() {
+        if (state == STOPPED_FORWARD) {
+            this.state = FORWARD;
+        } else if (state == STOPPED_TURNING) {
+            this.state = TURNING;
+        }
+        this.speed = 0;
     }
 
     public void setInOut(Road r, Road d) {
@@ -38,24 +316,41 @@ public class Vehicle {
 
     private void getArrayListsFromDjikstras(int[] previous, int start, int target,
                                             ArrayList<Intersection> intersections) {
-        while (target != start) {
-            // add target intersections
-            Intersection last = intersectionPath.get(0);
-            Intersection newest = intersections.get(target);
-            intersectionPath.add(0, intersections.get(target));
+        // init array lists
+        if (intersectionPath == null) intersectionPath = new ArrayList<>();
+        else intersectionPath.clear();
 
-            if (last.getColNum() < newest.getColNum()) {
-                directionPath.add(LEFT);
-            } else if (last.getColNum() > newest.getColNum()) {
-                directionPath.add(RIGHT);
-            } else if (last.getRowNum() < newest.getRowNum()) {
-                directionPath.add(UP);
+        if (directionPath == null) directionPath = new ArrayList<>();
+        else directionPath.clear();
+
+        // backwards building of a stack
+        Stack<Intersection> tempPath = new Stack<>();
+        int current = target;
+        while (current != start) {
+            tempPath.push(intersections.get(current));
+            current = previous[current];
+        }
+
+        // Add the start intersection
+        tempPath.push(intersections.get(start));
+
+        // Pop from stack to get intersections in correct order
+        intersectionPath.add(tempPath.pop());
+        while (!tempPath.isEmpty()) {
+            Intersection prev = intersectionPath.get(intersectionPath.size() - 1);
+            Intersection next = tempPath.pop();
+            intersectionPath.add(next);
+
+            // calc direction
+            if (next.getColNum() > prev.getColNum()) {
+                directionPath.add(Direction.RIGHT);
+            } else if (next.getColNum() < prev.getColNum()) {
+                directionPath.add(Direction.LEFT);
+            } else if (next.getRowNum() > prev.getRowNum()) {
+                directionPath.add(Direction.DOWN);
             } else {
-                directionPath.add(DOWN);
+                directionPath.add(Direction.UP);
             }
-
-
-            target = previous[target];
         }
     }
 
@@ -111,5 +406,63 @@ public class Vehicle {
 
     public void findPath(int[][] adjMatrix, ArrayList<Intersection> intersections) {
         modifiedDjikstras(adjMatrix, startRoadID, endRoadID, intersections);
+    }
+
+    private int[] front() {
+        return front(0);
+    }
+
+    private int[] left() {
+        return left(0);
+    }
+
+    private int[] right() {
+        return right(0);
+    }
+
+
+    private int[] front(int delta) {
+        // COORDINATES ARE TOP LEFT OF CAR
+        // LENGTH = x LENGTH
+        // WIDTH = y LENGTH
+        if (direction == RIGHT) {
+            return new int[]{x + length + delta, y + (int) (0.5 * width)};
+        } else if (direction == LEFT) {
+            return new int[]{x - length - delta, y - (int) (0.5 * width)};
+        } else if (direction == UP) {
+            return new int[]{x - (int) (0.5 * width), y - length - delta};
+        } else {
+            return new int[]{x - (int) (0.5 * width), y + (length) + delta};
+        }
+    }
+
+    private int[] left(int delta) {
+        // COORDINATES ARE TOP LEFT OF CAR
+        // LENGTH = x LENGTH in right facing orientation
+        // WIDTH = y LENGTH
+        if (direction == RIGHT) {
+            return new int[]{x + (int) (0.5 * length), y - delta};
+        } else if (direction == LEFT) {
+            return new int[]{x - (int) (0.5 * length), y + delta};
+        } else if (direction == UP) {
+            return new int[]{x - delta, y - (int) (0.5 * width)};
+        } else { // DOWN
+            return new int[]{x +  delta, y + (int) (0.5 * width)};
+        }
+    }
+
+    private int[] right(int delta) {
+        // COORDINATES ARE TOP LEFT OF CAR
+        // LENGTH = x LENGTH in right facing orientation
+        // WIDTH = y LENGTH
+        if (direction == RIGHT) {
+            return new int[]{x + (int) (0.5 * length), y + width + delta};
+        } else if (direction == LEFT) {
+            return new int[]{x - (int) (0.5 * length), y - width - delta};
+        } else if (direction == UP) {
+            return new int[]{x + width + delta, y - (int) (0.5 * length)};
+        } else {
+            return new int[]{x - width - delta, y - (int) (0.5 * length)};
+        }
     }
 }
