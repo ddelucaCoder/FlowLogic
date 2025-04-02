@@ -1,27 +1,27 @@
 package com.FlowLogic;
 
 public class Step {
-    GridObject oldObject;
-    GridObject newObject;
+    Object oldObject;
+    Object newObject;
 
-    public Step(GridObject oldObject, GridObject newObject) {
+    public Step(Object oldObject, Object newObject) {
         this.oldObject = oldObject;
         this.newObject = newObject;
     }
 
-    public GridObject getOldObject() {
+    public Object getOldObject() {
         return oldObject;
     }
 
-    public void setOldObject(GridObject oldObject) {
+    public void setOldObject(Object oldObject) {
         this.oldObject = oldObject;
     }
 
-    public GridObject getNewObject() {
+    public Object getNewObject() {
         return newObject;
     }
 
-    public void setNewObject(GridObject newObject) {
+    public void setNewObject(Object newObject) {
         this.newObject = newObject;
     }
 }

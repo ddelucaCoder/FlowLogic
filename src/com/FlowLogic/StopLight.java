@@ -12,6 +12,8 @@ public class StopLight extends Intersection implements GridObject {
     final int GREEN = 2;
     private int rowNum;
     private int colNum;
+
+    private int YELLOW_TIMING = 10; // TODO: adjust this
     private Image imageFile;
     private Image redGreen4WayImage;
     private Image redYellow4WayImage;
@@ -69,45 +71,29 @@ public class StopLight extends Intersection implements GridObject {
      *
      * @return boolean : was successful
      */
-    public boolean switchLights() {
-        if (lightOneColor == RED) {
-            lightTwoColor = YELLOW;
-            imageFile = redYellow4WayImage;
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    public int switchLights() {
+        if (lightOneColor == YELLOW) {
+            lightOneColor = RED;
+            lightTwoColor = GREEN;
+            this.imageFile = getRedYellow4WayImage();
+            return YELLOW_TIMING;
+        } else if (lightOneColor == GREEN) {
+            lightOneColor = YELLOW;
             lightTwoColor = RED;
-            imageFile = allRed4WayImage;
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            this.imageFile = getRedYellow4WayImage();
+            return timingOne;
+        } else if (lightTwoColor == YELLOW) {
+            lightTwoColor = RED;
             lightOneColor = GREEN;
-            imageFile = greenRed4WayImage;
-        } else {
-            if (lightOneColor == GREEN) {
-                lightOneColor = YELLOW;
-                imageFile = yellowRed4WayImage;
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                lightOneColor = RED;
-                imageFile = allRed4WayImage;
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                lightTwoColor = GREEN;
-                imageFile = redGreen4WayImage;
-            }
+            this.imageFile = getRedGreen4WayImage();
+            return YELLOW_TIMING;
+        } else if (lightTwoColor == GREEN) {
+            lightTwoColor = YELLOW;
+            lightOneColor = RED;
+            this.imageFile = getRedYellow4WayImage();
+            return timingTwo;
         }
-        return true;
+        return -1;
     }
 
     /**
@@ -117,10 +103,9 @@ public class StopLight extends Intersection implements GridObject {
     public Step tick() {
         timer--;
         if (timer <= 0) {
-            // set the image to yellow light or green light
-            // set the timer to a new time
-            timer = 5; // TODO: change this to a realistic time
-            return null;
+            StopLight clone = (StopLight) this.clone();
+            timer = switchLights();
+            return new Step(clone, this);
         }
         return null;
     }

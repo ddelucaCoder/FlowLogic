@@ -5,6 +5,9 @@ import java.util.Queue;
 public class StopSign extends Intersection {
     private Queue<Vehicle> queue;
 
+    private final int WAIT_TIME = 10; // TODO: adjust if necessary
+    int timer = WAIT_TIME;
+
 
 
     private Image imageFile;
@@ -17,6 +20,16 @@ public class StopSign extends Intersection {
     public StopSign(StopSign s) {
         super(s.getRowNum(), s.getColNum(), s.getRoadList());
         this.imageFile = new Image("file:Images/4WayStopSign.png");
+    }
+
+    public Step tick() {
+        timer--;
+        if (timer <= 0) {
+            timer = WAIT_TIME;
+            Vehicle go = queue.remove();
+            go.stopSignLetGo();
+        }
+        return null;
     }
 
 

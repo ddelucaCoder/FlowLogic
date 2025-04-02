@@ -642,6 +642,19 @@ public class Grid {
         ((Parking) obj).setParkingCapacity(newCap);
     }
 
+    public static int[] getRealCoords(GridObject g) {
+        int row = g.getRowNum();
+        int col = g.getColNum();
+
+        return new int[]{row * GRID_SIZE, col * GRID_SIZE};
+    }
+
+    public GridObject getSpotRealCoords(int x, int y) {
+        x /= GRID_SIZE;
+        y /= GRID_SIZE;
+        return getAtSpot(x, y);
+    }
+
     /**
      * This function changes the size of the building at (row, col)
      * it grows down and to the right, and vise versa for shrinking

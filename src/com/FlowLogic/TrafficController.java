@@ -18,7 +18,10 @@ public class TrafficController {
 
     private final Random random = new Random();
 
-    public TrafficController() {
+    public TrafficController(int numCars) {
+        for (int i = 0; i < numCars; i++) {
+            vehicles.add(new Vehicle());
+        }
 
     }
 
@@ -61,7 +64,7 @@ public class TrafficController {
 
             for (Vehicle v : vehicles) {
                 // update each vehicle
-                Step s = v.tick();
+                Step s = v.tick(grid);
                 // add old / new vehicles to the sim
                 if (!s.getNewObject().equals(s.getOldObject())) {
                     f.addStep(s);
