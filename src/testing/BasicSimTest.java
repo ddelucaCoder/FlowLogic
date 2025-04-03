@@ -2,6 +2,10 @@ package testing;
 
 import com.FlowLogic.*;
 import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
@@ -40,10 +44,11 @@ public class BasicSimTest {
             System.out.println(Arrays.deepToString(g.gridToGraph()));
             // set up a sim
 
-            TrafficController tc = new TrafficController(1, g);
+            TrafficController tc = new TrafficController(5,1, g);
 
             // run the sim
             tc.runSimulation();
+
             // print the output
 
         } catch (InterruptedException e) {

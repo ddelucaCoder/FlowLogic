@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -69,7 +70,24 @@ public class Simulation {
         });
         for (Frame f : frames) {
             for (Step s : f.getSteps()) {
+                Object oldObj = s.oldObject;
+                Object newObj = s.newObject;
+                if (oldObj != null) {
+                    if (oldObj instanceof StopLight) {
 
+                    }
+                }
+                if (newObj != null) {
+                    if (oldObj instanceof Vehicle) {
+                        Vehicle car = (Vehicle) oldObj;
+                        Rectangle newCar = new Rectangle(car.getX(), car.getY(), car.getWidth(), car.getLength());
+                        newCar.setRotate(car.getCurRotation());
+                        car.setCar(newCar);
+                    }
+                    if (oldObj instanceof StopLight) {
+
+                    }
+                }
             }
         }
 

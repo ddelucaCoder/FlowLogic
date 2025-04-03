@@ -2,6 +2,7 @@ package com.FlowLogic;
 import javafx.scene.paint.Stop;
 import javafx.util.Pair;
 
+import javafx.scene.shape.Rectangle;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -13,7 +14,7 @@ import static com.FlowLogic.Direction.*;
 
 public class Vehicle {
 
-    int length = 10;
+    int length;
     int width = 5;
 
     ArrayList<GridObject> intersectionPath;
@@ -38,6 +39,7 @@ public class Vehicle {
     int angle = 0;
 
     int curRotation = 0; // ASSUME THIS IS DEGREES
+    Rectangle car;
 
     private final int TURN_RATE = 1;
     private final int FOLLOWING_DISTANCE = 10;
@@ -46,7 +48,9 @@ public class Vehicle {
 
     private final int ACCEL = 3;
 
-    public Vehicle() {
+    public Vehicle(int length) {
+        this.length = length;
+
         // Initialize collections as empty ArrayLists
         this.intersectionPath = new ArrayList<GridObject>();
         this.directionPath = new ArrayList<Direction>();
@@ -69,6 +73,8 @@ public class Vehicle {
         // Clone the ArrayList collections using new instances
         this.intersectionPath = new ArrayList<>(v.intersectionPath);
         this.directionPath = new ArrayList<>(v.directionPath);
+
+        this.car = v.car;
 
         this.angle = v.angle;
         this.width = v.width;
@@ -116,6 +122,7 @@ public class Vehicle {
             case DOWN -> curRotation = 180;
             case LEFT -> curRotation = 270;
         }
+        car = new Rectangle(x, y, width, length);
     }
 
     /**
@@ -490,5 +497,27 @@ public class Vehicle {
         } else {
             return new int[]{x - width - delta, y - (int) (0.5 * length)};
         }
+    }
+
+    public Rectangle getCar() {
+        return car;
+    }
+    public void setCar(Rectangle car) {
+        this.car = car;
+    }
+    public int getLength() {
+        return length;
+    }
+    public int getWidth() {
+        return width;
+    }
+    public int getX() {
+        return x;
+    }
+    public int getY() {
+        return y;
+    }
+    public int getCurRotation() {
+        return curRotation;
     }
 }
