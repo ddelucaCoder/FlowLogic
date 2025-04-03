@@ -146,7 +146,6 @@ public class Grid {
                                 numLanes, vehicleList);
                         oneWayRoad.setLength(length);
                         oneWayRoad.setName(name);
-                        oneWayRoad.setInRoad(properties.getBoolean("inRoad"));
 
                         gridObject = oneWayRoad;
                         break;
@@ -254,18 +253,22 @@ public class Grid {
                     grid[row][col] = gridObject;
                 }
             }
-            // Second loop: Connect the roads to intersections
+            // Second loop: Connect the roads to all forms of intersections
             for (int i = 0; i < gridObjectsArray.length(); i++) {
                 JSONObject objJson = gridObjectsArray.getJSONObject(i);
-                if ("Intersection".equals(objJson.getString("type"))) {
+                String objType = objJson.getString("type");
+
+                // Handle both Intersection, StopSign, Stoplight objects
+                if ("Intersection".equals(objType) || "StopSign".equals(objType) || "StopLight".equals(objType)) {
                     int row = objJson.getInt("row");
                     int col = objJson.getInt("column");
                     JSONObject properties = objJson.getJSONObject("properties");
                     JSONArray connectedRoads = properties.getJSONArray("connectedRoads");
 
-                    Intersection intersection = (Intersection) grid[row][col];
+                    // Get the appropriate object (either Intersection, StopSign, Stoplight)
+                    GridObject trafficController = grid[row][col];
 
-                    // Connect each road to the intersection
+                    // Connect each road to the intersection or stop sign or stop light
                     for (int j = 0; j < connectedRoads.length(); j++) {
                         JSONObject roadRef = connectedRoads.getJSONObject(j);
                         int roadRow = roadRef.getInt("row");
@@ -275,7 +278,13 @@ public class Grid {
                         if (roadRow >= 0 && roadRow < numRows && roadCol >= 0 && roadCol < numColumns) {
                             GridObject obj = grid[roadRow][roadCol];
                             if (obj instanceof Road) {
-                                intersection.addRoad((Road) obj);
+                                if (trafficController instanceof StopSign) {
+                                    ((StopSign) trafficController).addRoad((Road) obj);
+                                } else if (trafficController instanceof StopLight) {
+                                    ((StopLight) trafficController).addRoad((Road) obj);
+                                } else if (trafficController instanceof  Intersection) {
+                                    ((Intersection) trafficController).addRoad((Road) obj);
+                                }
                             }
                         }
                     }
@@ -337,7 +346,6 @@ public class Grid {
                         properties.put("numLanes", road.getNumLanes());
                         properties.put("vehicleList", road.getVehicleList());
                         properties.put("name", road.getName());
-                        properties.put("inRoad", road.getInRoad());
                     }
                     else if (obj instanceof TwoWayRoad road) {
                         properties.put("orientation", road.getOrientation());
@@ -473,6 +481,7 @@ public class Grid {
         GridObject newObject = imgToObj.get(imageFile);
         System.out.println(imageFile);
         addObject(newObject.clone(), rowNum, colNum);
+        mergeRoads(rowNum, colNum);
     }
 
     /**
@@ -939,10 +948,10 @@ public class Grid {
                         groupIntersections(numIntersections++, i, j);
                         intersections.add(in);
                     }
-                } else if (getAtSpot(i, j) instanceof Road r && r.isInRoad()) { // ADDED IN ROADS TO GRAPH
+                } else if (getAtSpot(i, j) instanceof OneWayRoad r && r.isInRoad()) { // ADDED IN ROADS TO GRAPH
                     intersections.add(r);
                     r.setIntersectionID(numIntersections++);
-                } else if (getAtSpot(i, j) instanceof Road r) { // ADDED DESTINATION ROADS TO GRAPH
+                } else if (getAtSpot(i, j) instanceof OneWayRoad r) { // ADDED DESTINATION ROADS TO GRAPH
                     if (checkAroundDest(r)) {
                         intersections.add(r);
                         r.setIntersectionID(numIntersections++);

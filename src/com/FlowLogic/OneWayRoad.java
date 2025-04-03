@@ -18,7 +18,6 @@ public class OneWayRoad extends Road implements GridObject {
     private int rowNum;
     private int colNum;
     private Image imageFile;
-    private boolean inRoad;
 
 
 
@@ -28,7 +27,6 @@ public class OneWayRoad extends Road implements GridObject {
         this.direction = direction;
         this.numLanes = numLanes;
         this.vehicleList = vehicleList;
-        this.inRoad = false;
         updateGraphic();
     }
 
@@ -145,14 +143,5 @@ public class OneWayRoad extends Road implements GridObject {
     @Override
     public void setImageFile(Image imageFile) {
         this.imageFile = imageFile;
-    }
-
-    @Override
-    public void setInRoad(boolean inRoad) {
-        this.inRoad = inRoad;
-    }
-
-    public boolean getInRoad() {
-        return inRoad;
     }
 }
