@@ -38,8 +38,7 @@ public class UserInterface extends Application {
     private static final int SCREEN_HEIGHT = 720;     // Height of the screen
 
     private static final int CELL_SIZE = 32;          // Fixed cell size of 32x32
-
-    private static int GRID_SIZE = 20;         // Number of rows and columns in the grid
+    public static int GRID_SIZE = 20;         // Number of rows and columns in the grid
 
     // Variables to track zoom and pan offsets
     private static double offsetX = 0;
@@ -324,7 +323,7 @@ public class UserInterface extends Application {
             //Add prompt for vehicle selection here
             //TODO: ISAAC - add average car size prompt here (do manual and auto)
             //TODO: ISAAC / COLIN - add num vehicles prompt
-            TrafficController tc = new TrafficController(10,5, grid); // TODO: ISAAC / COLIN update params based on prompts
+            TrafficController tc = new TrafficController(25,5, grid); // TODO: ISAAC / COLIN update params based on prompts
             Simulation sim = tc.runSimulation();
             root.getChildren().remove(right);
             root.getChildren().remove(left);

@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.FlowLogic.UserInterface.GRID_SIZE;
+
 public class Simulation {
     int numVehicles;
     ArrayList<Vehicle> vehicles;
@@ -74,7 +76,7 @@ public class Simulation {
             exit.set(true);
 
         });
-        System.out.println(frames.size());
+
         new Thread(() -> {
             System.out.println(frames.size());
             for (Frame f : frames) {
@@ -86,28 +88,43 @@ public class Simulation {
                     for (Step s : f.getSteps()) {
                         Object oldObj = s.oldObject;
                         Object newObj = s.newObject;
+
                         if (oldObj instanceof  Vehicle) {
                             Vehicle car = (Vehicle) oldObj;
-                            Platform.runLater(() -> grid.getChildren().remove(car.getCar())); // Ensure JavaFX thread handles UI update
-
+                            if (grid.getChildren().contains(car.getCar())) {
+                                grid.getChildren().remove(car.getCar());
+                            }
                         }
                         if (oldObj instanceof StopLight) {
-                            // Handle StopLight
+
                         }
                         if (newObj instanceof Vehicle) {
                             Vehicle car = (Vehicle) newObj;
-                            Rectangle newCar = new Rectangle(car.getX(), car.getY(), car.getWidth(), car.getLength());
+                            int x = car.getX();
+                            int y = car.getY() + 16; //+16 should move it half a tile before scaling
+                            double cell_size = (720 * 1.0)/GRID_SIZE;
+                            x = (int) (((x * 1.0) /32) * cell_size);
+                            y = (int) (((y * 1.0) /32) * cell_size);
+                            Rectangle update = car.getCar();
+                            update.setX(x);
+                            update.setY(y);
+                            update.setFill(Color.BLUE);
+                            update.setStroke(Color.BLACK);
+                            update.setStrokeWidth(2);
+                            update.setRotate(car.getCurRotation());
+                            if (!grid.getChildren().contains(car.getCar())) {
+                                grid.getChildren().add(car.getCar());
+                            }
+                            /*Rectangle newCar = new Rectangle(x, y, car.getWidth(), car.getLength());
+
                             newCar.setRotate(car.getCurRotation());
                             newCar.setVisible(true);
                             newCar.setFill(Color.BLUE);
                             newCar.setStroke(Color.BLACK);
                             newCar.setStrokeWidth(2);
+                            car.setCar(newCar);*/
 
-                            // Update Vehicle state
-                            car.setCar(newCar);
-
-                            System.out.println(car.getX() + " x " + car.getY() + " y ");
-                            Platform.runLater(() -> grid.getChildren().add(car.getCar())); // Ensure JavaFX thread handles UI update
+                            //Platform.runLater(() -> grid.getChildren().add(car.getCar())); // Ensure JavaFX thread handles UI update
                         }
                     }
                 });

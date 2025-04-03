@@ -1,4 +1,5 @@
 package com.FlowLogic;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.util.Pair;
 
@@ -66,6 +67,12 @@ public class Vehicle {
         this.state = NOT_SPAWNED;
         this.direction = null;
         this.currentIntersection = null;
+        Rectangle newCar = new Rectangle(-100, -100, width, length);//Hide of screen
+
+        newCar.setRotate(curRotation);
+        newCar.setVisible(true);
+
+        car = newCar;
     }
 
     public Vehicle(Vehicle v) {
@@ -91,6 +98,8 @@ public class Vehicle {
         // Copy enum value
         this.state = v.state;
         this.direction = v.direction;
+
+        this.car = v.car;
 
         // Reference to the same intersection object
         // If deep copying is needed, you'd need a copy constructor for Intersection
