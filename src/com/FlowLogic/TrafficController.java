@@ -31,7 +31,7 @@ public class TrafficController {
         }
         intersections = g.intersections;
         for (GridObject obj : grid.intersections) {
-            if (obj instanceof Road r) {
+            if (obj instanceof OneWayRoad r) {
                 if (grid.checkAroundDest(r)) {
                     destinations.add(r);
                 }
@@ -97,7 +97,7 @@ public class TrafficController {
             }
             sim.addFrame(f);
         }
-        return null;
+        return sim;
     }
 
 }
