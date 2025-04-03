@@ -41,6 +41,7 @@ public class Grid {
     private int numObjs = 0;
 
     ArrayList<Intersection> intersections;
+    boolean testingMode = false;
 
     //Allows for quick conversion from Image file to backend object
     public static HashMap<String, GridObject> imgToObj = new HashMap<>();
@@ -273,9 +274,10 @@ public class Grid {
                     }
                 }
             }
-
-            UserInterface.refreshGrid(numRows);
-            synchronizeGrid();
+            if (!testingMode) {
+                UserInterface.refreshGrid(numRows);
+                synchronizeGrid();
+            }
             System.out.println("Successfully loaded grid from " + filename);
             return true;
         }
@@ -1036,7 +1038,9 @@ public class Grid {
         File imageFile = new File("Images/BasicIntersection.png");
         Image intersection = new Image(imageFile.toURI().toString());
         ImagePattern intersectionPattern = new ImagePattern(intersection);
-        frontGrid[rowNum][colNum].setFill(intersectionPattern);
+        if (!testingMode) {
+            frontGrid[rowNum][colNum].setFill(intersectionPattern);
+        }
     }
 
     public void testGridInit() {
@@ -1208,4 +1212,7 @@ public class Grid {
         s.setTimingOne(newTimingHorizontal);
     }
 
+    public void setTestingMode(boolean testingMode) {
+        this.testingMode = testingMode;
+    }
 }
