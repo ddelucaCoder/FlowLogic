@@ -42,9 +42,13 @@ public class Grid {
 
     private int numObjs = 0;
 
+
     ArrayList<GridObject> intersections;
 
     private final int MAX_SPEED_LIMIT = 100;
+
+    boolean testingMode = false;
+
 
     //Allows for quick conversion from Image file to backend object
     public static HashMap<String, GridObject> imgToObj = new HashMap<>();
@@ -71,11 +75,12 @@ public class Grid {
         imgToObj.put("TwoWayRoad.png", new TwoWayRoad(Orientation.VERTICAL));
         imgToObj.put("4WayStopSign.png", new StopSign(0, 0, new Road[4]));
         imgToObj.put("AllRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
-        imgToObj.put("roundabout.png", new Roundabout(new ArrayList<>()));
+        imgToObj.put("roundabout.png", new Roundabout(new Boolean[4]));
         imgToObj.put("YellowRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("RedYellow4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("GreenRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("RedGreen4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
+        imgToObj.put("Hazard.png", new Hazard(0 ,0));
     }
 
     /**
@@ -235,10 +240,14 @@ public class Grid {
                         gridObject = stopLight;
                         break;
                     case "Roundabout":
-                        Roundabout roundabout = new Roundabout(new ArrayList<>());
+                        Roundabout roundabout = new Roundabout(new Boolean[4]);
                         gridObject = roundabout;
                         break;
                         //idk
+                    case "Hazard":
+                        Hazard hazard = new Hazard(row, col);
+                        gridObject = hazard;
+                        break;
                 }
                 // Add everything to the grid
                 if (gridObject != null) {
@@ -272,9 +281,10 @@ public class Grid {
                     }
                 }
             }
-
-            UserInterface.refreshGrid(numRows);
-            synchronizeGrid();
+            if (!testingMode) {
+                UserInterface.refreshGrid(numRows);
+                synchronizeGrid();
+            }
             System.out.println("Successfully loaded grid from " + filename);
             return true;
         }
@@ -424,6 +434,9 @@ public class Grid {
                         properties.put("yLength", parking.getyLength());
                         properties.put("parkingCapacity", parking.getParkingCapacity());
                         properties.put("numCars", parking.getNumCars());
+                    }
+                    else if (obj instanceof Hazard hazard) {
+
                     }
 
                     cellJson.put("properties", properties);
@@ -1093,7 +1106,9 @@ public class Grid {
         File imageFile = new File("Images/BasicIntersection.png");
         Image intersection = new Image(imageFile.toURI().toString());
         ImagePattern intersectionPattern = new ImagePattern(intersection);
-        frontGrid[rowNum][colNum].setFill(intersectionPattern);
+        if (!testingMode) {
+            frontGrid[rowNum][colNum].setFill(intersectionPattern);
+        }
     }
 
     public void testGridInit() {
@@ -1255,7 +1270,6 @@ public class Grid {
         for (int i = 0; i < numRows; i++) {
             for (int k = 0; k < numColumns; k++) {
                 if (grid[i][k] != null) {
-                    System.out.println(i + " i " + k + " k");
                     frontGrid[i][k].setFill(new ImagePattern(grid[i][k].getImageFile()));
                 }
             }
@@ -1268,4 +1282,7 @@ public class Grid {
         s.setTimingOne(newTimingHorizontal);
     }
 
+    public void setTestingMode(boolean testingMode) {
+        this.testingMode = testingMode;
+    }
 }

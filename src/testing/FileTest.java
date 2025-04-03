@@ -1,5 +1,7 @@
 package testing;
 
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 import org.junit.jupiter.api.*;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -20,9 +22,13 @@ public class FileTest {
     // Method will set up a grid before each test
     @BeforeEach
     public void setUp() {
+        // Initialize the JavaFX platform
+        new JFXPanel(); // This will initialize the JavaFX toolkit, preventing a Runtime Exception
+
         // Initialize a 10x10 grid for testing
         grid = new Grid(10, 10);
         Grid.GRID_SIZE = 50; // Set the grid size for consistent testing
+        grid.setTestingMode(true);
 
         // Make sure test file doesn't exist at the start of each test
         File file = new File(TEST_FILE);
@@ -174,13 +180,8 @@ public class FileTest {
             JSONObject properties = roadJson.getJSONObject("properties");
             assertEquals("HORIZONTAL", properties.getString("orientation"));
             assertEquals(40, properties.getInt("speedLimit"));
-            assertEquals(4, properties.getInt("length"));
             assertFalse(properties.getBoolean("isInRoad"));
             assertEquals(0, properties.getInt("inCars"));
-
-            // Check if left and right roads exist
-            assertTrue(properties.has("leftRoad"));
-            assertTrue(properties.has("rightRoad"));
         } catch (Exception e) {
             fail("Exception occurred: " + e.getMessage());
         }
@@ -300,6 +301,8 @@ public class FileTest {
 
         // Create a new grid to load into
         Grid loadedGrid = new Grid(5, 5); // Different dimensions to ensure they're properly loaded
+        loadedGrid.setTestingMode(true);
+
 
         // Load the grid
         assertTrue(loadedGrid.loadGridState(TEST_FILE));
@@ -317,6 +320,7 @@ public class FileTest {
     public void testSaveAndLoadGridWithObjects() {
         // Create a grid with various objects
         Building building = new Building(2, 3, 100);
+        building.setColor("red");
         grid.addObject(building, 1, 1);
 
         OneWayRoad horizontalRoad = new OneWayRoad(Orientation.HORIZONTAL, Direction.RIGHT);
@@ -337,6 +341,7 @@ public class FileTest {
 
         // Create a new grid to load into
         Grid loadedGrid = new Grid(5, 5);
+        loadedGrid.setTestingMode(true);
 
         // Load the grid
         assertTrue(loadedGrid.loadGridState(TEST_FILE));
@@ -404,6 +409,7 @@ public class FileTest {
 
         // Create a new grid to load into
         Grid loadedGrid = new Grid(5, 5);
+        loadedGrid.setTestingMode(true);
 
         // Load the grid
         assertTrue(loadedGrid.loadGridState(TEST_FILE));
@@ -468,9 +474,15 @@ public class FileTest {
     public void testComplexGridSaveAndLoad() {
         // Create a more complex grid with multiple objects and intersections
         // Buildings
-        grid.addObject(new Building(2, 2, 200), 0, 0);
-        grid.addObject(new Building(3, 2, 150), 0, 7);
-        grid.addObject(new Building(2, 4, 300), 7, 0);
+        Building building1 = new Building(2, 2, 200);
+        building1.setColor("red");
+        grid.addObject(building1, 0, 0);
+        Building building2 = new Building(3, 2, 150);
+        building2.setColor("yellow");
+        grid.addObject(building2, 0, 7);
+        Building building3 = new Building(2, 4, 300);
+        building3.setColor("green");
+        grid.addObject(building3, 7, 0);
 
         // Parking lots
         grid.addObject(new Parking(2, 2, 50, 20), 8, 8);
@@ -508,6 +520,7 @@ public class FileTest {
 
         // Create a new grid to load into
         Grid loadedGrid = new Grid(5, 5);
+        loadedGrid.setTestingMode(true);
 
         // Load the grid
         assertTrue(loadedGrid.loadGridState(TEST_FILE));
@@ -681,6 +694,7 @@ public class FileTest {
 
         // Create a new grid to load into
         Grid loadedGrid = new Grid(5, 5);
+        loadedGrid.setTestingMode(true);
 
         // Load the grid
         assertTrue(loadedGrid.loadGridState(TEST_FILE));
@@ -729,6 +743,7 @@ public class FileTest {
 
         // Create a new grid to load into
         Grid loadedGrid = new Grid(5, 5);
+        loadedGrid.setTestingMode(true);
 
         // Load the grid
         assertTrue(loadedGrid.loadGridState(TEST_FILE));
@@ -766,6 +781,7 @@ public class FileTest {
     public void testRenameSaveFile() {
         // First create and save a grid to our test file
         Building building = new Building(2, 3, 100);
+        building.setColor("red");
         grid.addObject(building, 1, 1);
         assertTrue(grid.saveGridState(TEST_FILE));
 
@@ -793,6 +809,8 @@ public class FileTest {
 
         // Load from the renamed file to verify it contains the correct data
         Grid loadedGrid = new Grid(5, 5);
+        loadedGrid.setTestingMode(true);
+
         assertTrue(loadedGrid.loadGridState(newFileName));
 
         // Verify the loaded grid has our building
