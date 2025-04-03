@@ -97,7 +97,7 @@ public class TrafficController {
             }
             sim.addFrame(f);
         }
-        return null;
+        return sim;
     }
 
 }

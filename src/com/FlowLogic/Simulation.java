@@ -1,14 +1,16 @@
 package com.FlowLogic;
 
-import javafx.scene.Scene;
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Simulation {
     int numVehicles;
@@ -65,31 +67,57 @@ public class Simulation {
         Button back = new Button("Back");
         back.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         right.getChildren().add(back);
+        AtomicReference<Boolean> exit = new AtomicReference<>(false);
         back.setOnAction(e -> {
             UserInterface.setupBuildMenu();
+            exit.set(true);
+
         });
-        for (Frame f : frames) {
-            for (Step s : f.getSteps()) {
-                Object oldObj = s.oldObject;
-                Object newObj = s.newObject;
-                if (oldObj != null) {
-                    if (oldObj instanceof StopLight) {
-
-                    }
+        System.out.println(frames.size());
+        new Thread(() -> {
+            System.out.println(frames.size());
+            for (Frame f : frames) {
+                if (exit.get() == true) {
+                    break;
                 }
-                if (newObj != null) {
-                    if (oldObj instanceof Vehicle) {
-                        Vehicle car = (Vehicle) oldObj;
-                        Rectangle newCar = new Rectangle(car.getX(), car.getY(), car.getWidth(), car.getLength());
-                        newCar.setRotate(car.getCurRotation());
-                        car.setCar(newCar);
-                    }
-                    if (oldObj instanceof StopLight) {
+                Platform.runLater(() -> { // Ensures UI updates happen on JavaFX thread
+                    System.out.println("Rendering frame");
+                    for (Step s : f.getSteps()) {
+                        Object oldObj = s.oldObject;
+                        Object newObj = s.newObject;
+                        if (oldObj instanceof  Vehicle) {
+                            Vehicle car = (Vehicle) oldObj;
+                            Platform.runLater(() -> root.getChildren().remove(car.getCar())); // Ensure JavaFX thread handles UI update
 
+                        }
+                        if (oldObj instanceof StopLight) {
+                            // Handle StopLight
+                        }
+                        if (newObj instanceof Vehicle) {
+                            Vehicle car = (Vehicle) newObj;
+                            Rectangle newCar = new Rectangle(car.getX(), car.getY(), car.getWidth(), car.getLength());
+                            newCar.setRotate(car.getCurRotation());
+                            newCar.setVisible(true);
+                            newCar.setFill(Color.BLUE);
+                            newCar.setStroke(Color.BLACK);
+                            newCar.setStrokeWidth(2);
+
+                            // Update Vehicle state
+                            car.setCar(newCar);
+
+                            System.out.println(car.getX() + " x " + car.getY() + " y ");
+                            Platform.runLater(() -> root.getChildren().add(car.getCar())); // Ensure JavaFX thread handles UI update
+                        }
                     }
+                });
+
+                try {
+                    Thread.sleep(1000); // Simulate delay, but UI won't freeze
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-        }
+        }).start();
 
         //Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 
