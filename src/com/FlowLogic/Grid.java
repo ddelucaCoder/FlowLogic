@@ -19,6 +19,8 @@ import org.json.JSONObject;
 
 import javax.print.attribute.standard.OrientationRequested;
 
+import static com.FlowLogic.Direction.*;
+
 /**
  * This class represents the grid that holds all of the "GridObjects"
  * which includes roads and buildings.
@@ -40,7 +42,9 @@ public class Grid {
 
     private int numObjs = 0;
 
-    ArrayList<Intersection> intersections;
+    ArrayList<GridObject> intersections;
+
+    private final int MAX_SPEED_LIMIT = 100;
 
     //Allows for quick conversion from Image file to backend object
     public static HashMap<String, GridObject> imgToObj = new HashMap<>();
@@ -55,7 +59,7 @@ public class Grid {
 
     private void populateMap() {
         imgToObj.put("RoadImageDown.png", new OneWayRoad(Orientation.VERTICAL, Direction.DOWN));
-        imgToObj.put("RoadImage.png", new OneWayRoad(Orientation.VERTICAL, Direction.UP));
+        imgToObj.put("RoadImage.png", new OneWayRoad(Orientation.VERTICAL, UP));
         imgToObj.put("RoadImageLeft.png", new OneWayRoad(Orientation.HORIZONTAL, Direction.LEFT));
         imgToObj.put("RoadImageRight.png", new OneWayRoad(Orientation.HORIZONTAL, Direction.RIGHT));
         imgToObj.put("BasicIntersection.png", new Intersection(0, 0, new Road[4]));
@@ -166,7 +170,7 @@ public class Grid {
                             // Set Directions based on their orientation
                             if (twoWayOrientation == Orientation.VERTICAL) {
                                 leftRoad = new OneWayRoad(twoWayOrientation, Direction.DOWN);
-                                rightRoad = new OneWayRoad(twoWayOrientation, Direction.UP);
+                                rightRoad = new OneWayRoad(twoWayOrientation, UP);
                             } else {
                                 leftRoad = new OneWayRoad(twoWayOrientation, Direction.LEFT);
                                 rightRoad = new OneWayRoad(twoWayOrientation, Direction.RIGHT);
@@ -501,7 +505,7 @@ public class Grid {
             return null;
         }
         Direction oneDir = oneRoad.getDirection();
-        if (oneDir == Direction.UP || oneDir == Direction.DOWN) {
+        if (oneDir == UP || oneDir == Direction.DOWN) {
             // check up and down obj to see if it is a road
             obj = getAtSpot(rowNum, colNum + 1);
             mergeHelper(obj, container, oneDir);
@@ -834,8 +838,84 @@ public class Grid {
 
     }
 
-    public int[][] gridToGraph() {
+    private boolean checkAroundDest(Road r) {
+        int row = r.getRowNum();
+        int col = r.getColNum();
+        if (r.getOrientation() == Orientation.HORIZONTAL) { // CHECK ABOVE AND BELOW
+            if (row - 1 >= 0 && getAtSpot(row - 1, col) instanceof Parking) {
+                return true;
+            } else if (row + 1 < numRows && getAtSpot(row + 1, col) instanceof Parking) {
+                return true;
+            }
+        }
+        if (r.getOrientation() == Orientation.VERTICAL) { // CHECK ABOVE AND BELOW
+            if (col - 1 >= 0 && getAtSpot(row, col - 1) instanceof Parking) {
+                return true;
+            } else if (col + 1 < numColumns && getAtSpot(row, col + 1) instanceof Parking) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    private void getOutRoadsAroundHelper(Intersection i, ArrayList<OneWayRoad> response) {
+        int row = i.getRowNum();
+        int col = i.getColNum();
+        // MAKE RECURSIVE CALLS TO THE INTERSECTIONS AROUND IT
+        if (row + 1 < numRows
+            && getAtSpot(row + 1, col) instanceof Intersection j
+            && j.getIntersectionID() == i.getIntersectionID() ) {
+            getOutRoadsAroundHelper(j, response);
+        }
+        if (row - 1 >= 0 &&
+            getAtSpot(row - 1, col) instanceof Intersection j
+            && j.getIntersectionID() == i.getIntersectionID() ) {
+            getOutRoadsAroundHelper(j, response);
+        }
+        if (col + 1 < numColumns
+            && getAtSpot(row, col + 1) instanceof Intersection j
+            && j.getIntersectionID() == i.getIntersectionID() ) {
+            getOutRoadsAroundHelper(j, response);
+        }
+        if (col - 1 >= 0 &&
+            getAtSpot(row, col - 1) instanceof Intersection j
+            && j.getIntersectionID() == i.getIntersectionID() ) {
+            getOutRoadsAroundHelper(j, response);
+        }
+
+        // ADD THE RIGHT ROADS TO THE LIST
+        if (row + 1 < numRows
+            && getAtSpot(row + 1, col) instanceof OneWayRoad r
+            && r.getDirection() == DOWN) {
+            response.add(r);
+        }
+        if (row - 1 >= 0 &&
+            getAtSpot(row - 1, col) instanceof OneWayRoad r
+            && r.getDirection() == UP) {
+            response.add(r);
+        }
+        if (col + 1 < numColumns
+            && getAtSpot(row, col + 1) instanceof OneWayRoad r
+            && r.getDirection() == RIGHT) {
+            response.add(r);
+        }
+        if (col - 1 >= 0 &&
+            getAtSpot(row, col - 1) instanceof OneWayRoad r
+            && r.getDirection() == LEFT) {
+            response.add(r);
+        }
+
+    }
+
+    private ArrayList<OneWayRoad> getOutRoadsAround(Intersection i) {
+        ArrayList<OneWayRoad> response = new ArrayList<>();
+        getOutRoadsAroundHelper(i, response);
+        return response;
+    }
+
+
+    public int[][] gridToGraph() {
+        //TODO: ADD DESTINATIONS AND IN ROADS
         intersections = new ArrayList<>();
         // count intersections
         int numIntersections = 0;
@@ -846,98 +926,83 @@ public class Grid {
                         groupIntersections(numIntersections++, i, j);
                         intersections.add(in);
                     }
+                } else if (getAtSpot(i, j) instanceof Road r && r.isInRoad()) { // ADDED IN ROADS TO GRAPH
+                    intersections.add(r);
+                    r.setIntersectionID(numIntersections++);
+                } else if (getAtSpot(i, j) instanceof Road r) { // ADDED DESTINATION ROADS TO GRAPH
+                    if (checkAroundDest(r)) {
+                        intersections.add(r);
+                        r.setIntersectionID(numIntersections++);
+                    }
                 }
             }
         }
         int[][] graph = new int[numIntersections][numIntersections];
 
         // route between intersections
-        for (Intersection i : intersections) {
-            for (int k = 0; k < 4; k++) {
-                Road currentRoad = i.getRoadList()[k];
-                int row = i.getRowNum();
-                int col = i.getColNum();
-                if ((row > 0) && (grid[row - 1][col] == currentRoad)) {
-                    if (currentRoad instanceof OneWayRoad) {
-                        if (((OneWayRoad) currentRoad).getDirection() == Direction.DOWN) {
-                            continue;
+        for (GridObject obj : intersections) {
+            if (obj instanceof Intersection i) {
+                ArrayList<OneWayRoad> roads = getOutRoadsAround(i);
+                for (OneWayRoad r : roads) {
+                    GridObject cur = r;
+                    int count = 0;
+                    int lastID = -1;
+                    while (!(cur instanceof Intersection)) {
+                        if (cur instanceof OneWayRoad d) {
+                            count += (MAX_SPEED_LIMIT - d.getSpeedLimit() + 1); // weighted graph
+                            if (checkAroundDest(d)) {
+                                lastID = d.getIntersectionID();
+                                break;
+                            }
+                            cur = switch (d.getDirection()) {
+                                case UP -> d.getRowNum() - 1 >= 0 ? getAtSpot(d.getRowNum() - 1, d.getColNum()) : null;
+                                case DOWN ->
+                                    d.getRowNum() + 1 < numRows ? getAtSpot(d.getRowNum() + 1, d.getColNum()) : null;
+                                case RIGHT -> d.getColNum() + 1 < numColumns ? getAtSpot(d.getRowNum(), d.getColNum() + 1) :
+                                    null;
+                                case LEFT -> d.getColNum() - 1 >= 0 ? getAtSpot(d.getRowNum(), d.getColNum() - 1) : null;
+                            };
+                            if (cur == null) {
+                                break;
+                            }
                         }
                     }
-                    int len = 0;
-                    // otherwise just follow it to its spot
-                    GridObject current = currentRoad;
-                    while (!(current instanceof Intersection)) {
-                        if (row == 0) {
+                    if (cur instanceof Intersection j) {
+                        lastID = j.getIntersectionID();
+                    }
+                    if (lastID != -1) {
+                        graph[r.getIntersectionID()][lastID] = count;
+                    }
+                }
+            } else if (obj instanceof Road r) {
+                GridObject cur = r;
+                int count = 0;
+                int lastID = -1;
+                while (!(cur instanceof Intersection)) {
+                    if (cur instanceof OneWayRoad d) {
+                        count += (MAX_SPEED_LIMIT - d.getSpeedLimit() + 1); // weighted graph
+                        if (checkAroundDest(d)) {
+                            lastID = d.getIntersectionID();
                             break;
                         }
-                        len++;
-                        current = grid[row - 1][col];
-                        row--;
-                    }
-                    if (current instanceof Intersection) {
-                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = len;
-                    }
-                } else if ((row < numRows - 1) && (grid[row + 1][col] == currentRoad)) {
-                    if (currentRoad instanceof OneWayRoad) {
-                        if (((OneWayRoad) currentRoad).getDirection() == Direction.UP) {
-                            continue;
-                        }
-                    }
-                    // otherwise just follow it to its spot
-                    GridObject current = currentRoad;
-                    int len = 0;
-                    while (!(current instanceof Intersection)) {
-                        if (row == numRows - 1) {
+                        cur = switch (d.getDirection()) {
+                            case UP -> d.getRowNum() - 1 >= 0 ? getAtSpot(d.getRowNum() - 1, d.getColNum()) : null;
+                            case DOWN ->
+                                d.getRowNum() + 1 < numRows ? getAtSpot(d.getRowNum() + 1, d.getColNum()) : null;
+                            case RIGHT -> d.getColNum() + 1 < numColumns ? getAtSpot(d.getRowNum(), d.getColNum() + 1) :
+                                null;
+                            case LEFT -> d.getColNum() - 1 >= 0 ? getAtSpot(d.getRowNum(), d.getColNum() - 1) : null;
+                        };
+                        if (cur == null) {
                             break;
                         }
-                        current = grid[row + 1][col];
-                        len++;
-                        row++;
                     }
-                    if (current instanceof Intersection) {
-                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = len;
-                    }
-                } else if ((col > 0) && (grid[row][col - 1] == currentRoad)) {
-                    if (currentRoad instanceof OneWayRoad) {
-                        if (((OneWayRoad) currentRoad).getDirection() == Direction.RIGHT) {
-                            continue;
-                        }
-                    }
-                    // otherwise just follow it to its spot
-                    GridObject current = currentRoad;
-                    int len = 0;
-                    while (!(current instanceof Intersection)) {
-                        if (col == 0) {
-                            break;
-                        }
-                        current = grid[row][col - 1];
-                        len++;
-                        col--;
-                    }
-                    if (current instanceof Intersection) {
-                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = len;
-                    }
-                } else if ((col < numColumns - 1) && (grid[row][col + 1] == currentRoad)) {
-                    if (currentRoad instanceof OneWayRoad) {
-                        if (((OneWayRoad) currentRoad).getDirection() == Direction.LEFT) {
-                            continue;
-                        }
-                    }
-                    // otherwise just follow it to its spot
-                    GridObject current = currentRoad;
-                    int len = 0;
-                    while (!(current instanceof Intersection)) {
-                        if (col == numColumns - 1) {
-                            break;
-                        }
-                        current = grid[row][col + 1];
-                        len++;
-                        col++;
-
-                    }
-                    if (current instanceof Intersection) {
-                        graph[i.getIntersectionID()][((Intersection) current).getIntersectionID()] = len;
-                    }
+                }
+                if (cur instanceof Intersection i) {
+                    lastID = i.getIntersectionID();
+                }
+                if (lastID != -1) {
+                    graph[r.getIntersectionID()][lastID] = count;
                 }
             }
         }
@@ -975,7 +1040,7 @@ public class Grid {
      * @param newNumCols - the number of columns for the new grid size
      */
     public void resize(int newNumRows, int newNumCols) {
-        // create new 
+        // create new
         GridObject[][] newGrid = new GridObject[newNumRows][newNumCols];
         int leastRows = Math.min(numRows, newNumRows);
         int leastCols = Math.min(numColumns, newNumCols);
@@ -1122,6 +1187,8 @@ public class Grid {
         }
         // add object to grid
         grid[rowNum][colNum] = newObject;
+        grid[rowNum][colNum].setColNum(colNum);
+        grid[rowNum][colNum].setRowNum(rowNum);
 
         // automatically snap new roads into intersections
         if (newObject instanceof Road) {
