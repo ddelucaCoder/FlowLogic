@@ -308,11 +308,13 @@ public class UserInterface extends Application {
         simulate.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         simulate.setOnAction(e -> {
             //Add prompt for vehicle selection here
-            Simulation sim = new Simulation(5);
-            sim.simulate();//Processes the simulation
+            //TODO: ISAAC - add average car size prompt here (do manual and auto)
+            //TODO: ISAAC / COLIN - add num vehicles prompt
+            TrafficController tc = new TrafficController(5, grid); // TODO: ISAAC / COLIN update params based on prompts
+            Simulation sim = tc.runSimulation();
             root.getChildren().remove(right);
             root.getChildren().remove(left);
-            sim.display(stage, root);//Displays the result
+            sim.display(stage, root); // display the simulation
         });
         right.getChildren().add(simulate);
 
