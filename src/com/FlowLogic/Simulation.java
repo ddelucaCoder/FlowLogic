@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
+import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -53,7 +54,7 @@ public class Simulation {
     }
     int SCREEN_WIDTH = 1280;
     int SCREEN_HEIGHT = 720;
-    public void display(Stage stage, AnchorPane root){
+    public void display(Stage stage, AnchorPane root, Pane grid){
         VBox right = new VBox();
         right.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
         right.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
@@ -87,7 +88,7 @@ public class Simulation {
                         Object newObj = s.newObject;
                         if (oldObj instanceof  Vehicle) {
                             Vehicle car = (Vehicle) oldObj;
-                            Platform.runLater(() -> root.getChildren().remove(car.getCar())); // Ensure JavaFX thread handles UI update
+                            Platform.runLater(() -> grid.getChildren().remove(car.getCar())); // Ensure JavaFX thread handles UI update
 
                         }
                         if (oldObj instanceof StopLight) {
@@ -106,7 +107,7 @@ public class Simulation {
                             car.setCar(newCar);
 
                             System.out.println(car.getX() + " x " + car.getY() + " y ");
-                            Platform.runLater(() -> root.getChildren().add(car.getCar())); // Ensure JavaFX thread handles UI update
+                            Platform.runLater(() -> grid.getChildren().add(car.getCar())); // Ensure JavaFX thread handles UI update
                         }
                     }
                 });

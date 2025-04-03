@@ -324,11 +324,11 @@ public class UserInterface extends Application {
             //Add prompt for vehicle selection here
             //TODO: ISAAC - add average car size prompt here (do manual and auto)
             //TODO: ISAAC / COLIN - add num vehicles prompt
-            TrafficController tc = new TrafficController(5,1, grid); // TODO: ISAAC / COLIN update params based on prompts
+            TrafficController tc = new TrafficController(10,5, grid); // TODO: ISAAC / COLIN update params based on prompts
             Simulation sim = tc.runSimulation();
             root.getChildren().remove(right);
             root.getChildren().remove(left);
-            sim.display(stage, root); // display the simulation
+            sim.display(stage, root, gridContainer); // display the simulation
         });
         right.getChildren().add(simulate);
 
