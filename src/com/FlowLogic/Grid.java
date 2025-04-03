@@ -730,7 +730,7 @@ public class Grid {
     public GridObject getSpotRealCoords(int x, int y) {
         x /= GRID_SIZE;
         y /= GRID_SIZE;
-        return getAtSpot(x, y);
+        return getAtSpot(y, x);
     }
 
     /**
@@ -838,7 +838,7 @@ public class Grid {
 
     }
 
-    private boolean checkAroundDest(Road r) {
+    public boolean checkAroundDest(Road r) {
         int row = r.getRowNum();
         int col = r.getColNum();
         if (r.getOrientation() == Orientation.HORIZONTAL) { // CHECK ABOVE AND BELOW
