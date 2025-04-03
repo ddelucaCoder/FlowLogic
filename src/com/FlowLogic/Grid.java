@@ -1077,8 +1077,9 @@ public class Grid {
 
     private void setIntersectionAt(int rowNum, int colNum, Road newRoad) {
         // if is intersection, just add the newRoad
-        if (grid[rowNum][colNum] instanceof Intersection) {
-            ((Intersection) grid[rowNum][colNum]).addRoad(newRoad);
+        if (grid[rowNum][colNum] instanceof Intersection i) {
+            i.addRoad(newRoad);
+            return;
         }
 
         Intersection newIntersection = new Intersection(rowNum, colNum, new Road[4]);
@@ -1279,7 +1280,7 @@ public class Grid {
 
     public void updateTiming(StopLight s, int newTimingVertical, int newTimingHorizontal) {
         s.setTimingOne(newTimingVertical);
-        s.setTimingOne(newTimingHorizontal);
+        s.setTimingTwo(newTimingHorizontal);
     }
 
     public void setTestingMode(boolean testingMode) {
