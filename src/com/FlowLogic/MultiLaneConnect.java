@@ -5,10 +5,13 @@ import java.util.List;
 
 public class MultiLaneConnect {
 
-
+    private static int totalCount;
+    private int count = 0;
     private List<Road> laneList;
 
     public MultiLaneConnect() {
+        totalCount++;
+        count = totalCount;
         this.laneList = new ArrayList<>();
     }
 
@@ -20,6 +23,10 @@ public class MultiLaneConnect {
 
     public void removeRoadFromList(Road road) {
         laneList.remove(road);
+    }
+
+    public int getCount() {
+        return count;
     }
     public List<Road> getLaneList() {
         return laneList;

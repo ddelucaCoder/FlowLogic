@@ -483,6 +483,7 @@ public class Grid {
         GridObject newObject = imgToObj.get(imageFile);
         System.out.println(imageFile);
         addObject(newObject.clone(), rowNum, colNum);
+        mergeRoads(rowNum, colNum);
     }
 
     /**
