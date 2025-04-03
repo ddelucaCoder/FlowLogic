@@ -1,13 +1,11 @@
 package com.FlowLogic;
 
-import com.sun.prism.paint.Stop;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,8 +14,6 @@ import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import javax.print.attribute.standard.OrientationRequested;
 
 import static com.FlowLogic.Direction.*;
 
@@ -497,14 +493,23 @@ public class Grid {
     }
 
     /**
+     * This function detects a hazard
+     * @param imageFile
+     * @return
+     */
+    public boolean isHazard(String imageFile) {
+        return Objects.equals(imageFile, "Hazard.png");
+    }
+
+    /**
      * This function is used to find and merge lanes that are next to the road in the location defined
      * by the coordinates. This returns the multilaneConnect object that all of the roads next to each
      * other will be contained by
+     *
      * @param rowNum
      * @param colNum
-     * @return
      */
-    public MultiLaneConnect mergeRoads(int rowNum, int colNum) {
+    public void mergeRoads(int rowNum, int colNum) {
         // get road from spot and create multilane for it
         GridObject obj = getAtSpot(rowNum, colNum);
         Road mainRoad;
@@ -512,8 +517,8 @@ public class Grid {
         if (obj instanceof Road) {
             mainRoad = (Road) obj;
         } else {
-            System.out.println("mergeRoads error: No road here to merge\n");
-            return null;
+           // System.out.println("mergeRoads error: No road here to merge\n");
+            return;
         }
         if (mainRoad.getLaneContainer() != null) {
             container = mainRoad.getLaneContainer();
@@ -526,7 +531,7 @@ public class Grid {
         // check all 4 directions around
         if (!(mainRoad instanceof OneWayRoad oneRoad)) {
             System.out.println("mergeRoads error: Not a one way road\n");
-            return null;
+            return;
         }
         Direction oneDir = oneRoad.getDirection();
         if (oneDir == UP || oneDir == Direction.DOWN) {
@@ -541,7 +546,6 @@ public class Grid {
             obj = getAtSpot(rowNum - 1, colNum);
             mergeHelper(obj, container, oneDir);
         }
-        return container;
     }
 
     /**
@@ -600,6 +604,8 @@ public class Grid {
             }
         } else if (obj instanceof StopLight) {
             UserInterface.showTrafficLightOptions(optionLayout, this, row, col);
+        } else if (obj instanceof Hazard) {
+            UserInterface.showHazardOptions(optionLayout, this, row, col);
         }
     }
 
@@ -701,7 +707,7 @@ public class Grid {
             return;
         }
         grid[row][col] = null;
-        frontGrid[row][col] = null;
+        frontGrid[row][col] = new Rectangle();
         if (obj == getAtSpot(row - 1, col)) {
             remove(row - 1, col);
         }
@@ -1208,11 +1214,15 @@ public class Grid {
      * @param colNum - the column number to place the object at
      */
     public void addObject(GridObject newObject, int rowNum, int colNum) {
+        if (newObject == null) {
+            System.out.println("Adding null object to the grid\n");
+        }
         // if the spot is already full then do nothing
         if (grid[rowNum][colNum] != null) {
             return;
         }
         // add object to grid
+        System.out.println(newObject.toString());
         grid[rowNum][colNum] = newObject;
         grid[rowNum][colNum].setColNum(colNum);
         grid[rowNum][colNum].setRowNum(rowNum);

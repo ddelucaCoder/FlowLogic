@@ -28,6 +28,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static com.FlowLogic.Direction.UP;
+
 
 public class UserInterface extends Application {
 
@@ -218,6 +220,18 @@ public class UserInterface extends Application {
             int row = (int) (y / CELL_SIZE);
             int col = (int) (x / CELL_SIZE);
             Rectangle cell = grid.getFrontGrid()[row][col];
+            // check to see if it is a hazard
+            if (grid.isHazard(db.getString())) {
+                Image image = new Image("file:Images/Hazard.png");
+                GridObject obj = grid.getAtSpot(row, col);
+                System.out.println("Should be Road: "+ obj.toString());
+                grid.remove(row, col);
+                grid.placeObjectByImage("Hazard.png", row, col);
+                cell.setFill(new ImagePattern(image));
+                Hazard hazard = (Hazard) grid.getAtSpot(row, col);
+
+                hazard.setCoveredObject(obj);
+            }
             // Check to see if it is a two-way road
             if (grid.isTwoWayRoad(db.getString())) {
                 System.out.println("This is a two way road\n");
@@ -1266,6 +1280,8 @@ public class UserInterface extends Application {
         // Get the road object
         GridObject obj = grid.getAtSpot(row, col);
         String name = ((Road)obj).getName();
+        OneWayRoad oneRoad = (OneWayRoad)obj;
+        Image image = oneRoad.getImageFile();
         String multiLane = ("MultiLaneConnector: " + ((Road) obj).getLaneContainer().getCount());
 
         Label titleLabel = new Label(name + " Options");
@@ -1278,6 +1294,8 @@ public class UserInterface extends Application {
         Button closeButton = new Button("Close Road Options");
         CheckBox inRoad = new CheckBox("Make Input Road");
         Label multiLabel = new Label(multiLane);
+        Button addLaneRight = new Button("Add Lane to the Right");
+        Button addLaneLeft = new Button("Add Lane to the Left");
 
         options.getChildren().add(titleLabel);
         options.getChildren().add(renameButt);
@@ -1288,6 +1306,8 @@ public class UserInterface extends Application {
         options.getChildren().add(removeButton);
         options.getChildren().add(closeButton);
         options.getChildren().add(multiLabel);
+        options.getChildren().add(addLaneLeft);
+        options.getChildren().add(addLaneRight);
 
         OneWayRoad road = (OneWayRoad) grid.getGrid()[row][col];
         if ((row == 0 && road.getDirection() == Direction.DOWN) ||
@@ -1300,6 +1320,72 @@ public class UserInterface extends Application {
             }
             options.getChildren().add(inRoad);
         }
+
+        addLaneRight.setOnAction(e -> {
+            Direction oneDir = oneRoad.getDirection();
+            if (oneDir == UP) {
+                Rectangle cell = grid.getFrontGrid()[row][col + 1];
+                if (!(cell.getFill() instanceof ImagePattern)) {
+                    cell.setFill(new ImagePattern(image));
+                    grid.placeObjectByImage("RoadImage.png", row, col + 1);
+                    System.out.println(image.getUrl());
+                }
+            } else if (oneDir == Direction.DOWN) {
+                Rectangle cell = grid.getFrontGrid()[row][col - 1];
+                if (!(cell.getFill() instanceof ImagePattern)) {
+                    cell.setFill(new ImagePattern(image));
+                    grid.placeObjectByImage("RoadImageDown.png", row, col - 1);
+                    System.out.println(image);
+                }
+            } else if (oneDir == Direction.RIGHT) {
+                Rectangle cell = grid.getFrontGrid()[row + 1][col];
+                if (!(cell.getFill() instanceof ImagePattern)) {
+                    cell.setFill(new ImagePattern(image));
+                    grid.placeObjectByImage("RoadImageRight.png", row + 1, col);
+                    System.out.println(image);
+                }
+            } else if (oneDir == Direction.LEFT) {
+                Rectangle cell = grid.getFrontGrid()[row - 1][col];
+                if (!(cell.getFill() instanceof ImagePattern)) {
+                    cell.setFill(new ImagePattern(image));
+                    grid.placeObjectByImage("RoadImageLeft.png", row - 1, col);
+                    System.out.println(image);
+                }
+            }
+        });
+
+        addLaneLeft.setOnAction(e -> {
+            Direction oneDir = oneRoad.getDirection();
+            if (oneDir == UP) {
+                Rectangle cell = grid.getFrontGrid()[row][col - 1];
+                if (!(cell.getFill() instanceof ImagePattern)) {
+                    cell.setFill(new ImagePattern(image));
+                    grid.placeObjectByImage("RoadImage.png", row, col - 1);
+                    System.out.println(image);
+                }
+            } else if (oneDir == Direction.DOWN) {
+                Rectangle cell = grid.getFrontGrid()[row][col + 1];
+                if (!(cell.getFill() instanceof ImagePattern)) {
+                    cell.setFill(new ImagePattern(image));
+                    grid.placeObjectByImage("RoadImageDown.png", row, col + 1);
+                    System.out.println(image);
+                }
+            } else if (oneDir == Direction.RIGHT) {
+                Rectangle cell = grid.getFrontGrid()[row - 1][col];
+                if (!(cell.getFill() instanceof ImagePattern)) {
+                    cell.setFill(new ImagePattern(image));
+                    grid.placeObjectByImage("RoadImageRight.png", row - 1, col);
+                    System.out.println(image);
+                }
+            } else if (oneDir == Direction.LEFT) {
+                Rectangle cell = grid.getFrontGrid()[row + 1][col];
+                if (!(cell.getFill() instanceof ImagePattern)) {
+                    cell.setFill(new ImagePattern(image));
+                    grid.placeObjectByImage("RoadImageLeft.png", row + 1, col);
+                    System.out.println(image);
+                }
+            }
+        });
 
         upButt.setOnAction(e -> {
 
@@ -1378,6 +1464,41 @@ public class UserInterface extends Application {
                 road.setInRoad(false);
             }
         });
+    }
+
+
+
+    public static void showHazardOptions(VBox mainLayout, Grid grid, int row, int col) {
+        options.getChildren().clear();
+        // Get the road object
+        GridObject obj = grid.getAtSpot(row, col);
+        Hazard hazard= (Hazard)obj;
+        Image image = hazard.getCoveredObject().getImageFile();
+        System.out.println("Covered image: " + image.getUrl());
+
+        Label titleLabel = new Label("Hazard Options");
+        Button fixRoad = new Button("Fix Road");
+        Button closeButton = new Button("Close Hazard Options");
+
+
+        options.getChildren().add(titleLabel);
+        options.getChildren().add(fixRoad);
+        options.getChildren().add(closeButton);
+
+        fixRoad.setOnAction(e -> {
+            grid.synchronizeGrid();
+            Rectangle cell = grid.getFrontGrid()[row][col];
+            System.out.println(grid.getFrontGrid()[row][col].toString());
+            cell.setFill(new ImagePattern(image));
+            grid.remove(row, col);
+            grid.addObject(hazard.getCoveredObject(), row, col);
+            grid.mergeRoads(row, col);
+        });
+
+        closeButton.setOnAction(e -> {
+           options.getChildren().clear();
+        });
+
     }
 
     /**
@@ -1516,7 +1637,7 @@ public class UserInterface extends Application {
             clearMenu.run();
         });
 
-        closeButton.setOnAction(e -> {
+     closeButton.setOnAction(e -> {
             clearMenu.run();
         });
     }

@@ -14,12 +14,14 @@ public class Hazard implements GridObject {
         this.rowNum = rowNum;
         this.colNum = colNum;
         this.imageFile = new Image("file:Images/Hazard.png");
+        this.coveredObject = null;
     }
 
     public Hazard(Hazard hazard) {
         this.rowNum = hazard.rowNum;
         this.colNum = hazard.colNum;
         this.imageFile = hazard.imageFile;
+        this.coveredObject = hazard.coveredObject;
     }
 
     @Override
@@ -50,5 +52,14 @@ public class Hazard implements GridObject {
     @Override
     public GridObject clone() {
         return new Hazard(this);
+    }
+
+
+    public GridObject getCoveredObject() {
+        return coveredObject;
+    }
+
+    public void setCoveredObject(GridObject coveredObject) {
+        this.coveredObject = coveredObject;
     }
 }
