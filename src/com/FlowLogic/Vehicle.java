@@ -13,10 +13,10 @@ import static com.FlowLogic.Direction.*;
 
 public class Vehicle {
 
-    int length;
-    int width;
+    int length = 10;
+    int width = 5;
 
-    ArrayList<Intersection> intersectionPath;
+    ArrayList<GridObject> intersectionPath;
     ArrayList<Direction> directionPath;
 
     int startRoadID;
@@ -48,7 +48,7 @@ public class Vehicle {
 
     public Vehicle() {
         // Initialize collections as empty ArrayLists
-        this.intersectionPath = new ArrayList<Intersection>();
+        this.intersectionPath = new ArrayList<GridObject>();
         this.directionPath = new ArrayList<Direction>();
 
         // Initialize primitive types with default values
@@ -60,7 +60,7 @@ public class Vehicle {
         this.speed = 0;
 
         // Initialize object references to null
-        this.state = null;
+        this.state = NOT_SPAWNED;
         this.direction = null;
         this.currentIntersection = null;
     }
@@ -98,10 +98,12 @@ public class Vehicle {
         int coords[] = Grid.getRealCoords(this.intersectionPath.get(0));
         int spawnX = coords[0]; // TODO: COORDINATES
         int spawnY = coords[1]; // TODO: COORDINATES
+        x = spawnX;
+        y = spawnY;
         // set speed
         speed = 0;
         // set direction
-        direction = directionPath.get(1);
+        direction = directionPath.get(0);
         // set state
         state = FORWARD;
 
@@ -157,6 +159,15 @@ public class Vehicle {
     private boolean decelerate(Grid g) {
         // check if car in front
         // TODO: Check in front for car
+        // check if nearing destination
+        for (int i = 0; i < (speed / 10) * 32; i += 32) {
+            if (getCurrentGridObject(g, front(20)) instanceof OneWayRoad r && g.checkAroundDest(r)) {
+                speed -= SLOW_DECEL;
+                if (speed < 5) speed = 5;
+                return true;
+            }
+        }
+
         // check if car nearing intersection
         if ((getCurrentGridObject(g, front(20)) instanceof StopSign ||
             getCurrentGridObject(g, front(40)) instanceof StopSign)
@@ -203,7 +214,7 @@ public class Vehicle {
         // first move the vehicle to the center of the block
 
         // our intersection coords
-        Intersection i = intersectionPath.get(0);
+        GridObject i = intersectionPath.get(0);
         int[] intersectionCoords = Grid.getRealCoords(i);
 
         // move to center
@@ -221,7 +232,7 @@ public class Vehicle {
             directionPath.remove(0);
         }
 
-        return new Step(past, this);
+        return new Step(past, new Vehicle(this));
     }
 
     private Step turnLeft() {
@@ -229,7 +240,7 @@ public class Vehicle {
         // first move the vehicle to the center of the block
 
         // our intersection coords
-        Intersection i = intersectionPath.get(0);
+        GridObject i = intersectionPath.get(0);
         int[] intersectionCoords = Grid.getRealCoords(i);
 
         // move to center
@@ -247,37 +258,53 @@ public class Vehicle {
             directionPath.remove(0);
         }
 
-        return new Step(past, this);
+        return new Step(past, new Vehicle(this));
     }
 
 
     public Step tick(Grid g) {
+        // if at destination
+        if (state != DESTINATION_REACHED &&
+            getCurrentGridObject(g) == intersectionPath.get(intersectionPath.size() - 1)) {
+            System.out.println("Destination Reached");
+            state = DESTINATION_REACHED;
+            return new Step(this, null);
+        } else if (state == DESTINATION_REACHED) {
+            return null;
+        }
+
+
         // STATE MACHINE
         if (state == NOT_SPAWNED) {
             this.timeIn--;
             if (this.timeIn <= 0) {
                 this.spawn();
-                return new Step(null, this);
+                return new Step(null, new Vehicle(this));
             }
             return null;
         } else if (state == FORWARD) {
-            if (getCurrentGridObject(g) instanceof Road
-                && ((Road) getCurrentGridObject(g)).getSpeedLimit() >= speed
-                && !decelerate(g)) {
+            // state before
+            Vehicle before = new Vehicle(this);
+            if (!decelerate(g) &&
+                getCurrentGridObject(g) instanceof Road
+                && ((Road) getCurrentGridObject(g)).getSpeedLimit() > speed) {
                 accelerate();
             }
             if (state == FORWARD) {
                 moveForward();
             }
+            return new Step(before, new Vehicle(this));
         } else if (state == STOPPED_FORWARD) {
             if (currentIntersection instanceof StopLight) {
                 // TODO: Stoplight logic
                 // check if were moving
             }
+            return null;
         } else if (state == STOPPED_TURNING) {
             if (currentIntersection instanceof StopLight) {
                 // TODO: Stoplight logic
             }
+            return null;
         } else if (state == TURNING) {
             Direction next = directionPath.get(1);
             if ((next == RIGHT && direction == UP)
@@ -291,7 +318,6 @@ public class Vehicle {
                 || (direction == LEFT && next == DOWN)) {
                 return this.turnRight();
             }
-
         }
         return null;
     }
@@ -315,7 +341,7 @@ public class Vehicle {
     }
 
     private void getArrayListsFromDjikstras(int[] previous, int start, int target,
-                                            ArrayList<Intersection> intersections) {
+                                            ArrayList<GridObject> intersections) {
         // init array lists
         if (intersectionPath == null) intersectionPath = new ArrayList<>();
         else intersectionPath.clear();
@@ -324,7 +350,7 @@ public class Vehicle {
         else directionPath.clear();
 
         // backwards building of a stack
-        Stack<Intersection> tempPath = new Stack<>();
+        Stack<GridObject> tempPath = new Stack<>();
         int current = target;
         while (current != start) {
             tempPath.push(intersections.get(current));
@@ -337,8 +363,8 @@ public class Vehicle {
         // Pop from stack to get intersections in correct order
         intersectionPath.add(tempPath.pop());
         while (!tempPath.isEmpty()) {
-            Intersection prev = intersectionPath.get(intersectionPath.size() - 1);
-            Intersection next = tempPath.pop();
+            GridObject prev = intersectionPath.get(intersectionPath.size() - 1);
+            GridObject next = tempPath.pop();
             intersectionPath.add(next);
 
             // calc direction
@@ -354,7 +380,7 @@ public class Vehicle {
         }
     }
 
-    private void modifiedDjikstras(int[][] adjMatrix, int startID, int target, ArrayList<Intersection> intersections) {
+    private void modifiedDjikstras(int[][] adjMatrix, int startID, int target, ArrayList<GridObject> intersections) {
         //set up djikstra's algorithm
         int n = adjMatrix.length;
         int[] distance = new int[n];
@@ -404,7 +430,7 @@ public class Vehicle {
         return minIndex;
     }
 
-    public void findPath(int[][] adjMatrix, ArrayList<Intersection> intersections) {
+    public void findPath(int[][] adjMatrix, ArrayList<GridObject> intersections) {
         modifiedDjikstras(adjMatrix, startRoadID, endRoadID, intersections);
     }
 

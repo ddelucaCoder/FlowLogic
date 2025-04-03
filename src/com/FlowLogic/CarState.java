@@ -5,5 +5,6 @@ public enum CarState {
     STOPPED_FORWARD,
     STOPPED_TURNING,
     TURNING,
-    FORWARD
+    FORWARD,
+    DESTINATION_REACHED
 }

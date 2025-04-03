@@ -7,9 +7,9 @@ public class TrafficController {
 
     private int numCars;
     private ArrayList<Vehicle> vehicles;
-    private ArrayList<Intersection> intersections;
+    private ArrayList<GridObject> intersections;
 
-    private int totalTime;
+    private int totalTime = 1000;
 
     private ArrayList<Road> destinations;
     private ArrayList<Road> entrances;
@@ -18,9 +18,24 @@ public class TrafficController {
 
     private final Random random = new Random();
 
-    public TrafficController(int numCars) {
+    public TrafficController(int numCars, Grid g) {
+        grid = g;
+        vehicles = new ArrayList<>();
+        destinations = new ArrayList<>();
+        entrances = new ArrayList<>();
         for (int i = 0; i < numCars; i++) {
             vehicles.add(new Vehicle());
+        }
+        intersections = g.intersections;
+        for (GridObject obj : grid.intersections) {
+            if (obj instanceof Road r) {
+                if (grid.checkAroundDest(r)) {
+                    destinations.add(r);
+                }
+                if (r.isInRoad()) {
+                    entrances.add(r);
+                }
+            }
         }
 
     }
@@ -39,12 +54,13 @@ public class TrafficController {
     public Simulation runSimulation() {
         Simulation sim = new Simulation(numCars);
 
+
         // generate cars and their in-roads and out-roads and time of entrance and destination
 
         // get each car's route
         for (Vehicle v : vehicles) {
             v.setInOut(getRandomInRoad(), getRandomDestination());
-            v.setTimeIn((int) (Math.random() *  totalTime));
+            v.setTimeIn(0);//TODO: (int) (Math.random() *  totalTime));
             v.findPath(grid.gridToGraph(), grid.intersections);
         }
 
@@ -52,12 +68,18 @@ public class TrafficController {
         boolean running = true;
         while (running) {
             Frame f = new Frame();
-            for (Intersection i : intersections) {
+            totalTime--;
+            if (totalTime <= 0) {
+                running = false;
+            }
+            for (GridObject g : intersections) {
                 // update each intersection
-                Step s = i.tick();
-                // add old / new intersection to the sim
-                if (!s.getNewObject().equals(s.getOldObject())) {
-                    f.addStep(s);
+                if (g instanceof Intersection i) {
+                    Step s = i.tick();
+                    // add old / new intersection to the sim
+                    if (s != null && !s.getNewObject().equals(s.getOldObject())) {
+                        f.addStep(s);
+                    }
                 }
 
             }
@@ -66,12 +88,11 @@ public class TrafficController {
                 // update each vehicle
                 Step s = v.tick(grid);
                 // add old / new vehicles to the sim
-                if (!s.getNewObject().equals(s.getOldObject())) {
+                if (s != null && (s.getNewObject() == null || !s.getNewObject().equals(s.getOldObject()))) {
                     f.addStep(s);
                 }
             }
             sim.addFrame(f);
-            running = false;
         }
         return null;
     }
