@@ -72,6 +72,7 @@ public class Grid {
         imgToObj.put("RedYellow4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("GreenRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("RedGreen4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
+        imgToObj.put("Hazard.png", new Hazard(0 ,0));
     }
 
     /**
@@ -235,6 +236,10 @@ public class Grid {
                         gridObject = roundabout;
                         break;
                         //idk
+                    case "Hazard":
+                        Hazard hazard = new Hazard(row, col);
+                        gridObject = hazard;
+                        break;
                 }
                 // Add everything to the grid
                 if (gridObject != null) {
@@ -420,6 +425,9 @@ public class Grid {
                         properties.put("yLength", parking.getyLength());
                         properties.put("parkingCapacity", parking.getParkingCapacity());
                         properties.put("numCars", parking.getNumCars());
+                    }
+                    else if (obj instanceof Hazard hazard) {
+
                     }
 
                     cellJson.put("properties", properties);
@@ -1188,7 +1196,6 @@ public class Grid {
         for (int i = 0; i < numRows; i++) {
             for (int k = 0; k < numColumns; k++) {
                 if (grid[i][k] != null) {
-                    System.out.println(i + " i " + k + " k");
                     frontGrid[i][k].setFill(new ImagePattern(grid[i][k].getImageFile()));
                 }
             }

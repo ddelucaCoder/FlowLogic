@@ -334,6 +334,7 @@ public class UserInterface extends Application {
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
+
         stage.setScene(scene);
         stage.show();
         lastScene = scene;

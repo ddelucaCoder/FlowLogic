@@ -13,7 +13,7 @@ public class Hazard implements GridObject {
     public Hazard(int rowNum, int colNum) {
         this.rowNum = rowNum;
         this.colNum = colNum;
-        this.imageFile = new Image("file:Image/Hazard.png");
+        this.imageFile = new Image("file:Images/Hazard.png");
     }
 
     public Hazard(Hazard hazard) {
