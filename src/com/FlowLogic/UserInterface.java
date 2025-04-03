@@ -66,6 +66,9 @@ public class UserInterface extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Error {
+        mainMenu(primaryStage);
+    }
+    public static void mainMenu(Stage primaryStage) {
         stage = primaryStage;
         stage.setTitle("FlowLogic");
 
@@ -113,7 +116,7 @@ public class UserInterface extends Application {
         lastScene = scene;
     }
 
-    private void setupBuildMenu(){
+    public static void setupBuildMenu(){
         //Stops user from resizing the window
         stage.setResizable(false);
 
@@ -297,9 +300,21 @@ public class UserInterface extends Application {
         Button menu = new Button("Menu");
         menu.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         menu.setOnAction(e -> {
-            start(stage);
+            mainMenu(stage);
         });
         right.getChildren().add(menu);
+
+        Button simulate = new Button("Simulate");
+        simulate.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+        simulate.setOnAction(e -> {
+            //Add prompt for vehicle selection here
+            Simulation sim = new Simulation(5);
+            sim.simulate();//Processes the simulation
+            root.getChildren().remove(right);
+            root.getChildren().remove(left);
+            sim.display(stage, root);//Displays the result
+        });
+        right.getChildren().add(simulate);
 
         // Add a checkbox under the menu button
         selectEntireRoadCheckbox = new CheckBox("Toggle Select Entire Road");
@@ -329,6 +344,7 @@ public class UserInterface extends Application {
             pan = false;
         });
 
+
         right.getChildren().add(options);
 
 
@@ -349,7 +365,7 @@ public class UserInterface extends Application {
         return selectEntireRoadCheckbox != null && selectEntireRoadCheckbox.isSelected();
     }
 
-    private void setupLoadMenu() {
+    public static void setupLoadMenu() {
         VBox root = new VBox();
         root.setAlignment(Pos.CENTER);
 
@@ -372,7 +388,7 @@ public class UserInterface extends Application {
                     stage.setScene(lastScene);
                 }
                 else {
-                    start(stage);
+                    mainMenu(stage);
                 }
             });
 
@@ -466,7 +482,7 @@ public class UserInterface extends Application {
                     stage.setScene(lastScene);
                 }
                 else {
-                    start(stage);
+                    mainMenu(stage);
                 }
             });
 
@@ -606,7 +622,7 @@ public class UserInterface extends Application {
      * @param mainLayout The main AnchorPane layout
      * @param grid The Grid object containing the grid data to save
      */
-    public void loadGridButton(VBox mainLayout, Grid grid) {
+    public static void loadGridButton(VBox mainLayout, Grid grid) {
         // Create the button
         Button loadButton = new Button("Load Existing Layout");
         loadButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
@@ -677,7 +693,7 @@ public class UserInterface extends Application {
      *
      * Used if the user's layout file, for whatever reason, is not in the correct directory
      */
-    private void browseForExternalSaveFile() {
+    private static void browseForExternalSaveFile() {
         // Create save directory if it doesn't exist
         createSaveDirectory();
 
@@ -730,7 +746,7 @@ public class UserInterface extends Application {
     /**
      * Copies a file from source to destination
      */
-    private void copyFile(File sourceFile, File destinationFile) throws IOException {
+    private static void copyFile(File sourceFile, File destinationFile) throws IOException {
         Files.copy(sourceFile.toPath(), destinationFile.toPath(),
                 java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         showInfoAlert("File Copied", "File '" + sourceFile.getName() +
@@ -740,7 +756,7 @@ public class UserInterface extends Application {
     /**
      * Asks the user for a new filename and copies the file with that name
      */
-    private void renameAndCopyFile(File sourceFile) {
+    private static void renameAndCopyFile(File sourceFile) {
         TextInputDialog dialog = new TextInputDialog(sourceFile.getName().replace(".json", "") + "_copy");
         dialog.setTitle("Rename File");
         dialog.setHeaderText("Please enter a new name for the file");
@@ -771,7 +787,7 @@ public class UserInterface extends Application {
      *
      * @param sourceFile The file that will be renamed
      */
-    private void renameSaveFile(File sourceFile) {
+    private static void renameSaveFile(File sourceFile) {
         // First check to ensure the file exists
         if (!sourceFile.exists()) {
             showErrorAlert("File does not exist: " + sourceFile.getAbsolutePath());
@@ -828,7 +844,7 @@ public class UserInterface extends Application {
      *
      * @param file The file that will be deleted
      */
-    private void deleteSaveFile(File file) {
+    private static void deleteSaveFile(File file) {
         if (!file.exists()) {
             showErrorAlert("File does not exist: " + file.getAbsolutePath());
             return;

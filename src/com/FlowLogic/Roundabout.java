@@ -14,7 +14,7 @@ import java.util.List;
 public class Roundabout implements GridObject {
     int rowNum;
     int colNum;
-    List<Boolean> availableSpots;
+    Boolean availableSpots[];
 
 
 
@@ -24,9 +24,13 @@ public class Roundabout implements GridObject {
      * Class Definition Function
      * @param availableSpots True/False list representing the current spots in the roundabout that are open for cars
      *                       true means the spot is open. false means the spot is taken.
+     *                       Index:0 = Right
+     *                       Index:1 = North
+     *                       Index:2 = 180 degrees
+     *                       Index:3 = 3/2 pi radians
      */
-    public Roundabout(List<Boolean> availableSpots) {
-        this.availableSpots = availableSpots;
+    public Roundabout(Boolean[] availableSpots) {
+        this.availableSpots = new Boolean[4];
         this.imageFile = new Image("file:Images/roundabout.png");
     }
 
@@ -55,30 +59,6 @@ public class Roundabout implements GridObject {
         return new Roundabout(this);
     }
 
-    /**
-     * Closes a spot in the roundabout
-     */
-    public void fillSpot() {
-        for (int i = 0; i < availableSpots.size(); i++) {
-            if (availableSpots.get(i)) {
-                availableSpots.set(i, false);
-                break;
-            }
-        }
-    }
-
-    /**
-     * Opens a spot in the roundabout
-     */
-    public void openSpot() {
-        for (int i = 0; i < availableSpots.size(); i++) {
-            if (!availableSpots.get(i)) {
-                availableSpots.set(i, true);
-                break;
-            }
-        }
-    }
-
     /*
      * Getter and Setter Methods
      */
@@ -99,11 +79,11 @@ public class Roundabout implements GridObject {
         this.colNum = colNum;
     }
 
-    public List<Boolean> getAvailableSpots() {
+    public Boolean[] getAvailableSpots() {
         return availableSpots;
     }
 
-    public void setAvailableSpots(List<Boolean> availableSpots) {
+    public void setAvailableSpots(Boolean[] availableSpots) {
         this.availableSpots = availableSpots;
     }
 
