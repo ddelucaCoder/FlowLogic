@@ -310,7 +310,7 @@ public class UserInterface extends Application {
             //Add prompt for vehicle selection here
             //TODO: ISAAC - add average car size prompt here (do manual and auto)
             //TODO: ISAAC / COLIN - add num vehicles prompt
-            TrafficController tc = new TrafficController(5, grid); // TODO: ISAAC / COLIN update params based on prompts
+            TrafficController tc = new TrafficController(5,5, grid); // TODO: ISAAC / COLIN update params based on prompts
             Simulation sim = tc.runSimulation();
             root.getChildren().remove(right);
             root.getChildren().remove(left);
@@ -348,7 +348,6 @@ public class UserInterface extends Application {
 
 
         right.getChildren().add(options);
-
 
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -492,7 +491,6 @@ public class UserInterface extends Application {
             root.getChildren().addAll(titleLabel, saveFileListView, buttonBox);
         }
 
-        //loadGridButton(root, grid);
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         stage.setScene(scene);
         stage.show();
@@ -1266,6 +1264,7 @@ public class UserInterface extends Application {
         // Get the road object
         GridObject obj = grid.getAtSpot(row, col);
         String name = ((Road)obj).getName();
+        String multiLane = ("MultiLaneConnector: " + ((Road) obj).getLaneContainer().getCount());
 
         Label titleLabel = new Label(name + " Options");
         Button renameButt = new Button("Rename Road");
@@ -1276,6 +1275,7 @@ public class UserInterface extends Application {
         Button removeButton = new Button("Remove Road");
         Button closeButton = new Button("Close Road Options");
         CheckBox inRoad = new CheckBox("Make Input Road");
+        Label multiLabel = new Label(multiLane);
 
         options.getChildren().add(titleLabel);
         options.getChildren().add(renameButt);
@@ -1285,6 +1285,7 @@ public class UserInterface extends Application {
         options.getChildren().add(rightButt);
         options.getChildren().add(removeButton);
         options.getChildren().add(closeButton);
+        options.getChildren().add(multiLabel);
 
         OneWayRoad road = (OneWayRoad) grid.getGrid()[row][col];
         if ((row == 0 && road.getDirection() == Direction.DOWN) ||
@@ -1292,7 +1293,7 @@ public class UserInterface extends Application {
                 (col == 0 && road.getDirection() == Direction.RIGHT) ||
                 (col == grid.getNumColumns() - 1 && road.getDirection() == Direction.LEFT))
         {
-            if (((OneWayRoad) grid.getGrid()[row][col]).getInRoad()) {
+            if (((OneWayRoad) grid.getGrid()[row][col]).isInRoad()) {
                 inRoad.setSelected(true);
             }
             options.getChildren().add(inRoad);

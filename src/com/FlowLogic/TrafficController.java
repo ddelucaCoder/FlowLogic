@@ -1,6 +1,7 @@
 package com.FlowLogic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class TrafficController {
@@ -18,17 +19,19 @@ public class TrafficController {
 
     private final Random random = new Random();
 
-    public TrafficController(int numCars, Grid g) {
+    public TrafficController(int avgSize, int numCars, Grid g) {
+        g.gridToGraph();
         grid = g;
         vehicles = new ArrayList<>();
         destinations = new ArrayList<>();
         entrances = new ArrayList<>();
         for (int i = 0; i < numCars; i++) {
-            vehicles.add(new Vehicle());
+            Random ran = new Random();
+            vehicles.add(new Vehicle(ran.nextInt(6) -3 + avgSize));
         }
         intersections = g.intersections;
         for (GridObject obj : grid.intersections) {
-            if (obj instanceof Road r) {
+            if (obj instanceof OneWayRoad r) {
                 if (grid.checkAroundDest(r)) {
                     destinations.add(r);
                 }
