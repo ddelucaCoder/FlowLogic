@@ -146,7 +146,6 @@ public class Grid {
                                 numLanes, vehicleList);
                         oneWayRoad.setLength(length);
                         oneWayRoad.setName(name);
-                        oneWayRoad.setInRoad(properties.getBoolean("inRoad"));
 
                         gridObject = oneWayRoad;
                         break;
@@ -347,7 +346,6 @@ public class Grid {
                         properties.put("numLanes", road.getNumLanes());
                         properties.put("vehicleList", road.getVehicleList());
                         properties.put("name", road.getName());
-                        properties.put("inRoad", road.getInRoad());
                     }
                     else if (obj instanceof TwoWayRoad road) {
                         properties.put("orientation", road.getOrientation());
@@ -950,10 +948,10 @@ public class Grid {
                         groupIntersections(numIntersections++, i, j);
                         intersections.add(in);
                     }
-                } else if (getAtSpot(i, j) instanceof Road r && r.isInRoad()) { // ADDED IN ROADS TO GRAPH
+                } else if (getAtSpot(i, j) instanceof OneWayRoad r && r.isInRoad()) { // ADDED IN ROADS TO GRAPH
                     intersections.add(r);
                     r.setIntersectionID(numIntersections++);
-                } else if (getAtSpot(i, j) instanceof Road r) { // ADDED DESTINATION ROADS TO GRAPH
+                } else if (getAtSpot(i, j) instanceof OneWayRoad r) { // ADDED DESTINATION ROADS TO GRAPH
                     if (checkAroundDest(r)) {
                         intersections.add(r);
                         r.setIntersectionID(numIntersections++);

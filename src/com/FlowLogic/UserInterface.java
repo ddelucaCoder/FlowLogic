@@ -349,7 +349,6 @@ public class UserInterface extends Application {
 
         right.getChildren().add(options);
 
-
         // Set up a Scene
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -492,7 +491,6 @@ public class UserInterface extends Application {
             root.getChildren().addAll(titleLabel, saveFileListView, buttonBox);
         }
 
-        //loadGridButton(root, grid);
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
         stage.setScene(scene);
         stage.show();
@@ -1295,7 +1293,7 @@ public class UserInterface extends Application {
                 (col == 0 && road.getDirection() == Direction.RIGHT) ||
                 (col == grid.getNumColumns() - 1 && road.getDirection() == Direction.LEFT))
         {
-            if (((OneWayRoad) grid.getGrid()[row][col]).getInRoad()) {
+            if (((OneWayRoad) grid.getGrid()[row][col]).isInRoad()) {
                 inRoad.setSelected(true);
             }
             options.getChildren().add(inRoad);
