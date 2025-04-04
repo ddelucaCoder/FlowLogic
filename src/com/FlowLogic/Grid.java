@@ -504,7 +504,6 @@ public class Grid {
         GridObject newObject = imgToObj.get(imageFile);
         System.out.println(imageFile);
         addObject(newObject.clone(), rowNum, colNum);
-        mergeRoads(rowNum, colNum);
     }
 
     /**
@@ -1268,6 +1267,7 @@ public class Grid {
         grid[rowNum][colNum] = newObject;
         grid[rowNum][colNum].setColNum(colNum);
         grid[rowNum][colNum].setRowNum(rowNum);
+        mergeRoads(rowNum, colNum);
 
         // automatically snap new roads into intersections
         if (newObject instanceof Road) {
