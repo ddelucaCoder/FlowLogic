@@ -1605,6 +1605,7 @@ public class UserInterface extends Application {
      * @param connectedRoads - set of the selected road objects
      */
     public static void showRoadOptions(VBox mainLayout, Grid grid, int row, int col, Set<int[]> connectedRoads) {
+        options.getChildren().clear();
         // Get the first road to determine the name
         String roadName = "Road";
         if (!connectedRoads.isEmpty()) {
@@ -1625,28 +1626,14 @@ public class UserInterface extends Application {
         Label selectedTilesLabel;
         if (connectedRoads.size() > 1) {
             selectedTilesLabel = new Label("Selected Road Tiles: " + connectedRoads.size());
-            mainLayout.getChildren().add(selectedTilesLabel);
-        } else {
-            selectedTilesLabel = null;
+            options.getChildren().add(selectedTilesLabel);
         }
 
-        mainLayout.getChildren().add(titleLabel[0]);
-        mainLayout.getChildren().add(flipDirectionButton);
-        mainLayout.getChildren().add(renameRoadButton);
-        mainLayout.getChildren().add(removeButton);
-        mainLayout.getChildren().add(closeButton);
-
-        // Helper function to clear options menu
-        Runnable clearMenu = () -> {
-            mainLayout.getChildren().remove(titleLabel[0]);
-            if (selectedTilesLabel != null) {
-                mainLayout.getChildren().remove(selectedTilesLabel);
-            }
-            mainLayout.getChildren().remove(flipDirectionButton);
-            mainLayout.getChildren().remove(renameRoadButton);
-            mainLayout.getChildren().remove(removeButton);
-            mainLayout.getChildren().remove(closeButton);
-        };
+        options.getChildren().add(titleLabel[0]);
+        options.getChildren().add(flipDirectionButton);
+        options.getChildren().add(renameRoadButton);
+        options.getChildren().add(removeButton);
+        options.getChildren().add(closeButton);
 
         flipDirectionButton.setOnAction(e -> {
             // For each connected road tile, flip its direction
@@ -1691,8 +1678,7 @@ public class UserInterface extends Application {
                     // TODO: Implement Road Flip for Two Way Roads
                 }
             }
-
-            clearMenu.run();
+            options.getChildren().clear();
             showRoadOptions(mainLayout, grid, row, col, grid.getConnectedRoadTiles(row, col));
             refreshGrid(GRID_SIZE);
         });
@@ -1716,8 +1702,7 @@ public class UserInterface extends Application {
                     }
                 }
             }
-
-            clearMenu.run();
+            options.getChildren().clear();
             showRoadOptions(mainLayout, grid, row, col, grid.getConnectedRoadTiles(row, col));
             refreshGrid(GRID_SIZE);
         });
@@ -1728,11 +1713,11 @@ public class UserInterface extends Application {
                 grid.remove(coord[0], coord[1]);
             }
             refreshGrid(GRID_SIZE);
-            clearMenu.run();
+            options.getChildren().clear();
         });
 
      closeButton.setOnAction(e -> {
-            clearMenu.run();
+         options.getChildren().clear();
         });
     }
 
