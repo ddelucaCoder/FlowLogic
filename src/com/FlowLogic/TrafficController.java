@@ -20,9 +20,7 @@ public class TrafficController {
     private final Random random = new Random();
 
     public TrafficController(int avgSize, int numCars, Grid g) {
-        System.out.println("Going to grdi to graph");
         g.gridToGraph();
-        System.out.println("Back from grdi to graph");
         grid = g;
         vehicles = new ArrayList<>();
         destinations = new ArrayList<>();

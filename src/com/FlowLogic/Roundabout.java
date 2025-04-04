@@ -1,7 +1,9 @@
 package com.FlowLogic;
 import javafx.scene.image.Image;
 
+import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Class definition file for com.FlowLogic.Roundabout objects
@@ -12,9 +14,11 @@ import java.util.List;
  */
 
 public class Roundabout extends Intersection{
-    Boolean availableSpots[];
+    Boolean availableSpots[] = {true, true, true, true};
+    private Queue<Vehicle> queue = new ArrayDeque<Vehicle>();
 
-
+    private final int WAIT_TIME = 10; // TODO: adjust if necessary
+    int timer = WAIT_TIME;
 
     private Image imageFile;
 
@@ -29,7 +33,6 @@ public class Roundabout extends Intersection{
      */
     public Roundabout(Boolean[] availableSpots, int row, int col, Road[] roadList) {
         super(row, col, roadList);
-        this.availableSpots = new Boolean[4];
         this.imageFile = new Image("file:Images/roundabout.png");
     }
 
@@ -78,6 +81,23 @@ public class Roundabout extends Intersection{
     }
     public void setImageFile(Image imageFile) {
         this.imageFile = imageFile;
+    }
+
+    public Queue<Vehicle> getQueue() {
+        return queue;
+    }
+
+
+    public Step tick() {
+        timer--;
+        if (timer <= 0) {
+            timer = WAIT_TIME;
+            if (!queue.isEmpty()) {
+                Vehicle go = queue.remove();
+                go.roundAboutGo(this);
+            }
+        }
+        return null;
     }
 
 }
