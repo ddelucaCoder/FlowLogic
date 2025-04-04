@@ -262,6 +262,9 @@ public class Grid {
                 // Add everything to the grid
                 if (gridObject != null) {
                     grid[row][col] = gridObject;
+                    if (gridObject instanceof OneWayRoad) {
+                        mergeRoads(row,col);
+                    }
                 }
             }
             // Second loop: Connect the roads to all forms of intersections
