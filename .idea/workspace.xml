@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Implemented save/load for MultiLaneConnect">
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Attempt to fix hazard">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -251,7 +250,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743740343175</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Attempt to fix hazard">
+      <option name="closed" value="true" />
+      <created>1743744002144</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1743744002144</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -331,6 +338,7 @@
     <MESSAGE value="Implemented Hazard functionality, still needs some bug fixes when fixing a hazard" />
     <MESSAGE value="for pull" />
     <MESSAGE value="Implemented save/load for MultiLaneConnect" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented save/load for MultiLaneConnect" />
+    <MESSAGE value="Attempt to fix hazard" />
+    <option name="LAST_COMMIT_MESSAGE" value="Attempt to fix hazard" />
   </component>
 </project>
