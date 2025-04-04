@@ -30,6 +30,7 @@ public class TrafficController {
             vehicles.add(new Vehicle(ran.nextInt(6) -3 + avgSize));
         }
         intersections = g.intersections;
+        System.out.println(intersections.size());
         for (GridObject obj : grid.intersections) {
             if (obj instanceof OneWayRoad r) {
                 if (grid.checkAroundDest(r)) {
@@ -40,7 +41,6 @@ public class TrafficController {
                 }
             }
         }
-
     }
 
     private Road getRandomInRoad() {
