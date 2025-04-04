@@ -40,7 +40,7 @@ public class BasicSimTest {
             System.out.println(Arrays.deepToString(g.gridToGraph()));
             // set up a sim
 
-            TrafficController tc = new TrafficController(1, g);
+            TrafficController tc = new TrafficController(10, 1, g);
 
             // run the sim
             tc.runSimulation();

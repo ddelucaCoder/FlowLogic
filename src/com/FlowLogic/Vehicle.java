@@ -47,6 +47,9 @@ public class Vehicle {
     private final int FAST_DECEL = 6;
 
     private final int ACCEL = 3;
+    private StopSign lastStopped;
+
+
 
     public Vehicle(int length) {
         this.length = length;
@@ -176,14 +179,17 @@ public class Vehicle {
         // TODO: Check in front for car
         System.out.println(getCurrentGridObject(g, front(5)));
         if (getCurrentGridObject(g, front(5)) instanceof StopSign s) {
-            speed = 0;
-            s.getQueue().add(this);
-            if (directionPath.get(1) != direction) {
-                state = STOPPED_TURNING;
-            } else {
-                state = STOPPED_FORWARD;
+            if (lastStopped != s) {
+                lastStopped = s;
+                speed = 0;
+                s.getQueue().add(this);
+                if (directionPath.get(1) != direction) {
+                    state = STOPPED_TURNING;
+                } else {
+                    state = STOPPED_FORWARD;
+                }
+                return true;
             }
-            return true;
         }
         // check if nearing destination or stop sign
         for (int i = 0; i < ((speed / 10) + 1) * 32; i += 32) {
@@ -292,7 +298,7 @@ public class Vehicle {
                 // TODO: Stoplight logic
                 // check if were moving
             }
-            return null;
+            return new Step(new Vehicle(this), new Vehicle(this));
         } else if (state == STOPPED_TURNING) {
             if (currentIntersection instanceof StopLight) {
                 // TODO: Stoplight logic
