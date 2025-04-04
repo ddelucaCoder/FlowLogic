@@ -334,7 +334,7 @@ public class UserInterface extends Application {
             Simulation sim = tc.runSimulation();
             root.getChildren().remove(right);
             root.getChildren().remove(left);
-            sim.display(stage, root, gridContainer); // display the simulation
+            sim.display(stage, root, gridContainer, grid); // display the simulation
         });
         right.getChildren().add(simulate);
 

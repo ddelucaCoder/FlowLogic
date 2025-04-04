@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.ImagePattern;
 import javafx.stage.Stage;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
@@ -56,7 +57,7 @@ public class Simulation {
     }
     int SCREEN_WIDTH = 1280;
     int SCREEN_HEIGHT = 720;
-    public void display(Stage stage, AnchorPane root, Pane grid){
+    public void display(Stage stage, AnchorPane root, Pane gridGroup, Grid grid){
         VBox right = new VBox();
         right.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
         right.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
@@ -91,13 +92,11 @@ public class Simulation {
 
                         if (oldObj instanceof  Vehicle) {
                             Vehicle car = (Vehicle) oldObj;
-                            if (grid.getChildren().contains(car.getCar())) {
-                                grid.getChildren().remove(car.getCar());
+                            if (gridGroup.getChildren().contains(car.getCar())) {
+                                gridGroup.getChildren().remove(car.getCar());
                             }
                         }
-                        if (oldObj instanceof StopLight) {
 
-                        }
                         if (newObj instanceof Vehicle) {
                             Vehicle car = (Vehicle) newObj;
                             int x = car.getX() + 16;
@@ -112,19 +111,14 @@ public class Simulation {
                             update.setStroke(Color.BLACK);
                             update.setStrokeWidth(2);
                             update.setRotate(car.getCurRotation());
-                            if (!grid.getChildren().contains(car.getCar())) {
-                                grid.getChildren().add(car.getCar());
+                            if (!gridGroup.getChildren().contains(car.getCar())) {
+                                gridGroup.getChildren().add(car.getCar());
                             }
-                            /*Rectangle newCar = new Rectangle(x, y, car.getWidth(), car.getLength());
-
-                            newCar.setRotate(car.getCurRotation());
-                            newCar.setVisible(true);
-                            newCar.setFill(Color.BLUE);
-                            newCar.setStroke(Color.BLACK);
-                            newCar.setStrokeWidth(2);
-                            car.setCar(newCar);*/
-
-                            //Platform.runLater(() -> grid.getChildren().add(car.getCar())); // Ensure JavaFX thread handles UI update
+                        }
+                        if (newObj instanceof StopLight) {
+                            StopLight light = (StopLight) newObj;
+                            Rectangle rect = grid.getFrontGrid()[light.getRowNum()][light.getColNum()];
+                            rect.setFill(new ImagePattern(light.getImageFile()));
                         }
                     }
                 });
