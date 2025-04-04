@@ -1,6 +1,8 @@
 package com.FlowLogic;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.transform.Rotate;
 
 public class StopLight extends Intersection implements GridObject {
     private int timingOne; // vertical light (top-bottom)
@@ -13,7 +15,7 @@ public class StopLight extends Intersection implements GridObject {
     private int rowNum;
     private int colNum;
 
-    private int YELLOW_TIMING = 10; // TODO: adjust this
+    private int YELLOW_TIMING = 5; // TODO: adjust this
     private Image imageFile;
     private Image redGreen4WayImage;
     private Image redYellow4WayImage;
@@ -21,7 +23,7 @@ public class StopLight extends Intersection implements GridObject {
     private Image yellowRed4WayImage;
     private Image allRed4WayImage;
 
-    private int timer;
+    private int timer = 10;
 
     public StopLight(Road roadOne, Road roadTwo, int timingOne, int timingTwo, int lightOneColor, int lightTwoColor, Road[] roadList, int rowNum, int colNum) {
         super(rowNum, colNum, roadList);
@@ -39,6 +41,8 @@ public class StopLight extends Intersection implements GridObject {
 
     public StopLight(StopLight s) {
         super(s.getRowNum(), s.getColNum(), s.getRoadList());
+        this.rowNum = s.getRowNum();
+        this.colNum = s.getColNum();
         this.lightOneColor = s.getLightOneColor(); // Vertical Light
         this.lightTwoColor = s.getLightTwoColor(); // Horizontal Light
         this.timingOne = s.getTimingOne();
@@ -48,7 +52,7 @@ public class StopLight extends Intersection implements GridObject {
         this.greenRed4WayImage = new Image("file:Images/GreenRed4WayStopLight.png");
         this.yellowRed4WayImage = new Image("file:Images/YellowRed4WayStopLight.png");
         this.allRed4WayImage = new Image("file:Images/AllRed4WayStopLight.png");
-        this.imageFile = new Image("file:Images/RedGreen4WayStopLight.png");
+        this.imageFile = s.getImageFile();
     }
 
 
@@ -72,26 +76,29 @@ public class StopLight extends Intersection implements GridObject {
      * @return boolean : was successful
      */
     public int switchLights() {
+        if (lightOneColor == RED && lightTwoColor == RED) {
+            lightOneColor = GREEN;
+        }
         if (lightOneColor == YELLOW) {
             lightOneColor = RED;
             lightTwoColor = GREEN;
             this.imageFile = getRedGreen4WayImage();
-            return YELLOW_TIMING;
+            return timingTwo;
         } else if (lightOneColor == GREEN) {
             lightOneColor = YELLOW;
             lightTwoColor = RED;
             this.imageFile = getRedYellow4WayImage();
-            return timingOne;
+            return YELLOW_TIMING;
         } else if (lightTwoColor == YELLOW) {
             lightTwoColor = RED;
             lightOneColor = GREEN;
             this.imageFile = getRedGreen4WayImage();
-            return YELLOW_TIMING;
+            return timingOne;
         } else if (lightTwoColor == GREEN) {
             lightTwoColor = YELLOW;
             lightOneColor = RED;
             this.imageFile = getRedYellow4WayImage();
-            return timingTwo;
+            return YELLOW_TIMING;
         }
         return -1;
     }
