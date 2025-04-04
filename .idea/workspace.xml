@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Implemented basic hazard class">
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Finalized MultiLaneConnect implementation into front/backend">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/MultiLaneConnect.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/MultiLaneConnect.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/OneWayRoad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/OneWayRoad.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/TwoWayRoad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/TwoWayRoad.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Hazard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Hazard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +84,7 @@
       <workItem from="1740443332602" duration="4938000" />
       <workItem from="1740664465878" duration="1514000" />
       <workItem from="1740752532896" duration="1056000" />
-      <workItem from="1743550897074" duration="8508000" />
+      <workItem from="1743550897074" duration="27520000" />
     </task>
     <task id="LOCAL-00001" summary="implemented onewayroad class">
       <option name="closed" value="true" />
@@ -214,7 +213,31 @@
       <option name="project" value="LOCAL" />
       <updated>1743111269435</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Worked on implementation of multilane containers">
+      <option name="closed" value="true" />
+      <created>1743566603119</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1743566603119</updated>
+    </task>
+    <task id="LOCAL-00018" summary="finished implementation of mergeRoads method to combine a road and roads around it into a MultiLane object">
+      <option name="closed" value="true" />
+      <created>1743609199968</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1743609199968</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Finalized MultiLaneConnect implementation into front/backend">
+      <option name="closed" value="true" />
+      <created>1743692104226</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1743692104226</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -289,6 +312,9 @@
     <MESSAGE value="for pull" />
     <MESSAGE value="Implemented basic multilaneConnect class" />
     <MESSAGE value="Implemented basic hazard class" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented basic hazard class" />
+    <MESSAGE value="Worked on implementation of multilane containers" />
+    <MESSAGE value="finished implementation of mergeRoads method to combine a road and roads around it into a MultiLane object" />
+    <MESSAGE value="Finalized MultiLaneConnect implementation into front/backend" />
+    <option name="LAST_COMMIT_MESSAGE" value="Finalized MultiLaneConnect implementation into front/backend" />
   </component>
 </project>

@@ -1,13 +1,12 @@
 package com.FlowLogic;
 
-import com.sun.prism.paint.Stop;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,8 +15,6 @@ import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import javax.print.attribute.standard.OrientationRequested;
 
 import static com.FlowLogic.Direction.*;
 
@@ -245,6 +242,20 @@ public class Grid {
                         //idk
                     case "Hazard":
                         Hazard hazard = new Hazard(row, col);
+                        orientation = Orientation.valueOf(properties.getString("orientation"));
+                        speedLimit = properties.getInt("speedLimit");
+                        length = properties.getInt("length");
+                        isInRoad = properties.getBoolean("isInRoad");
+                        inCars = properties.getInt("inCars");
+                        direction = Direction.valueOf(properties.getString("direction"));
+                        numLanes = properties.getInt("numLanes");
+                        name = properties.getString("name");
+                        vehicleList = new ArrayList<>();
+                        OneWayRoad hazardRoad = new OneWayRoad(orientation, speedLimit, isInRoad, inCars, row, col, direction,
+                                numLanes, vehicleList);
+                        hazardRoad.setLength(length);
+                        hazardRoad.setName(name);
+                        hazard.setCoveredObject(hazardRoad);
                         gridObject = hazard;
                         break;
                 }
@@ -444,7 +455,16 @@ public class Grid {
                         properties.put("numCars", parking.getNumCars());
                     }
                     else if (obj instanceof Hazard hazard) {
-
+                        OneWayRoad road = (OneWayRoad) hazard.getCoveredObject();
+                        properties.put("orientation", road.getOrientation());
+                        properties.put("speedLimit", road.getSpeedLimit());
+                        properties.put("length", road.getLength());
+                        properties.put("isInRoad", road.isInRoad());
+                        properties.put("inCars", road.getInCars());
+                        properties.put("direction", road.getDirection());
+                        properties.put("numLanes", road.getNumLanes());
+                        properties.put("vehicleList", road.getVehicleList());
+                        properties.put("name", road.getName());
                     }
 
                     cellJson.put("properties", properties);
@@ -495,14 +515,23 @@ public class Grid {
     }
 
     /**
+     * This function detects a hazard
+     * @param imageFile
+     * @return
+     */
+    public boolean isHazard(String imageFile) {
+        return Objects.equals(imageFile, "Hazard.png");
+    }
+
+    /**
      * This function is used to find and merge lanes that are next to the road in the location defined
      * by the coordinates. This returns the multilaneConnect object that all of the roads next to each
      * other will be contained by
+     *
      * @param rowNum
      * @param colNum
-     * @return
      */
-    public MultiLaneConnect mergeRoads(int rowNum, int colNum) {
+    public void mergeRoads(int rowNum, int colNum) {
         // get road from spot and create multilane for it
         GridObject obj = getAtSpot(rowNum, colNum);
         Road mainRoad;
@@ -510,8 +539,8 @@ public class Grid {
         if (obj instanceof Road) {
             mainRoad = (Road) obj;
         } else {
-            System.out.println("mergeRoads error: No road here to merge\n");
-            return null;
+           // System.out.println("mergeRoads error: No road here to merge\n");
+            return;
         }
         if (mainRoad.getLaneContainer() != null) {
             container = mainRoad.getLaneContainer();
@@ -524,7 +553,7 @@ public class Grid {
         // check all 4 directions around
         if (!(mainRoad instanceof OneWayRoad oneRoad)) {
             System.out.println("mergeRoads error: Not a one way road\n");
-            return null;
+            return;
         }
         Direction oneDir = oneRoad.getDirection();
         if (oneDir == UP || oneDir == Direction.DOWN) {
@@ -539,7 +568,6 @@ public class Grid {
             obj = getAtSpot(rowNum - 1, colNum);
             mergeHelper(obj, container, oneDir);
         }
-        return container;
     }
 
     /**
@@ -598,6 +626,8 @@ public class Grid {
             }
         } else if (obj instanceof StopLight) {
             UserInterface.showTrafficLightOptions(optionLayout, this, row, col);
+        } else if (obj instanceof Hazard) {
+            UserInterface.showHazardOptions(optionLayout, this, row, col);
         }
     }
 
@@ -1028,7 +1058,6 @@ public class Grid {
                 }
             }
         }
-
         return graph;
     }
 
@@ -1206,11 +1235,15 @@ public class Grid {
      * @param colNum - the column number to place the object at
      */
     public void addObject(GridObject newObject, int rowNum, int colNum) {
+        if (newObject == null) {
+            System.out.println("Adding null object to the grid\n");
+        }
         // if the spot is already full then do nothing
         if (grid[rowNum][colNum] != null) {
             return;
         }
         // add object to grid
+        System.out.println(newObject.toString());
         grid[rowNum][colNum] = newObject;
         grid[rowNum][colNum].setColNum(colNum);
         grid[rowNum][colNum].setRowNum(rowNum);
@@ -1277,6 +1310,7 @@ public class Grid {
      * This function updates the frontend to represent the backend
      */
     public void synchronizeGrid(){
+        UserInterface.refreshGrid(numRows);
         for (int i = 0; i < numRows; i++) {
             for (int k = 0; k < numColumns; k++) {
                 if (grid[i][k] != null) {

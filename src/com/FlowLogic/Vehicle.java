@@ -1,13 +1,13 @@
 package com.FlowLogic;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.util.Pair;
 
 import javafx.scene.shape.Rectangle;
-import java.util.ArrayList;
-import java.util.Random;
+
+import java.util.*;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
 import static com.FlowLogic.CarState.*;
 import static com.FlowLogic.Direction.*;
@@ -15,7 +15,7 @@ import static com.FlowLogic.Direction.*;
 public class Vehicle {
 
     int length;
-    int width = 5;
+    int width = 10;
 
     ArrayList<GridObject> intersectionPath;
     ArrayList<Direction> directionPath;
@@ -67,6 +67,12 @@ public class Vehicle {
         this.state = NOT_SPAWNED;
         this.direction = null;
         this.currentIntersection = null;
+        Rectangle newCar = new Rectangle(-100, -100, width, length);//Hide of screen
+
+        newCar.setRotate(curRotation);
+        newCar.setVisible(true);
+
+        car = newCar;
     }
 
     public Vehicle(Vehicle v) {
@@ -93,6 +99,8 @@ public class Vehicle {
         this.state = v.state;
         this.direction = v.direction;
 
+        this.car = v.car;
+
         // Reference to the same intersection object
         // If deep copying is needed, you'd need a copy constructor for Intersection
         this.currentIntersection = v.currentIntersection;
@@ -102,8 +110,8 @@ public class Vehicle {
         // TODO: spawn car in
         // set x and y
         int coords[] = Grid.getRealCoords(this.intersectionPath.get(0));
-        int spawnX = coords[0]; // TODO: COORDINATES
-        int spawnY = coords[1]; // TODO: COORDINATES
+        int spawnX = coords[1]; // TODO: COORDINATES
+        int spawnY = coords[0]; // TODO: COORDINATES
         x = spawnX;
         y = spawnY;
         // set speed
@@ -416,6 +424,7 @@ public class Vehicle {
     }
 
     public void findPath(int[][] adjMatrix, ArrayList<GridObject> intersections) {
+        System.out.println(endRoadID);
         modifiedDjikstras(adjMatrix, startRoadID, endRoadID, intersections);
     }
 
