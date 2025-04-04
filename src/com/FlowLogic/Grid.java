@@ -729,7 +729,7 @@ public class Grid {
             return;
         }
         grid[row][col] = null;
-        frontGrid[row][col].setFill(null);
+        frontGrid[row][col] = null;
         if (obj == getAtSpot(row - 1, col)) {
             remove(row - 1, col);
         }
