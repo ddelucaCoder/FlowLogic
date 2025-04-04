@@ -2,6 +2,7 @@ package com.FlowLogic;
 
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
@@ -241,6 +242,20 @@ public class Grid {
                         //idk
                     case "Hazard":
                         Hazard hazard = new Hazard(row, col);
+                        orientation = Orientation.valueOf(properties.getString("orientation"));
+                        speedLimit = properties.getInt("speedLimit");
+                        length = properties.getInt("length");
+                        isInRoad = properties.getBoolean("isInRoad");
+                        inCars = properties.getInt("inCars");
+                        direction = Direction.valueOf(properties.getString("direction"));
+                        numLanes = properties.getInt("numLanes");
+                        name = properties.getString("name");
+                        vehicleList = new ArrayList<>();
+                        OneWayRoad hazardRoad = new OneWayRoad(orientation, speedLimit, isInRoad, inCars, row, col, direction,
+                                numLanes, vehicleList);
+                        hazardRoad.setLength(length);
+                        hazardRoad.setName(name);
+                        hazard.setCoveredObject(hazardRoad);
                         gridObject = hazard;
                         break;
                 }
@@ -440,7 +455,16 @@ public class Grid {
                         properties.put("numCars", parking.getNumCars());
                     }
                     else if (obj instanceof Hazard hazard) {
-
+                        OneWayRoad road = (OneWayRoad) hazard.getCoveredObject();
+                        properties.put("orientation", road.getOrientation());
+                        properties.put("speedLimit", road.getSpeedLimit());
+                        properties.put("length", road.getLength());
+                        properties.put("isInRoad", road.isInRoad());
+                        properties.put("inCars", road.getInCars());
+                        properties.put("direction", road.getDirection());
+                        properties.put("numLanes", road.getNumLanes());
+                        properties.put("vehicleList", road.getVehicleList());
+                        properties.put("name", road.getName());
                     }
 
                     cellJson.put("properties", properties);
@@ -944,6 +968,15 @@ public class Grid {
 
     public int[][] gridToGraph() {
         //TODO: ADD DESTINATIONS AND IN ROADS
+        if (intersections != null) {
+            for (GridObject i : intersections) {
+                if (i instanceof Intersection in) {
+                    in.setIntersectionID(-1);
+                } else if (i instanceof Road) {
+                    ((Road) i).setIntersectionID(-1);
+                }
+            }
+        }
         intersections = new ArrayList<>();
         // count intersections
         int numIntersections = 0;
@@ -971,6 +1004,7 @@ public class Grid {
         for (GridObject obj : intersections) {
             if (obj instanceof Intersection i) {
                 ArrayList<OneWayRoad> roads = getOutRoadsAround(i);
+                int originalID = i.getIntersectionID();
                 for (OneWayRoad r : roads) {
                     GridObject cur = r;
                     int count = 0;
@@ -999,7 +1033,7 @@ public class Grid {
                         lastID = j.getIntersectionID();
                     }
                     if (lastID != -1) {
-                        graph[r.getIntersectionID()][lastID] = count;
+                        graph[originalID][lastID] = count;
                     }
                 }
             } else if (obj instanceof Road r) {
@@ -1034,7 +1068,6 @@ public class Grid {
                 }
             }
         }
-
         return graph;
     }
 
@@ -1287,6 +1320,7 @@ public class Grid {
      * This function updates the frontend to represent the backend
      */
     public void synchronizeGrid(){
+        UserInterface.refreshGrid(numRows);
         for (int i = 0; i < numRows; i++) {
             for (int k = 0; k < numColumns; k++) {
                 if (grid[i][k] != null) {
