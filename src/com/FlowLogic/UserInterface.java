@@ -1911,7 +1911,7 @@ public class UserInterface extends Application {
 
         submitButton.setOnAction(e -> {
             int vert = Integer.parseInt(verticalField.getText());
-            int hor = Integer.parseInt(verticalField.getText());
+            int hor = Integer.parseInt(horizontalField.getText());
             grid.updateTiming(light, vert, hor);
             options.getChildren().clear();
             showTrafficLightOptions(mainLayout, grid, row, col);
