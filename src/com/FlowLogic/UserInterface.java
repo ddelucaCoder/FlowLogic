@@ -41,7 +41,8 @@ public class UserInterface extends Application {
     private static final int SCREEN_HEIGHT = 720;     // Height of the screen
 
     private static final int CELL_SIZE = 32;          // Fixed cell size of 32x32
-    public static int GRID_SIZE = 20;         // Number of rows and columns in the grid
+
+    private static int GRID_SIZE = 20;         // Number of rows and columns in the grid
 
     // Variables to track zoom and pan offsets
     private static double offsetX = 0;
@@ -323,15 +324,14 @@ public class UserInterface extends Application {
         Button simulate = new Button("Simulate");
         simulate.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         simulate.setOnAction(e -> {
-            scale.setY(maxZoom);
-            scale.setX(maxZoom);
             //Add prompt for vehicle selection here
-            int [] back = simPrompt(stage);
-            TrafficController tc = new TrafficController(back[0],back[1], grid);
+            //TODO: ISAAC - add average car size prompt here (do manual and auto)
+            //TODO: ISAAC / COLIN - add num vehicles prompt
+            TrafficController tc = new TrafficController(5,1, grid); // TODO: ISAAC / COLIN update params based on prompts
             Simulation sim = tc.runSimulation();
             root.getChildren().remove(right);
             root.getChildren().remove(left);
-            sim.display(stage, root, gridContainer); // display the simulation
+            sim.display(stage, root); // display the simulation
         });
         right.getChildren().add(simulate);
 
@@ -372,84 +372,6 @@ public class UserInterface extends Application {
         stage.setScene(scene);
         stage.show();
         lastScene = scene;
-    }
-
-    public static int [] simPrompt(Stage owner) {
-        Stage popup = new Stage();
-        popup.initModality(Modality.APPLICATION_MODAL);
-        popup.initOwner(owner);
-        popup.setTitle("Enter an Integer");
-
-        TextField inputField = new TextField();
-        inputField.setPromptText("Enter Number of Cars");
-
-        Label message = new Label();
-        message.setText("Enter Number of Cars");
-        Button okButton = new Button("OK");
-        Button cancelButton = new Button("Cancel");
-
-        final int[] userValue = {25, 10};  // Store value inside array to modify inside lambda
-
-        okButton.setOnAction(e -> {
-            String input = inputField.getText();
-            if (!input.isEmpty()) {
-                try {
-                    userValue[1] = Integer.parseInt(input);
-                } catch (NumberFormatException ex) {
-                    message.setText("Invalid input! Using default value.");
-                }
-            }
-            popup.close();
-        });
-
-        cancelButton.setOnAction(e -> {
-            popup.close();
-        });
-
-        VBox layout = new VBox(10, inputField, message, okButton, cancelButton);
-        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-
-        popup.setScene(new Scene(layout, 250, 150));
-        popup.showAndWait();
-
-        Stage popup2 = new Stage();
-        popup2.initModality(Modality.APPLICATION_MODAL);
-        popup2.initOwner(owner);
-        popup2.setTitle("Enter an Integer");
-
-        TextField inputField2 = new TextField();
-        inputField2.setPromptText("Enter Number of Cars");
-
-        Label message2 = new Label();
-        message2.setText("Enter Average Size of Car");
-        Button okButton2 = new Button("OK");
-        Button cancelButton2 = new Button("Cancel");
-
-        okButton2.setOnAction(e -> {
-            String input2 = inputField2.getText();
-            if (!input2.isEmpty()) {
-                try {
-                    userValue[0] = Integer.parseInt(input2);
-                } catch (NumberFormatException ex) {
-                    message.setText("Invalid input! Using default value.");
-                }
-            }
-            popup2.close();
-        });
-
-        cancelButton2.setOnAction(e -> {
-            popup2.close();
-        });
-
-        VBox layout2 = new VBox(10, inputField2, message2, okButton2, cancelButton2);
-        layout2.setStyle("-fx-padding: 20; -fx-alignment: center;");
-
-        popup2.setScene(new Scene(layout2, 250, 150));
-        popup2.showAndWait();
-
-
-
-        return userValue;  // Return final integer value
     }
 
     /**
@@ -1370,24 +1292,11 @@ public class UserInterface extends Application {
         Button leftButt = new Button("Change Direction Left");
         Button rightButt = new Button("Change Direction Right");
         Button removeButton = new Button("Remove Road");
-        Label speedLabel = new Label("Speed Limit:");
-        TextField speedField = new TextField();
         Button closeButton = new Button("Close Road Options");
         CheckBox inRoad = new CheckBox("Make Input Road");
         Label multiLabel = new Label(multiLane);
         Button addLaneRight = new Button("Add Lane to the Right");
         Button addLaneLeft = new Button("Add Lane to the Left");
-
-        TextFormatter<String> numberFormatter = new TextFormatter<>(change -> {
-            if (change.getText().matches("[0-9]*")) {
-                return change;  // Accept change
-            }
-            return null;  // Reject change
-        });
-
-        speedField.setTextFormatter(numberFormatter);
-        speedField.setText(Integer.toString(oneRoad.getSpeedLimit()));
-
 
         options.getChildren().add(titleLabel);
         options.getChildren().add(renameButt);
@@ -1396,13 +1305,10 @@ public class UserInterface extends Application {
         options.getChildren().add(leftButt);
         options.getChildren().add(rightButt);
         options.getChildren().add(removeButton);
-        options.getChildren().add(speedLabel);
-        options.getChildren().add(speedField);
+        options.getChildren().add(closeButton);
         options.getChildren().add(multiLabel);
         options.getChildren().add(addLaneLeft);
         options.getChildren().add(addLaneRight);
-        options.getChildren().add(closeButton);
-
 
         OneWayRoad road = (OneWayRoad) grid.getGrid()[row][col];
         if ((row == 0 && road.getDirection() == Direction.DOWN) ||
@@ -1548,18 +1454,6 @@ public class UserInterface extends Application {
             refreshGrid(GRID_SIZE);
         });
 
-        speedField.textProperty().addListener(new ChangeListener<String>() {
-            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                Set<int[]> connectedRoads = grid.getConnectedRoadTiles(row, col);
-                for (int[] coord : connectedRoads) {
-                    GridObject obj = grid.getAtSpot(coord[0], coord[1]);
-                    if (obj instanceof Road) {
-                        ((Road) obj).setSpeedLimit(Integer.parseInt(t1));
-                    }
-                }
-            }
-        });
-
         closeButton.setOnAction(e -> {
             options.getChildren().clear();
         });
@@ -1593,17 +1487,13 @@ public class UserInterface extends Application {
         options.getChildren().add(closeButton);
 
         fixRoad.setOnAction(e -> {
+            grid.synchronizeGrid();
             Rectangle cell = grid.getFrontGrid()[row][col];
-            if (cell == null) {
-                cell = new Rectangle();
-                grid.getFrontGrid()[row][col] = cell;
-            }
-            //System.out.println(grid.getFrontGrid()[row][col].toString());
+            System.out.println(grid.getFrontGrid()[row][col].toString());
             cell.setFill(new ImagePattern(image));
             grid.remove(row, col);
             grid.addObject(hazard.getCoveredObject(), row, col);
             grid.mergeRoads(row, col);
-            grid.synchronizeGrid();
         });
 
         closeButton.setOnAction(e -> {
