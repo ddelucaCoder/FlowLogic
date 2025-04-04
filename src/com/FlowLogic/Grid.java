@@ -72,7 +72,7 @@ public class Grid {
         imgToObj.put("TwoWayRoad.png", new TwoWayRoad(Orientation.VERTICAL));
         imgToObj.put("4WayStopSign.png", new StopSign(0, 0, new Road[4]));
         imgToObj.put("AllRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
-        imgToObj.put("roundabout.png", new Roundabout(new Boolean[4]));
+        imgToObj.put("roundabout.png", new Roundabout(new Boolean[4], 0 ,0, null));
         imgToObj.put("YellowRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("RedYellow4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("GreenRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
@@ -236,7 +236,7 @@ public class Grid {
                         gridObject = stopLight;
                         break;
                     case "Roundabout":
-                        Roundabout roundabout = new Roundabout(new Boolean[4]);
+                        Roundabout roundabout = new Roundabout(new Boolean[4], row, col, new Road[4]);
                         gridObject = roundabout;
                         break;
                         //idk
@@ -504,7 +504,6 @@ public class Grid {
         GridObject newObject = imgToObj.get(imageFile);
         System.out.println(imageFile);
         addObject(newObject.clone(), rowNum, colNum);
-        mergeRoads(rowNum, colNum);
     }
 
     /**
@@ -627,10 +626,12 @@ public class Grid {
             else {
                 UserInterface.showRoadOptions(optionLayout, this, row, col);
             }
-        } else if (obj instanceof StopLight) {
+        }  else if (obj instanceof StopLight) {
             UserInterface.showTrafficLightOptions(optionLayout, this, row, col);
         } else if (obj instanceof Hazard) {
             UserInterface.showHazardOptions(optionLayout, this, row, col);
+        } else if (obj instanceof  Intersection) {
+            UserInterface.showIntersectionOptions(optionLayout, this, row, col);
         }
     }
 
@@ -1013,6 +1014,9 @@ public class Grid {
                     int count = 0;
                     int lastID = -1;
                     while (!(cur instanceof Intersection)) {
+                        if (cur instanceof Hazard) {
+                            break;
+                        }
                         if (cur instanceof OneWayRoad d) {
                             count += (MAX_SPEED_LIMIT - d.getSpeedLimit() + 1); // weighted graph
                             if (checkAroundDest(d)) {
@@ -1044,6 +1048,9 @@ public class Grid {
                 int count = 0;
                 int lastID = -1;
                 while (!(cur instanceof Intersection)) {
+                    if (cur instanceof Hazard) {
+                        break;
+                    }
                     if (cur instanceof OneWayRoad d) {
                         count += (MAX_SPEED_LIMIT - d.getSpeedLimit() + 1); // weighted graph
                         if (checkAroundDest(d)) {
@@ -1260,6 +1267,7 @@ public class Grid {
         grid[rowNum][colNum] = newObject;
         grid[rowNum][colNum].setColNum(colNum);
         grid[rowNum][colNum].setRowNum(rowNum);
+        mergeRoads(rowNum, colNum);
 
         // automatically snap new roads into intersections
         if (newObject instanceof Road) {

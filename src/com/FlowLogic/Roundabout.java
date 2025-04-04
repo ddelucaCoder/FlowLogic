@@ -1,7 +1,9 @@
 package com.FlowLogic;
 import javafx.scene.image.Image;
 
+import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Class definition file for com.FlowLogic.Roundabout objects
@@ -11,12 +13,12 @@ import java.util.List;
  * @version February 23, 2025
  */
 
-public class Roundabout implements GridObject {
-    int rowNum;
-    int colNum;
-    Boolean availableSpots[];
+public class Roundabout extends Intersection{
+    Boolean availableSpots[] = {true, true, true, true};
+    private Queue<Vehicle> queue = new ArrayDeque<Vehicle>();
 
-
+    private final int WAIT_TIME = 10; // TODO: adjust if necessary
+    int timer = WAIT_TIME;
 
     private Image imageFile;
 
@@ -29,12 +31,13 @@ public class Roundabout implements GridObject {
      *                       Index:2 = 180 degrees
      *                       Index:3 = 3/2 pi radians
      */
-    public Roundabout(Boolean[] availableSpots) {
-        this.availableSpots = new Boolean[4];
+    public Roundabout(Boolean[] availableSpots, int row, int col, Road[] roadList) {
+        super(row, col, roadList);
         this.imageFile = new Image("file:Images/roundabout.png");
     }
 
     public Roundabout(Roundabout r) {
+        super(r.getRowNum(), r.getColNum(), r.getRoadList());
         this.availableSpots = r.getAvailableSpots();
         this.imageFile = r.getImageFile();
     }
@@ -63,21 +66,7 @@ public class Roundabout implements GridObject {
      * Getter and Setter Methods
      */
 
-    public int getRowNum() {
-        return rowNum;
-    }
 
-    public void setRowNum(int rowNum) {
-        this.rowNum = rowNum;
-    }
-
-    public int getColNum() {
-        return colNum;
-    }
-
-    public void setColNum(int colNum) {
-        this.colNum = colNum;
-    }
 
     public Boolean[] getAvailableSpots() {
         return availableSpots;
@@ -87,21 +76,28 @@ public class Roundabout implements GridObject {
         this.availableSpots = availableSpots;
     }
 
-    /*
-     * toString Method for Debugging Purposes
-     */
-    public String toString() {
-        return "Roundabout{" +
-                "rowNum=" + rowNum +
-                ", colNum=" + colNum +
-                ", availableSpots=" + availableSpots +
-                '}';
-    }
     public Image getImageFile() {
         return imageFile;
     }
     public void setImageFile(Image imageFile) {
         this.imageFile = imageFile;
+    }
+
+    public Queue<Vehicle> getQueue() {
+        return queue;
+    }
+
+
+    public Step tick() {
+        timer--;
+        if (timer <= 0) {
+            timer = WAIT_TIME;
+            if (!queue.isEmpty()) {
+                Vehicle go = queue.remove();
+                go.roundAboutGo(this);
+            }
+        }
+        return null;
     }
 
 }

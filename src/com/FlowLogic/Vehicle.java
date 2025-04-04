@@ -191,10 +191,15 @@ public class Vehicle {
                 return true;
             }
         }
+        if (getCurrentGridObject(g, front(5)) instanceof Roundabout r) {
+            speed = 0;
+            r.getQueue().add(this);
+        }
         // check if nearing destination or stop sign
         for (int i = 0; i < ((speed / 10) + 1) * 32; i += 32) {
             if (getCurrentGridObject(g, front(i)) instanceof Road r && r.getIntersectionID() == endRoadID ||
-                getCurrentGridObject(g, front(i)) instanceof StopSign j) { //
+                getCurrentGridObject(g, front(i)) instanceof StopSign j ||
+                    getCurrentGridObject(g, front(i)) instanceof Roundabout round) { //
                 // TODO: make this smoother (always takes 3 frames until its under 5?)
                 // assume dist is i
                 if (speed > i / 3) speed = i / 3;
@@ -326,6 +331,21 @@ public class Vehicle {
             this.state = TURNING;
         }
         this.speed = 0;
+    }
+    public void roundAboutGo(Roundabout r) {
+        int entryPoint = 0;
+        switch (direction) {
+            case UP -> entryPoint = 3;
+            case RIGHT -> entryPoint = 2;
+            case DOWN -> entryPoint = 1;
+            case LEFT -> entryPoint = 0;
+        }
+        int prev = (entryPoint - 1 == -1) ? 3 : entryPoint - 1;
+        if (r.getAvailableSpots()[entryPoint] && r.getAvailableSpots()[prev]) {
+            //If it is able to advance into the roundabout (spot clear)
+            System.out.println("Entering slot:" + entryPoint);
+            r.getAvailableSpots()[entryPoint] = false;
+        }
     }
 
     public void setInOut(Road r, Road d) {
@@ -459,6 +479,7 @@ public class Vehicle {
             return new int[]{x, y + (length) + delta};
         }
     }
+
 
     private int[] left(int delta) {
         // COORDINATES ARE TOP LEFT OF CAR
