@@ -397,7 +397,6 @@ public class Vehicle {
 
     private void modifiedDjikstras(int[][] adjMatrix, int startID, int target, ArrayList<GridObject> intersections) {
         //set up djikstra's algorithm
-        System.out.println(Arrays.deepToString(adjMatrix) + "??????");
         int n = adjMatrix.length;
         int[] distance = new int[n];
         boolean[] visited = new boolean[n];

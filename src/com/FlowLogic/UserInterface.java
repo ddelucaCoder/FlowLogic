@@ -18,6 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
@@ -321,9 +322,8 @@ public class UserInterface extends Application {
         simulate.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         simulate.setOnAction(e -> {
             //Add prompt for vehicle selection here
-            //TODO: ISAAC - add average car size prompt here (do manual and auto)
-            //TODO: ISAAC / COLIN - add num vehicles prompt
-            TrafficController tc = new TrafficController(25,5, grid); // TODO: ISAAC / COLIN update params based on prompts
+            int [] back = simPrompt(stage);
+            TrafficController tc = new TrafficController(back[0],back[1], grid);
             Simulation sim = tc.runSimulation();
             root.getChildren().remove(right);
             root.getChildren().remove(left);
@@ -368,6 +368,84 @@ public class UserInterface extends Application {
         stage.setScene(scene);
         stage.show();
         lastScene = scene;
+    }
+
+    public static int [] simPrompt(Stage owner) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initOwner(owner);
+        popup.setTitle("Enter an Integer");
+
+        TextField inputField = new TextField();
+        inputField.setPromptText("Enter Number of Cars");
+
+        Label message = new Label();
+        message.setText("Enter Number of Cars");
+        Button okButton = new Button("OK");
+        Button cancelButton = new Button("Cancel");
+
+        final int[] userValue = {25, 10};  // Store value inside array to modify inside lambda
+
+        okButton.setOnAction(e -> {
+            String input = inputField.getText();
+            if (!input.isEmpty()) {
+                try {
+                    userValue[1] = Integer.parseInt(input);
+                } catch (NumberFormatException ex) {
+                    message.setText("Invalid input! Using default value.");
+                }
+            }
+            popup.close();
+        });
+
+        cancelButton.setOnAction(e -> {
+            popup.close();
+        });
+
+        VBox layout = new VBox(10, inputField, message, okButton, cancelButton);
+        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
+
+        popup.setScene(new Scene(layout, 250, 150));
+        popup.showAndWait();
+
+        Stage popup2 = new Stage();
+        popup2.initModality(Modality.APPLICATION_MODAL);
+        popup2.initOwner(owner);
+        popup2.setTitle("Enter an Integer");
+
+        TextField inputField2 = new TextField();
+        inputField2.setPromptText("Enter Number of Cars");
+
+        Label message2 = new Label();
+        message2.setText("Enter Average Size of Car");
+        Button okButton2 = new Button("OK");
+        Button cancelButton2 = new Button("Cancel");
+
+        okButton2.setOnAction(e -> {
+            String input2 = inputField2.getText();
+            if (!input2.isEmpty()) {
+                try {
+                    userValue[0] = Integer.parseInt(input2);
+                } catch (NumberFormatException ex) {
+                    message.setText("Invalid input! Using default value.");
+                }
+            }
+            popup2.close();
+        });
+
+        cancelButton2.setOnAction(e -> {
+            popup2.close();
+        });
+
+        VBox layout2 = new VBox(10, inputField2, message2, okButton2, cancelButton2);
+        layout2.setStyle("-fx-padding: 20; -fx-alignment: center;");
+
+        popup2.setScene(new Scene(layout2, 250, 150));
+        popup2.showAndWait();
+
+
+
+        return userValue;  // Return final integer value
     }
 
     /**
