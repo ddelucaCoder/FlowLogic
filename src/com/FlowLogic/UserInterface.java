@@ -321,6 +321,8 @@ public class UserInterface extends Application {
         Button simulate = new Button("Simulate");
         simulate.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         simulate.setOnAction(e -> {
+            scale.setY(maxZoom);
+            scale.setX(maxZoom);
             //Add prompt for vehicle selection here
             int [] back = simPrompt(stage);
             TrafficController tc = new TrafficController(back[0],back[1], grid);
@@ -1561,13 +1563,17 @@ public class UserInterface extends Application {
         options.getChildren().add(closeButton);
 
         fixRoad.setOnAction(e -> {
-            grid.synchronizeGrid();
             Rectangle cell = grid.getFrontGrid()[row][col];
-            System.out.println(grid.getFrontGrid()[row][col].toString());
+            if (cell == null) {
+                cell = new Rectangle();
+                grid.getFrontGrid()[row][col] = cell;
+            }
+            //System.out.println(grid.getFrontGrid()[row][col].toString());
             cell.setFill(new ImagePattern(image));
             grid.remove(row, col);
             grid.addObject(hazard.getCoveredObject(), row, col);
             grid.mergeRoads(row, col);
+            grid.synchronizeGrid();
         });
 
         closeButton.setOnAction(e -> {

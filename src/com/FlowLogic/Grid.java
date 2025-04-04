@@ -2,6 +2,7 @@ package com.FlowLogic;
 
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
@@ -705,7 +706,7 @@ public class Grid {
             return;
         }
         grid[row][col] = null;
-        frontGrid[row][col] = new Rectangle();
+        frontGrid[row][col] = null;
         if (obj == getAtSpot(row - 1, col)) {
             remove(row - 1, col);
         }
@@ -1286,6 +1287,7 @@ public class Grid {
      * This function updates the frontend to represent the backend
      */
     public void synchronizeGrid(){
+        UserInterface.refreshGrid(numRows);
         for (int i = 0; i < numRows; i++) {
             for (int k = 0; k < numColumns; k++) {
                 if (grid[i][k] != null) {
