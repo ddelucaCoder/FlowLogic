@@ -627,10 +627,12 @@ public class Grid {
             else {
                 UserInterface.showRoadOptions(optionLayout, this, row, col);
             }
-        } else if (obj instanceof StopLight) {
+        }  else if (obj instanceof StopLight) {
             UserInterface.showTrafficLightOptions(optionLayout, this, row, col);
         } else if (obj instanceof Hazard) {
             UserInterface.showHazardOptions(optionLayout, this, row, col);
+        } else if (obj instanceof  Intersection) {
+            UserInterface.showIntersectionOptions(optionLayout, this, row, col);
         }
     }
 
