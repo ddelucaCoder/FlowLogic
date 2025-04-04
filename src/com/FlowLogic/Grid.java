@@ -1015,6 +1015,9 @@ public class Grid {
                     int count = 0;
                     int lastID = -1;
                     while (!(cur instanceof Intersection)) {
+                        if (cur instanceof Hazard) {
+                            break;
+                        }
                         if (cur instanceof OneWayRoad d) {
                             count += (MAX_SPEED_LIMIT - d.getSpeedLimit() + 1); // weighted graph
                             if (checkAroundDest(d)) {
@@ -1046,6 +1049,9 @@ public class Grid {
                 int count = 0;
                 int lastID = -1;
                 while (!(cur instanceof Intersection)) {
+                    if (cur instanceof Hazard) {
+                        break;
+                    }
                     if (cur instanceof OneWayRoad d) {
                         count += (MAX_SPEED_LIMIT - d.getSpeedLimit() + 1); // weighted graph
                         if (checkAroundDest(d)) {
