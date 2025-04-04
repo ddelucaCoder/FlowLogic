@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Implemented Hazard functionality, still needs some bug fixes when fixing a hazard">
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Implemented save/load for MultiLaneConnect">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" afterDir="false" />
-
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +51,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "dom__dev",
+    "git-widget-placeholder": "isaac-dev",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -238,7 +235,6 @@
       <option name="project" value="LOCAL" />
       <updated>1743692104226</updated>
     </task>
-
     <task id="LOCAL-00020" summary="Implemented Hazard functionality, still needs some bug fixes when fixing a hazard">
       <option name="closed" value="true" />
       <created>1743710732756</created>
@@ -246,9 +242,16 @@
       <option name="presentableId" value="LOCAL-00020" />
       <option name="project" value="LOCAL" />
       <updated>1743710732756</updated>
-
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Implemented save/load for MultiLaneConnect">
+      <option name="closed" value="true" />
+      <created>1743740343175</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1743740343175</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -320,15 +323,14 @@
     <MESSAGE value="fixed building colors" />
     <MESSAGE value="Added gridToGraph Algorithm (not tested)" />
     <MESSAGE value="Fixed grid to graph algo and tested it" />
-    <MESSAGE value="for pull" />
     <MESSAGE value="Implemented basic multilaneConnect class" />
     <MESSAGE value="Implemented basic hazard class" />
     <MESSAGE value="Worked on implementation of multilane containers" />
     <MESSAGE value="finished implementation of mergeRoads method to combine a road and roads around it into a MultiLane object" />
     <MESSAGE value="Finalized MultiLaneConnect implementation into front/backend" />
-
     <MESSAGE value="Implemented Hazard functionality, still needs some bug fixes when fixing a hazard" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented Hazard functionality, still needs some bug fixes when fixing a hazard" />
-
+    <MESSAGE value="for pull" />
+    <MESSAGE value="Implemented save/load for MultiLaneConnect" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented save/load for MultiLaneConnect" />
   </component>
 </project>
