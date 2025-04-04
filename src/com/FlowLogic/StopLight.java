@@ -75,7 +75,7 @@ public class StopLight extends Intersection implements GridObject {
         if (lightOneColor == YELLOW) {
             lightOneColor = RED;
             lightTwoColor = GREEN;
-            this.imageFile = getRedYellow4WayImage();
+            this.imageFile = getRedGreen4WayImage();
             return YELLOW_TIMING;
         } else if (lightOneColor == GREEN) {
             lightOneColor = YELLOW;
@@ -105,7 +105,7 @@ public class StopLight extends Intersection implements GridObject {
         if (timer <= 0) {
             StopLight clone = (StopLight) this.clone();
             timer = switchLights();
-            return new Step(clone, this);
+            return new Step(clone, new StopLight(this));
         }
         return null;
     }
