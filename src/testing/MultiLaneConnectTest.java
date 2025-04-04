@@ -118,13 +118,13 @@ public class MultiLaneConnectTest {
         grid.addObject(road1, 5, 5);
         grid.addObject(road2, 6, 5);
 
-        // Get the initial container
-        MultiLaneConnect initialContainer = road1.getLaneContainer();
-        int initialContainerCount = initialContainer.getCount();
-
         // Add a third lane
         OneWayRoad road3 = new OneWayRoad(Orientation.HORIZONTAL, Direction.RIGHT);
         grid.addObject(road3, 7, 5);
+
+        // Verify road1 and road2 are now apart of the same container as road3
+        MultiLaneConnect initialContainer = road1.getLaneContainer();
+        int initialContainerCount = initialContainer.getCount();
 
         // Verify the third road is added to the same container
         assertEquals(initialContainer, road3.getLaneContainer(),
