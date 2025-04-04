@@ -47,6 +47,9 @@ public class Vehicle {
     private final int FAST_DECEL = 6;
 
     private final int ACCEL = 3;
+    private StopSign lastStopped;
+
+
 
     public Vehicle(int length) {
         this.length = length;
@@ -174,29 +177,10 @@ public class Vehicle {
     private boolean decelerate(Grid g) {
         // check if car in front
         // TODO: Check in front for car
-        // check if nearing destination
-        for (int i = 0; i < (speed / 10) * 32; i += 32) {
-            if (getCurrentGridObject(g, front(20)) instanceof OneWayRoad r && g.checkAroundDest(r)) {
-                speed -= SLOW_DECEL;
-                if (speed < 5) speed = 5;
-                return true;
-            }
-        }
-
-        // check if car nearing intersection
-        if ((getCurrentGridObject(g, front(20)) instanceof StopSign ||
-            getCurrentGridObject(g, front(40)) instanceof StopSign)
-            && speed > 10) {
-            speed -= SLOW_DECEL;
-            return true;
-        } else if ((getCurrentGridObject(g, front(10)) instanceof StopSign ||
-                   getCurrentGridObject(g, front(5)) instanceof StopSign)
-                   && speed > 8) {
-            speed -= FAST_DECEL;
-            if (speed <= 5) {
-                speed = 5;
-            }
-            if (getCurrentGridObject(g, front(5)) instanceof StopSign s) {
+        System.out.println(getCurrentGridObject(g, front(5)));
+        if (getCurrentGridObject(g, front(5)) instanceof StopSign s) {
+            if (lastStopped != s) {
+                lastStopped = s;
                 speed = 0;
                 s.getQueue().add(this);
                 if (directionPath.get(1) != direction) {
@@ -204,22 +188,22 @@ public class Vehicle {
                 } else {
                     state = STOPPED_FORWARD;
                 }
+                return true;
             }
-            return true;
+        }
+        // check if nearing destination or stop sign
+        for (int i = 0; i < ((speed / 10) + 1) * 32; i += 32) {
+            if (getCurrentGridObject(g, front(i)) instanceof Road r && r.getIntersectionID() == endRoadID ||
+                getCurrentGridObject(g, front(i)) instanceof StopSign j) { //
+                // TODO: make this smoother (always takes 3 frames until its under 5?)
+                // assume dist is i
+                if (speed > i / 3) speed = i / 3;
+                if (speed < 5) speed = 5;
+                return true;
+            }
         }
 
-        // if we are super close to the stop sign, then stop
 
-        if (getCurrentGridObject(g, front(5)) instanceof StopSign s) {
-            speed = 0;
-            s.getQueue().add(this);
-            if (directionPath.get(1) != direction) {
-                state = STOPPED_TURNING;
-            } else {
-                state = STOPPED_FORWARD;
-            }
-            return true;
-        }
         // TODO: stoplight logic
         return false;
     }
@@ -314,7 +298,7 @@ public class Vehicle {
                 // TODO: Stoplight logic
                 // check if were moving
             }
-            return null;
+            return new Step(new Vehicle(this), new Vehicle(this));
         } else if (state == STOPPED_TURNING) {
             if (currentIntersection instanceof StopLight) {
                 // TODO: Stoplight logic

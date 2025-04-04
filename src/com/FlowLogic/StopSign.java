@@ -1,10 +1,10 @@
 package com.FlowLogic;
 import javafx.scene.image.Image;
 
+import java.util.ArrayDeque;
 import java.util.Queue;
 public class StopSign extends Intersection {
-    private Queue<Vehicle> queue;
-
+    private Queue<Vehicle> queue = new ArrayDeque<Vehicle>();
     private final int WAIT_TIME = 10; // TODO: adjust if necessary
     int timer = WAIT_TIME;
 
@@ -26,8 +26,10 @@ public class StopSign extends Intersection {
         timer--;
         if (timer <= 0) {
             timer = WAIT_TIME;
-            Vehicle go = queue.remove();
-            go.stopSignLetGo();
+            if (!queue.isEmpty()) {
+                Vehicle go = queue.remove();
+                go.stopSignLetGo();
+            }
         }
         return null;
     }

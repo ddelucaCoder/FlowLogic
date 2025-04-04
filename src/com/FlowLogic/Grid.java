@@ -968,6 +968,15 @@ public class Grid {
 
     public int[][] gridToGraph() {
         //TODO: ADD DESTINATIONS AND IN ROADS
+        if (intersections != null) {
+            for (GridObject i : intersections) {
+                if (i instanceof Intersection in) {
+                    in.setIntersectionID(-1);
+                } else if (i instanceof Road) {
+                    ((Road) i).setIntersectionID(-1);
+                }
+            }
+        }
         intersections = new ArrayList<>();
         // count intersections
         int numIntersections = 0;
@@ -995,6 +1004,7 @@ public class Grid {
         for (GridObject obj : intersections) {
             if (obj instanceof Intersection i) {
                 ArrayList<OneWayRoad> roads = getOutRoadsAround(i);
+                int originalID = i.getIntersectionID();
                 for (OneWayRoad r : roads) {
                     GridObject cur = r;
                     int count = 0;
@@ -1023,7 +1033,7 @@ public class Grid {
                         lastID = j.getIntersectionID();
                     }
                     if (lastID != -1) {
-                        graph[r.getIntersectionID()][lastID] = count;
+                        graph[originalID][lastID] = count;
                     }
                 }
             } else if (obj instanceof Road r) {
