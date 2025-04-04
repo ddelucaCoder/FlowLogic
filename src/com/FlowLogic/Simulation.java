@@ -118,6 +118,19 @@ public class Simulation {
                         if (newObj instanceof StopLight) {
                             StopLight light = (StopLight) newObj;
                             Rectangle rect = grid.getFrontGrid()[light.getRowNum()][light.getColNum()];
+                            //double cell_size = (720.0)/GRID_SIZE;
+                            int x = light.getColNum() * Grid.GRID_SIZE;
+                            int y = light.getRowNum() * Grid.GRID_SIZE;
+
+                            x = (int) (((x * 1.0))); ///32)) * cell_size);
+                            y = (int) (((y * 1.0))); ///32)) * cell_size);
+
+                            rect.setX(x);
+                            rect.setY(y);
+
+
+                            if (light.getLightOneColor() != 0) rect.setRotate(90);
+                            else rect.setRotate(0);
                             rect.setFill(new ImagePattern(light.getImageFile()));
                         }
                     }
