@@ -450,15 +450,16 @@ public class Vehicle {
         // LENGTH = x LENGTH
         // WIDTH = y LENGTH
         if (direction == RIGHT) {
-            return new int[]{x + length + delta, y + (int) (0.5 * width)};
+            return new int[]{x + length + delta, y};
         } else if (direction == LEFT) {
-            return new int[]{x - length - delta, y - (int) (0.5 * width)};
+            return new int[]{x - length - delta, y};
         } else if (direction == UP) {
-            return new int[]{x - (int) (0.5 * width), y - length - delta};
+            return new int[]{x, y - length - delta};
         } else {
-            return new int[]{x - (int) (0.5 * width), y + (length) + delta};
+            return new int[]{x, y + (length) + delta};
         }
     }
+
 
     private int[] left(int delta) {
         // COORDINATES ARE TOP LEFT OF CAR
