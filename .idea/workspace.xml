@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Attempt to fix hazard">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="for pull" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -258,7 +256,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743744002144</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="for pull">
+      <option name="closed" value="true" />
+      <created>1743763328574</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1743763328574</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -336,9 +342,9 @@
     <MESSAGE value="finished implementation of mergeRoads method to combine a road and roads around it into a MultiLane object" />
     <MESSAGE value="Finalized MultiLaneConnect implementation into front/backend" />
     <MESSAGE value="Implemented Hazard functionality, still needs some bug fixes when fixing a hazard" />
-    <MESSAGE value="for pull" />
     <MESSAGE value="Implemented save/load for MultiLaneConnect" />
     <MESSAGE value="Attempt to fix hazard" />
-    <option name="LAST_COMMIT_MESSAGE" value="Attempt to fix hazard" />
+    <MESSAGE value="for pull" />
+    <option name="LAST_COMMIT_MESSAGE" value="for pull" />
   </component>
 </project>

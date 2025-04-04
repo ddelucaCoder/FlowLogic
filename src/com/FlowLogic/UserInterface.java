@@ -335,6 +335,7 @@ public class UserInterface extends Application {
             root.getChildren().remove(right);
             root.getChildren().remove(left);
             sim.display(stage, root, gridContainer, grid); // display the simulation
+            grid.synchronizeGrid();
         });
         right.getChildren().add(simulate);
 
