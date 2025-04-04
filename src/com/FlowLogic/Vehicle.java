@@ -41,7 +41,7 @@ public class Vehicle {
     int curRotation = 0; // ASSUME THIS IS DEGREES
     Rectangle car;
 
-    private final int TURN_RATE = 1;
+    private final int TURN_RATE = 10;
     private final int FOLLOWING_DISTANCE = 10;
     private final int SLOW_DECEL = 2;
     private final int FAST_DECEL = 6;
@@ -213,22 +213,21 @@ public class Vehicle {
         // first move the vehicle to the center of the block
 
         // our intersection coords
-        GridObject i = intersectionPath.get(0);
+        GridObject i = intersectionPath.get(1);
         int[] intersectionCoords = Grid.getRealCoords(i);
 
         // move to center
-        this.x = intersectionCoords[0] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.width);
-        this.y = intersectionCoords[1] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.length);
+        this.x = intersectionCoords[1] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.length);
+        this.y = intersectionCoords[0] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.width);
 
-        // TODO: check the angles
-
-        curRotation += TURN_RATE;
+        curRotation -= TURN_RATE;
 
         if (curRotation % 90 == 0) {
             // done turning
             state = FORWARD;
             intersectionPath.remove(0);
             directionPath.remove(0);
+            direction = directionPath.get(0);
         }
 
         return new Step(past, new Vehicle(this));
@@ -239,22 +238,21 @@ public class Vehicle {
         // first move the vehicle to the center of the block
 
         // our intersection coords
-        GridObject i = intersectionPath.get(0);
+        GridObject i = intersectionPath.get(1);
         int[] intersectionCoords = Grid.getRealCoords(i);
 
         // move to center
-        this.x = intersectionCoords[0] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.width);
-        this.y = intersectionCoords[1] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.length);
+        this.x = intersectionCoords[1] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.width);
+        this.y = intersectionCoords[0] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.length);
 
-        // TODO: check the angles
-
-        curRotation -= TURN_RATE;
+        curRotation += TURN_RATE;
 
         if (curRotation % 90 == 0) {
             // done turning
             state = FORWARD;
             intersectionPath.remove(0);
             directionPath.remove(0);
+            direction = directionPath.get(0);
         }
 
         return new Step(past, new Vehicle(this));
