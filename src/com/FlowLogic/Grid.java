@@ -242,6 +242,20 @@ public class Grid {
                         //idk
                     case "Hazard":
                         Hazard hazard = new Hazard(row, col);
+                        orientation = Orientation.valueOf(properties.getString("orientation"));
+                        speedLimit = properties.getInt("speedLimit");
+                        length = properties.getInt("length");
+                        isInRoad = properties.getBoolean("isInRoad");
+                        inCars = properties.getInt("inCars");
+                        direction = Direction.valueOf(properties.getString("direction"));
+                        numLanes = properties.getInt("numLanes");
+                        name = properties.getString("name");
+                        vehicleList = new ArrayList<>();
+                        OneWayRoad hazardRoad = new OneWayRoad(orientation, speedLimit, isInRoad, inCars, row, col, direction,
+                                numLanes, vehicleList);
+                        hazardRoad.setLength(length);
+                        hazardRoad.setName(name);
+                        hazard.setCoveredObject(hazardRoad);
                         gridObject = hazard;
                         break;
                 }
@@ -441,7 +455,16 @@ public class Grid {
                         properties.put("numCars", parking.getNumCars());
                     }
                     else if (obj instanceof Hazard hazard) {
-
+                        OneWayRoad road = (OneWayRoad) hazard.getCoveredObject();
+                        properties.put("orientation", road.getOrientation());
+                        properties.put("speedLimit", road.getSpeedLimit());
+                        properties.put("length", road.getLength());
+                        properties.put("isInRoad", road.isInRoad());
+                        properties.put("inCars", road.getInCars());
+                        properties.put("direction", road.getDirection());
+                        properties.put("numLanes", road.getNumLanes());
+                        properties.put("vehicleList", road.getVehicleList());
+                        properties.put("name", road.getName());
                     }
 
                     cellJson.put("properties", properties);
