@@ -460,6 +460,7 @@ public class Vehicle {
         }
     }
 
+
     private int[] left(int delta) {
         // COORDINATES ARE TOP LEFT OF CAR
         // LENGTH = x LENGTH in right facing orientation

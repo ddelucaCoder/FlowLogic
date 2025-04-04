@@ -1674,7 +1674,6 @@ public class UserInterface extends Application {
                             grid.changeRoadDirection(r, c, newDirection);
                         }
                     }
-                    // TODO: Implement Road Flip for Two Way Roads
                 }
             }
             options.getChildren().clear();
@@ -1717,6 +1716,153 @@ public class UserInterface extends Application {
 
      closeButton.setOnAction(e -> {
          options.getChildren().clear();
+        });
+    }
+
+    public static void showIntersectionOptions(VBox mainLayout, Grid grid, int row, int col) {
+        options.getChildren().clear();
+        Label titleLabel = new Label("Intersection Options");
+        Button changeButton = new Button("Change Intersection Type");
+        Button removeButton = new Button("Remove Intersection");
+        Button closeButton = new Button("Close Options Menu");
+
+        options.getChildren().add(titleLabel);
+        options.getChildren().add(changeButton);
+        options.getChildren().add(removeButton);
+        options.getChildren().add(closeButton);
+
+        changeButton.setOnAction(e -> {
+            // Get current intersection
+            GridObject currentObject = grid.getGrid()[row][col];
+
+            // Create popup for intersection type selection
+            Stage popup = new Stage();
+            popup.initModality(Modality.APPLICATION_MODAL);
+            popup.setTitle("Select Intersection Type");
+
+            VBox popupLayout = new VBox(10);
+            popupLayout.setPadding(new Insets(10));
+            popupLayout.setAlignment(Pos.CENTER);
+
+            Label selectLabel = new Label("Select new intersection type:");
+            popupLayout.getChildren().add(selectLabel);
+
+            // Create buttons for each intersection type except current one
+            if (!(currentObject instanceof Roundabout)) {
+                Button roundaboutButton = new Button("Roundabout");
+                roundaboutButton.setOnAction(event -> {
+                    Road[] roads = null;
+
+                    // Preserve connected roads
+                    if (currentObject instanceof Intersection) {
+                        roads = ((Intersection) currentObject).getRoadList();
+                    }
+
+                    Boolean[] availableSpots = new Boolean[]{true, true, true, true};
+                    Roundabout newRoundabout = new Roundabout(availableSpots);
+                    newRoundabout.setRowNum(row);
+                    newRoundabout.setColNum(col);
+
+                    grid.getGrid()[row][col] = newRoundabout;
+                    grid.getFrontGrid()[row][col].setFill(new ImagePattern(new Image("file:Images/roundabout.png")));
+                    refreshGrid(GRID_SIZE);
+                    popup.close();
+                });
+                popupLayout.getChildren().add(roundaboutButton);
+            }
+
+            if (!(currentObject instanceof StopSign)) {
+                Button stopSignButton = new Button("Stop Sign");
+                stopSignButton.setOnAction(event -> {
+                    Road[] roads = null;
+
+                    // Preserve connected roads
+                    if (currentObject instanceof Intersection) {
+                        roads = ((Intersection) currentObject).getRoadList();
+                    } else {
+                        roads = new Road[4];
+                    }
+
+                    StopSign newStopSign = new StopSign(row, col, roads);
+                    grid.getGrid()[row][col] = newStopSign;
+                    popup.close();
+                    refreshGrid(GRID_SIZE);
+                    grid.getFrontGrid()[row][col].setFill(new ImagePattern(new Image("file:Images/4WayStopSign.png")));
+                });
+                popupLayout.getChildren().add(stopSignButton);
+            }
+
+            if (!(currentObject instanceof StopLight)) {
+                Button stopLightButton = new Button("Stop Light");
+                stopLightButton.setOnAction(event -> {
+                    Road[] roads = null;
+
+                    // Preserve connected roads
+                    if (currentObject instanceof Intersection) {
+                        roads = ((Intersection) currentObject).getRoadList();
+                    } else {
+                        roads = new Road[4];
+                    }
+
+                    // Default settings for the stoplight
+                    Road roadOne = roads[0]; // vertical
+                    Road roadTwo = roads[1]; // horizontal
+                    int timingOne = 30;
+                    int timingTwo = 30;
+                    int lightOneColor = 2; // GREEN
+                    int lightTwoColor = 0; // RED
+
+                    StopLight newStopLight = new StopLight(roadOne, roadTwo, timingOne, timingTwo,
+                            lightOneColor, lightTwoColor, roads, row, col);
+                    newStopLight.initializeStopLightGraphics();
+                    grid.getGrid()[row][col] = newStopLight;
+                    popup.close();
+                    grid.getFrontGrid()[row][col].setFill(new ImagePattern(new Image("file:Images/AllRed4WayStopLight.png")));
+                    refreshGrid(GRID_SIZE);
+                });
+                popupLayout.getChildren().add(stopLightButton);
+            }
+
+            if (!(currentObject instanceof Intersection) ||
+                    (currentObject instanceof StopSign) ||
+                    (currentObject instanceof StopLight)) {
+                Button basicIntersectionButton = new Button("Basic Intersection");
+                basicIntersectionButton.setOnAction(event -> {
+                    Road[] roads = null;
+
+                    // Preserve connected roads
+                    if (currentObject instanceof Intersection) {
+                        roads = ((Intersection) currentObject).getRoadList();
+                    } else {
+                        roads = new Road[4];
+                    }
+
+                    Intersection newIntersection = new Intersection(row, col, roads);
+                    grid.getGrid()[row][col] = newIntersection;
+                    refreshGrid(GRID_SIZE);
+                    grid.getFrontGrid()[row][col].setFill(new ImagePattern(new Image("file:Images/BasicIntersection.png")));
+                    popup.close();
+                });
+                popupLayout.getChildren().add(basicIntersectionButton);
+            }
+
+            Button cancelButton = new Button("Cancel");
+            cancelButton.setOnAction(event -> popup.close());
+            popupLayout.getChildren().add(cancelButton);
+
+            Scene popupScene = new Scene(popupLayout, 250, 250);
+            popup.setScene(popupScene);
+            popup.showAndWait();
+        });
+
+        removeButton.setOnAction(e -> {
+            grid.remove(row, col);
+            refreshGrid(GRID_SIZE);
+            options.getChildren().clear();
+        });
+
+        closeButton.setOnAction(e -> {
+            options.getChildren().clear();
         });
     }
 
