@@ -11,9 +11,7 @@ import java.util.List;
  * @version February 23, 2025
  */
 
-public class Roundabout implements GridObject {
-    int rowNum;
-    int colNum;
+public class Roundabout extends Intersection{
     Boolean availableSpots[];
 
 
@@ -29,12 +27,14 @@ public class Roundabout implements GridObject {
      *                       Index:2 = 180 degrees
      *                       Index:3 = 3/2 pi radians
      */
-    public Roundabout(Boolean[] availableSpots) {
+    public Roundabout(Boolean[] availableSpots, int row, int col, Road[] roadList) {
+        super(row, col, roadList);
         this.availableSpots = new Boolean[4];
         this.imageFile = new Image("file:Images/roundabout.png");
     }
 
     public Roundabout(Roundabout r) {
+        super(r.getRowNum(), r.getColNum(), r.getRoadList());
         this.availableSpots = r.getAvailableSpots();
         this.imageFile = r.getImageFile();
     }
@@ -63,21 +63,7 @@ public class Roundabout implements GridObject {
      * Getter and Setter Methods
      */
 
-    public int getRowNum() {
-        return rowNum;
-    }
 
-    public void setRowNum(int rowNum) {
-        this.rowNum = rowNum;
-    }
-
-    public int getColNum() {
-        return colNum;
-    }
-
-    public void setColNum(int colNum) {
-        this.colNum = colNum;
-    }
 
     public Boolean[] getAvailableSpots() {
         return availableSpots;
@@ -87,16 +73,6 @@ public class Roundabout implements GridObject {
         this.availableSpots = availableSpots;
     }
 
-    /*
-     * toString Method for Debugging Purposes
-     */
-    public String toString() {
-        return "Roundabout{" +
-                "rowNum=" + rowNum +
-                ", colNum=" + colNum +
-                ", availableSpots=" + availableSpots +
-                '}';
-    }
     public Image getImageFile() {
         return imageFile;
     }

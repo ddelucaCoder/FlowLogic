@@ -191,6 +191,9 @@ public class Vehicle {
                 return true;
             }
         }
+        if (getCurrentGridObject(g, front(5)) instanceof Roundabout r) {
+
+        }
         // check if nearing destination or stop sign
         for (int i = 0; i < ((speed / 10) + 1) * 32; i += 32) {
             if (getCurrentGridObject(g, front(i)) instanceof Road r && r.getIntersectionID() == endRoadID ||

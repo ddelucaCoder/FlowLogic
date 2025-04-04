@@ -1759,9 +1759,7 @@ public class UserInterface extends Application {
                     }
 
                     Boolean[] availableSpots = new Boolean[]{true, true, true, true};
-                    Roundabout newRoundabout = new Roundabout(availableSpots);
-                    newRoundabout.setRowNum(row);
-                    newRoundabout.setColNum(col);
+                    Roundabout newRoundabout = new Roundabout(availableSpots, row, col, new Road[4]);
 
                     grid.getGrid()[row][col] = newRoundabout;
                     grid.getFrontGrid()[row][col].setFill(new ImagePattern(new Image("file:Images/roundabout.png")));

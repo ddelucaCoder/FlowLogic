@@ -72,7 +72,7 @@ public class Grid {
         imgToObj.put("TwoWayRoad.png", new TwoWayRoad(Orientation.VERTICAL));
         imgToObj.put("4WayStopSign.png", new StopSign(0, 0, new Road[4]));
         imgToObj.put("AllRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
-        imgToObj.put("roundabout.png", new Roundabout(new Boolean[4]));
+        imgToObj.put("roundabout.png", new Roundabout(new Boolean[4], 0 ,0, null));
         imgToObj.put("YellowRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("RedYellow4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("GreenRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
@@ -236,7 +236,7 @@ public class Grid {
                         gridObject = stopLight;
                         break;
                     case "Roundabout":
-                        Roundabout roundabout = new Roundabout(new Boolean[4]);
+                        Roundabout roundabout = new Roundabout(new Boolean[4], row, col, new Road[4]);
                         gridObject = roundabout;
                         break;
                         //idk
