@@ -16,6 +16,8 @@ public class Vehicle {
 
     int length;
     int width = 10;
+    int roundAboutPos = -1;
+    Roundabout curRoundabout = null;
 
     ArrayList<GridObject> intersectionPath;
     ArrayList<Direction> directionPath;
@@ -192,8 +194,15 @@ public class Vehicle {
             }
         }
         if (getCurrentGridObject(g, front(5)) instanceof Roundabout r) {
-            speed = 0;
-            r.getQueue().add(this);
+            if (curRoundabout != r) {
+                speed = 0;
+                r.getQueue().add(this);
+                if (directionPath.get(0) != directionPath.get(1)) {
+                    state = STOPPED_TURNING;
+                } else {
+                    state = STOPPED_FORWARD;
+                }
+            }
         }
         // check if nearing destination or stop sign
         for (int i = 0; i < ((speed / 10) + 1) * 32; i += 32) {
@@ -320,6 +329,53 @@ public class Vehicle {
                 || (direction == LEFT && next == DOWN)) {
                 return this.turnRight();
             }
+        } else if (state == ROUND_ABOUT_GO) {
+            Vehicle old = new Vehicle(this);
+            curRoundabout.availableSpots[roundAboutPos] = true;
+            roundAboutPos += 1;
+            roundAboutPos %= 4;
+            int coords[] = Grid.getRealCoords(this.curRoundabout);
+            int roundX = coords[1];
+            int roundY = coords[0];
+            curRoundabout.availableSpots[roundAboutPos] = false;
+            switch (roundAboutPos) {
+                case 0:
+                    x = roundX + 10;
+                    y = roundY;
+                    if (directionPath.get(0) == RIGHT) {
+                        this.curRotation = 90;
+                        this.state = FORWARD;
+                    }
+                    break;
+                case 1:
+                    y = roundY + 10;
+                    x = roundX;
+                    if (directionPath.get(0) == UP) {
+                        this.curRotation = 0;
+                        this.state = FORWARD;
+                    }
+                    break;
+                case 2:
+                    x = roundX - 10;
+                    y = roundY;
+                    if (directionPath.get(0) == LEFT) {
+                        this.curRotation = 270;
+                        this.state = FORWARD;
+                    }
+                    break;
+                case 3:
+
+                    y = roundY + 10;
+                    x = roundX;
+                    if (directionPath.get(0) == DOWN) {
+                        this.curRotation = 180;
+                        this.state = FORWARD;
+                    }
+                    break;
+            }
+
+
+            return new Step(old, new Vehicle(this));
         }
         return null;
     }
@@ -340,12 +396,17 @@ public class Vehicle {
             case DOWN -> entryPoint = 1;
             case LEFT -> entryPoint = 0;
         }
+
         int prev = (entryPoint - 1 == -1) ? 3 : entryPoint - 1;
         if (r.getAvailableSpots()[entryPoint] && r.getAvailableSpots()[prev]) {
             //If it is able to advance into the roundabout (spot clear)
             System.out.println("Entering slot:" + entryPoint);
             r.getAvailableSpots()[entryPoint] = false;
+            curRoundabout = r;
+            roundAboutPos = entryPoint;
+            state = ROUND_ABOUT_GO;
         }
+
     }
 
     public void setInOut(Road r, Road d) {
