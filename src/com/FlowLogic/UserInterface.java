@@ -1,6 +1,8 @@
 package com.FlowLogic;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -1368,11 +1370,24 @@ public class UserInterface extends Application {
         Button leftButt = new Button("Change Direction Left");
         Button rightButt = new Button("Change Direction Right");
         Button removeButton = new Button("Remove Road");
+        Label speedLabel = new Label("Speed Limit:");
+        TextField speedField = new TextField();
         Button closeButton = new Button("Close Road Options");
         CheckBox inRoad = new CheckBox("Make Input Road");
         Label multiLabel = new Label(multiLane);
         Button addLaneRight = new Button("Add Lane to the Right");
         Button addLaneLeft = new Button("Add Lane to the Left");
+
+        TextFormatter<String> numberFormatter = new TextFormatter<>(change -> {
+            if (change.getText().matches("[0-9]*")) {
+                return change;  // Accept change
+            }
+            return null;  // Reject change
+        });
+
+        speedField.setTextFormatter(numberFormatter);
+        speedField.setText(Integer.toString(oneRoad.getSpeedLimit()));
+
 
         options.getChildren().add(titleLabel);
         options.getChildren().add(renameButt);
@@ -1381,10 +1396,13 @@ public class UserInterface extends Application {
         options.getChildren().add(leftButt);
         options.getChildren().add(rightButt);
         options.getChildren().add(removeButton);
-        options.getChildren().add(closeButton);
+        options.getChildren().add(speedLabel);
+        options.getChildren().add(speedField);
         options.getChildren().add(multiLabel);
         options.getChildren().add(addLaneLeft);
         options.getChildren().add(addLaneRight);
+        options.getChildren().add(closeButton);
+
 
         OneWayRoad road = (OneWayRoad) grid.getGrid()[row][col];
         if ((row == 0 && road.getDirection() == Direction.DOWN) ||
@@ -1528,6 +1546,18 @@ public class UserInterface extends Application {
 
             showRoadOptions(mainLayout, grid, row, col);
             refreshGrid(GRID_SIZE);
+        });
+
+        speedField.textProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                Set<int[]> connectedRoads = grid.getConnectedRoadTiles(row, col);
+                for (int[] coord : connectedRoads) {
+                    GridObject obj = grid.getAtSpot(coord[0], coord[1]);
+                    if (obj instanceof Road) {
+                        ((Road) obj).setSpeedLimit(Integer.parseInt(t1));
+                    }
+                }
+            }
         });
 
         closeButton.setOnAction(e -> {
