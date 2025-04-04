@@ -705,7 +705,7 @@ public class Grid {
             return;
         }
         grid[row][col] = null;
-        frontGrid[row][col] = new Rectangle();
+        frontGrid[row][col].setFill(null);
         if (obj == getAtSpot(row - 1, col)) {
             remove(row - 1, col);
         }

@@ -1426,6 +1426,8 @@ public class UserInterface extends Application {
         rightButt.setOnAction(e -> {
 
             Rectangle cell = grid.getFrontGrid()[row][col];
+
+            System.out.println(grid.getFrontGrid()[row][col]);
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
             grid.placeObjectByImage("RoadImageRight.png", row, col);
             grid.changeRoadDirection(row, col, Direction.RIGHT);
@@ -1433,6 +1435,8 @@ public class UserInterface extends Application {
 
             showRoadOptions(mainLayout, grid, row, col);
             refreshGrid(GRID_SIZE);
+
+            System.out.println(grid.getFrontGrid()[row][col]);
         });
 
         removeButton.setOnAction(e -> {
@@ -1484,13 +1488,16 @@ public class UserInterface extends Application {
         options.getChildren().add(closeButton);
 
         fixRoad.setOnAction(e -> {
-            grid.synchronizeGrid();
-            Rectangle cell = grid.getFrontGrid()[row][col];
-            System.out.println(grid.getFrontGrid()[row][col].toString());
-            cell.setFill(new ImagePattern(image));
             grid.remove(row, col);
             grid.addObject(hazard.getCoveredObject(), row, col);
             grid.mergeRoads(row, col);
+            Rectangle cell = grid.getFrontGrid()[row][col];
+            grid.placeObjectByImage("RoadImage.png", row, col);
+            cell.setFill(new ImagePattern(image));
+            refreshGrid(GRID_SIZE);
+            System.out.println(image);
+            System.out.println(grid.getAtSpot(row,col));
+            System.out.println(grid.getFrontGrid()[row][col]);
         });
 
         closeButton.setOnAction(e -> {

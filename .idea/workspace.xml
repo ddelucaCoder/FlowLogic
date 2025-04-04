@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Finalized MultiLaneConnect implementation into front/backend">
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Implemented Hazard functionality, still needs some bug fixes when fixing a hazard">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Grid.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Hazard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Hazard.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/UserInterface.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -84,7 +83,7 @@
       <workItem from="1740443332602" duration="4938000" />
       <workItem from="1740664465878" duration="1514000" />
       <workItem from="1740752532896" duration="1056000" />
-      <workItem from="1743550897074" duration="27520000" />
+      <workItem from="1743550897074" duration="29654000" />
     </task>
     <task id="LOCAL-00001" summary="implemented onewayroad class">
       <option name="closed" value="true" />
@@ -237,7 +236,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743692104226</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Implemented Hazard functionality, still needs some bug fixes when fixing a hazard">
+      <option name="closed" value="true" />
+      <created>1743710732756</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1743710732756</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -315,6 +322,7 @@
     <MESSAGE value="Worked on implementation of multilane containers" />
     <MESSAGE value="finished implementation of mergeRoads method to combine a road and roads around it into a MultiLane object" />
     <MESSAGE value="Finalized MultiLaneConnect implementation into front/backend" />
-    <option name="LAST_COMMIT_MESSAGE" value="Finalized MultiLaneConnect implementation into front/backend" />
+    <MESSAGE value="Implemented Hazard functionality, still needs some bug fixes when fixing a hazard" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented Hazard functionality, still needs some bug fixes when fixing a hazard" />
   </component>
 </project>
