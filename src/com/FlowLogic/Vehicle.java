@@ -202,6 +202,7 @@ public class Vehicle {
                 } else {
                     state = STOPPED_FORWARD;
                 }
+                directionPath.remove(0);
             }
         }
         // check if nearing destination or stop sign
