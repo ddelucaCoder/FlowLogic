@@ -17,7 +17,7 @@ public class Roundabout extends Intersection{
     Boolean availableSpots[] = {true, true, true, true};
     private Queue<Vehicle> queue = new ArrayDeque<Vehicle>();
 
-    private final int WAIT_TIME = 10; // TODO: adjust if necessary
+    private final int WAIT_TIME = 2; // TODO: adjust if necessary
     int timer = WAIT_TIME;
 
     private Image imageFile;
@@ -91,8 +91,8 @@ public class Roundabout extends Intersection{
     public Step tick() {
         timer--;
         if (timer <= 0) {
-            timer = WAIT_TIME;
             if (!queue.isEmpty()) {
+                timer = WAIT_TIME;
                 Vehicle go = queue.remove();
                 go.roundAboutGo(this);
             }

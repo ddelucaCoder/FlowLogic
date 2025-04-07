@@ -99,8 +99,8 @@ public class Simulation {
 
                         if (newObj instanceof Vehicle) {
                             Vehicle car = (Vehicle) newObj;
-                            int x = car.getX() + 16;
-                            int y = car.getY() + 16; //+16 should move it half a tile before scaling
+                            int x = car.getX();
+                            int y = car.getY();
                             double cell_size = (720 * 1.0)/GRID_SIZE;
                             x = (int) (((x * 1.0) /32) * cell_size);
                             y = (int) (((y * 1.0) /32) * cell_size);

@@ -114,11 +114,11 @@ public class Vehicle {
     private void spawn() {
         // TODO: spawn car in
         // set x and y
-        int coords[] = Grid.getRealCoords(this.intersectionPath.get(0));
+        int[] coords = Grid.getRealCoords(this.intersectionPath.get(0));
         int spawnX = coords[1]; // TODO: COORDINATES
         int spawnY = coords[0]; // TODO: COORDINATES
-        x = spawnX;
-        y = spawnY;
+        x = spawnX + 16;
+        y = spawnY + 16;
         // set speed
         speed = 0;
         // set direction
@@ -202,6 +202,7 @@ public class Vehicle {
                 } else {
                     state = STOPPED_FORWARD;
                 }
+                directionPath.remove(0);
             }
         }
         // check if nearing destination or stop sign
@@ -231,8 +232,8 @@ public class Vehicle {
         int[] intersectionCoords = Grid.getRealCoords(i);
 
         // move to center
-        this.x = intersectionCoords[1] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.length);
-        this.y = intersectionCoords[0] + (int) (0.5 * Grid.GRID_SIZE) - (int) (0.5 * this.width);
+        this.x = intersectionCoords[1] - (int) (0.5 * this.length);
+        this.y = intersectionCoords[0] - (int) (0.5 * this.width);
 
         curRotation -= TURN_RATE;
 
@@ -334,41 +335,44 @@ public class Vehicle {
             curRoundabout.availableSpots[roundAboutPos] = true;
             roundAboutPos += 1;
             roundAboutPos %= 4;
+            curRoundabout.availableSpots[roundAboutPos] = false;
             int coords[] = Grid.getRealCoords(this.curRoundabout);
             int roundX = coords[1];
             int roundY = coords[0];
-            curRoundabout.availableSpots[roundAboutPos] = false;
             switch (roundAboutPos) {
                 case 0:
-                    x = roundX + 10;
-                    y = roundY;
+                    x = roundX + 26;
+                    y = roundY + 16;
+                    this.curRotation = 90;
+                    this.direction = RIGHT;
                     if (directionPath.get(0) == RIGHT) {
-                        this.curRotation = 90;
                         this.state = FORWARD;
                     }
                     break;
                 case 1:
-                    y = roundY + 10;
-                    x = roundX;
+                    y = roundY + 6;
+                    x = roundX + 16;
+                    this.curRotation = 0;
+                    this.direction = UP;
                     if (directionPath.get(0) == UP) {
-                        this.curRotation = 0;
                         this.state = FORWARD;
                     }
                     break;
                 case 2:
-                    x = roundX - 10;
-                    y = roundY;
+                    x = roundX + 6;
+                    y = roundY + 16;
+                    this.curRotation = 270;
+                    this.direction = LEFT;
                     if (directionPath.get(0) == LEFT) {
-                        this.curRotation = 270;
                         this.state = FORWARD;
                     }
                     break;
                 case 3:
-
-                    y = roundY + 10;
-                    x = roundX;
+                    y = roundY + 26;
+                    x = roundX + 16;
+                    this.curRotation = 180;
+                    this.direction = DOWN;
                     if (directionPath.get(0) == DOWN) {
-                        this.curRotation = 180;
                         this.state = FORWARD;
                     }
                     break;
