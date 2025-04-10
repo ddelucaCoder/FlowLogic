@@ -365,6 +365,7 @@ public class Vehicle {
             roundAboutPos += 1;
             roundAboutPos %= 4;
             curRoundabout.availableSpots[roundAboutPos] = false;
+            System.out.println(Arrays.toString(curRoundabout.getAvailableSpots()));
             int coords[] = Grid.getRealCoords(this.curRoundabout);
             int roundX = coords[1];
             int roundY = coords[0];
@@ -376,6 +377,7 @@ public class Vehicle {
                     this.direction = RIGHT;
                     if (directionPath.get(0) == RIGHT) {
                         this.state = FORWARD;
+                        curRoundabout.availableSpots[roundAboutPos] = true;
                     }
                     break;
                 case 1:
@@ -385,6 +387,7 @@ public class Vehicle {
                     this.direction = UP;
                     if (directionPath.get(0) == UP) {
                         this.state = FORWARD;
+                        curRoundabout.availableSpots[roundAboutPos] = true;
                     }
                     break;
                 case 2:
@@ -394,6 +397,7 @@ public class Vehicle {
                     this.direction = LEFT;
                     if (directionPath.get(0) == LEFT) {
                         this.state = FORWARD;
+                        curRoundabout.availableSpots[roundAboutPos] = true;
                     }
                     break;
                 case 3:
@@ -403,6 +407,7 @@ public class Vehicle {
                     this.direction = DOWN;
                     if (directionPath.get(0) == DOWN) {
                         this.state = FORWARD;
+                        curRoundabout.availableSpots[roundAboutPos] = true;
                     }
                     break;
             }
