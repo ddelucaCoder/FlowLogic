@@ -87,12 +87,33 @@ public class Vehicle {
         this.currentIntersection = v.currentIntersection;
     }
 
-    private void spawn() {
+    private boolean spawn(List<Vehicle> allVehicles) {
         int[] coords = Grid.getRealCoords(this.intersectionPath.get(0));
         int spawnX = coords[1];
         int spawnY = coords[0];
-        x = spawnX + 16;
-        y = spawnY + 16;
+
+        // Create a temporary position for collision check
+        int tempX = spawnX + 16;
+        int tempY = spawnY + 16;
+
+        // Check if any existing vehicle is occupying the spawn location
+        for (Vehicle other : allVehicles) {
+            if (this == other) continue; // Skip self
+
+            // Calculate distance between spawn point and other vehicle center
+            double dx = tempX - other.getX();
+            double dy = tempY - other.getY();
+            double distance = Math.sqrt(dx*dx + dy*dy);
+
+            // If another vehicle is too close to our spawn point, don't spawn
+            if (distance < length) {
+                return false; // Cannot spawn, location occupied
+            }
+        }
+
+        // Location is clear, proceed with spawning
+        x = tempX;
+        y = tempY;
         speed = 0;
         direction = directionPath.get(0);
         state = FORWARD;
@@ -104,6 +125,8 @@ public class Vehicle {
             case LEFT -> curRotation = 270;
         }
         car = new Rectangle(x, y, width, length);
+
+        return true; // Successfully spawned
     }
 
     private void moveForward() {
@@ -320,8 +343,11 @@ public class Vehicle {
         if (state == NOT_SPAWNED) {
             this.timeIn--;
             if (this.timeIn <= 0) {
-                this.spawn();
-                return new Step(null, new Vehicle(this));
+                if (this.spawn(allVehicles)) {
+                    return new Step(null, new Vehicle(this));
+                } else {
+                    return null;
+                }
             }
             return null;
         } else if (state == FORWARD) {
