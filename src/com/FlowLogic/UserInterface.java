@@ -332,18 +332,20 @@ public class UserInterface extends Application {
         Button simulate = new Button("Simulate");
         simulate.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         simulate.setOnAction(e -> {
-            scale.setY(maxZoom);
-            scale.setX(maxZoom);
-            int [] back = simPrompt(stage);
-
-
-
-            TrafficController tc = new TrafficController(back[0],back[1], grid);
-            Simulation sim = tc.runSimulation();
-            root.getChildren().remove(right);
-            root.getChildren().remove(left);
-            sim.display(stage, root, gridContainer, grid); // display the simulation
-            grid.synchronizeGrid();
+            if (Road.getNumInRoads() > 0) {
+                scale.setY(maxZoom);
+                scale.setX(maxZoom);
+                int[] back = simPrompt(stage);
+                TrafficController tc = new TrafficController(back[0], back[1], grid);
+                Simulation sim = tc.runSimulation();
+                root.getChildren().remove(right);
+                root.getChildren().remove(left);
+                sim.display(stage, root, gridContainer, grid); // display the simulation
+                grid.synchronizeGrid();
+            }
+            else {
+                showErrorAlert("Please set an input road!");
+            }
         });
         right.getChildren().add(simulate);
 
@@ -1562,8 +1564,10 @@ public class UserInterface extends Application {
         inRoad.setOnAction(event -> {
             if (inRoad.isSelected()) {
                 road.setInRoad(true);
+                road.incInRoads();
             } else {
                 road.setInRoad(false);
+                road.decInRoads();
             }
         });
     }
