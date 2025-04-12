@@ -23,6 +23,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
+import javafx.application.Platform;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,8 +82,11 @@ public class UserInterface extends Application {
         title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
         Button newButton = new Button("New");
         Button loadButton = new Button("Load");
+        Button exitButton = new Button("Exit");
         newButton.setPrefSize(100, 20);
         loadButton.setPrefSize(100,20);
+        exitButton.setPrefSize(100,20);
+
         newButton.setOnAction(event -> {
             Stage dialog = new Stage();
             dialog.setTitle("FlowLogic");
@@ -111,8 +115,12 @@ public class UserInterface extends Application {
             dialog.setScene(s);
             dialog.showAndWait();
         });
+
         loadButton.setOnAction(e -> setupLoadMenu());
-        VBox root = new VBox(20, title, newButton, loadButton);
+
+        exitButton.setOnAction(e -> Platform.exit());
+
+        VBox root = new VBox(20, title, newButton, loadButton, exitButton);
         root.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
