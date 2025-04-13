@@ -1271,6 +1271,10 @@ public class Grid {
         grid[rowNum][colNum].setRowNum(rowNum);
         mergeRoads(rowNum, colNum);
 
+        if (newObject instanceof Parking) {
+            Parking.incParking();
+        }
+
         // automatically snap new roads into intersections
         if (newObject instanceof Road) {
             updateIntersections(rowNum, colNum, (Road) newObject);
