@@ -513,6 +513,7 @@ public class Vehicle {
                 directionPath.add(Direction.UP);
             }
         }
+        System.out.println("Path found!");
     }
 
     private void modifiedDjikstras(int[][] adjMatrix, int startID, int target, ArrayList<GridObject> intersections) {

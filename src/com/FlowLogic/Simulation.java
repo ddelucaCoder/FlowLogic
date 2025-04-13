@@ -1,9 +1,7 @@
 package com.FlowLogic;
 
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
@@ -14,6 +12,7 @@ import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.FlowLogic.UserInterface.GRID_SIZE;
@@ -88,6 +87,27 @@ public class Simulation {
             }
         });
 
+        AtomicInteger delay = new AtomicInteger(500); // starting delay in ms
+
+        // Create the slider and label
+        Slider delaySlider = new Slider(0, 2000, delay.get());
+        delaySlider.setShowTickLabels(true);
+        delaySlider.setShowTickMarks(true);
+        delaySlider.setMajorTickUnit(500);
+        delaySlider.setBlockIncrement(100);
+
+        Label delayLabel = new Label("Delay: " + delay.get() + " ms");
+
+        // Add listener to update the delay variable and label
+        delaySlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            int newDelay = newVal.intValue();
+            delay.set(newDelay);
+            delayLabel.setText("Delay: " + newDelay + " ms");
+            System.out.println("Slider updated, new delay: " + newDelay);
+        });
+
+        right.getChildren().addAll(delayLabel, delaySlider);
+
         new Thread(() -> {
             System.out.println(frames.size());
             for (Frame f : frames) {
@@ -147,7 +167,7 @@ public class Simulation {
                 });
 
                 try {
-                    Thread.sleep(1000); // Simulate delay, but UI won't freeze
+                    Thread.sleep(delay.get()); // Simulate delay, but UI won't freeze
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
