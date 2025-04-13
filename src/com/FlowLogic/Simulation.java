@@ -1,7 +1,9 @@
 package com.FlowLogic;
 
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
@@ -73,9 +75,17 @@ public class Simulation {
         right.getChildren().add(back);
         AtomicReference<Boolean> exit = new AtomicReference<>(false);
         back.setOnAction(e -> {
-            UserInterface.setupBuildMenu();
-            exit.set(true);
+            // Confirm close with the user
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Confirm Simulation Exit");
+            confirmAlert.setHeaderText("Are you sure you want to close the simulation?");
+            confirmAlert.setContentText("You will have to remake it.");
 
+            if (confirmAlert.showAndWait().get() == ButtonType.OK) {
+                // User confirmed the close, so return to build menu
+                UserInterface.setupBuildMenu();
+                exit.set(true);
+            }
         });
 
         new Thread(() -> {
