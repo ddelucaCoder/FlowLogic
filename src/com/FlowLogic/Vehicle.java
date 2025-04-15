@@ -4,8 +4,6 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.*;
 
-import java.util.ArrayList;
-
 import static com.FlowLogic.CarState.*;
 import static com.FlowLogic.Direction.*;
 
@@ -46,7 +44,7 @@ public class Vehicle {
     private final int FAST_DECEL = 6;
 
     private final int ACCEL = 3;
-    private StopSign lastStopped;
+    private Intersection lastStopped;
 
     public Vehicle(int length) {
         this.length = length;
@@ -85,6 +83,7 @@ public class Vehicle {
         this.direction = v.direction;
         this.car = v.car;
         this.currentIntersection = v.currentIntersection;
+        this.lastStopped = v.lastStopped;
     }
 
     private boolean spawn(List<Vehicle> allVehicles) {
@@ -154,6 +153,17 @@ public class Vehicle {
         speed += ACCEL;
     }
 
+    private int getLightStateForDirection(StopLight light) {
+        if (direction == UP || direction == DOWN) {
+            // Vertical traffic - check lightOne
+            return light.getLightOneColor();
+        } else if (direction == LEFT || direction == RIGHT) {
+            // Horizontal traffic - check lightTwo
+            return light.getLightTwoColor();
+        }
+        return light.RED; // Default to RED if direction is undefined
+    }
+
     private boolean decelerate(Grid g, List<Vehicle> otherVehicles) {
         boolean needToDecelerate = false;
 
@@ -196,13 +206,72 @@ public class Vehicle {
             }
         }
 
+        // Check for traffic lights ahead
+        for (int i = 0; i < ((speed / 10) + 1) * 32; i += 32) {
+            if (getCurrentGridObject(g, front(i)) instanceof StopLight light) {
+                int lightState = getLightStateForDirection(light);
+
+                if (lightState == light.RED) {
+                    // Full stop for red light
+                    if (i < 10) { // Very close to the light
+                        if (lastStopped != light) {
+                            lastStopped = light;
+                            speed = 0;
+                            currentIntersection = light;
+
+                            // Set appropriate state based on path
+                            if (directionPath.size() > 1 && directionPath.get(1) != direction) {
+                                state = STOPPED_TURNING;
+                            } else {
+                                state = STOPPED_FORWARD;
+                            }
+
+                            // Add the vehicle to the appropriate queue
+                            light.addToQueue(this);
+                        }
+                    } else {
+                        // Gradual deceleration as we approach
+                        if (speed > i / 3) speed = i / 3;
+                        if (speed < 5 && i > 32) speed = 5; // Maintain minimum speed unless very close
+                    }
+                    return true;
+                } else if (lightState == light.YELLOW) {
+                    // Slow down for yellow light based on distance
+                    if (i < 64) { // Within two grid cells
+                        // Significant deceleration for yellow when close
+                        speed = speed > FAST_DECEL ? speed - FAST_DECEL : 0;
+                        if (i < 10 && lastStopped != light) { // Very close, just stop
+                            lastStopped = light;
+                            speed = 0;
+                            currentIntersection = light;
+
+                            // Set appropriate state based on path
+                            if (directionPath.size() > 1 && directionPath.get(1) != direction) {
+                                state = STOPPED_TURNING;
+                            } else {
+                                state = STOPPED_FORWARD;
+                            }
+
+                            // Add the vehicle to the appropriate queue
+                            light.addToQueue(this);
+                        }
+                    } else {
+                        // Moderate deceleration for distant yellow
+                        speed = speed > SLOW_DECEL ? speed - SLOW_DECEL : 0;
+                    }
+                    return true;
+                }
+                // If light is green, no need to decelerate for it
+            }
+        }
+
         // Original deceleration logic for stop signs
         if (getCurrentGridObject(g, front(5)) instanceof StopSign s) {
             if (lastStopped != s) {
                 lastStopped = s;
                 speed = 0;
                 s.getQueue().add(this);
-                if (directionPath.get(1) != direction) {
+                if (directionPath.size() > 1 && directionPath.get(1) != direction) {
                     state = STOPPED_TURNING;
                 } else {
                     state = STOPPED_FORWARD;
@@ -216,7 +285,7 @@ public class Vehicle {
             if (curRoundabout != r) {
                 speed = 0;
                 r.getQueue().add(this);
-                if (directionPath.get(0) != directionPath.get(1)) {
+                if (directionPath.size() > 1 && directionPath.get(0) != directionPath.get(1)) {
                     state = STOPPED_TURNING;
                 } else {
                     state = STOPPED_FORWARD;
@@ -327,7 +396,6 @@ public class Vehicle {
         return new Step(past, new Vehicle(this));
     }
 
-
     public Step tick(Grid g, List<Vehicle> allVehicles) {
         // if at destination
         if (state != DESTINATION_REACHED &&
@@ -363,13 +431,25 @@ public class Vehicle {
             }
             return new Step(before, new Vehicle(this));
         } else if (state == STOPPED_FORWARD) {
-            if (currentIntersection instanceof StopLight) {
-                // TODO: Stoplight logic
+            if (currentIntersection instanceof StopLight light) {
+                // Check if the light has turned green for our direction
+                if (getLightStateForDirection(light) == light.GREEN) {
+                    // Vehicle will be released by the StopLight's releaseVehicles method
+                    // This code is now just a fallback in case the queue system fails
+                    stopLightLetGo();
+                    return new Step(new Vehicle(this), new Vehicle(this));
+                }
             }
             return new Step(new Vehicle(this), new Vehicle(this));
         } else if (state == STOPPED_TURNING) {
-            if (currentIntersection instanceof StopLight) {
-                // TODO: Stoplight logic
+            if (currentIntersection instanceof StopLight light) {
+                // Check if the light has turned green for our direction
+                if (getLightStateForDirection(light) == light.GREEN) {
+                    // Vehicle will be released by the StopLight's releaseVehicles method
+                    // This code is now just a fallback in case the queue system fails
+                    stopLightLetGo();
+                    return new Step(new Vehicle(this), new Vehicle(this));
+                }
             }
             return null;
         } else if (state == TURNING) {
@@ -450,6 +530,34 @@ public class Vehicle {
             this.state = TURNING;
         }
         this.speed = 0;
+    }
+
+    public void stopLightLetGo() {
+        if (state == STOPPED_FORWARD) {
+            this.state = FORWARD;
+            // Move the vehicle slightly forward to clear the intersection
+            moveForwardClearIntersection();
+        } else if (state == STOPPED_TURNING) {
+            this.state = TURNING;
+        }
+        this.speed = 5; // Start with a small speed to ensure immediate movement
+
+        // Reset lastStopped so the vehicle can stop at this light again later
+        if (currentIntersection instanceof StopLight) {
+            lastStopped = null;
+            currentIntersection = null; // Clear the current intersection reference
+        }
+    }
+
+    // Add this method to help clear the intersection
+    private void moveForwardClearIntersection() {
+        // Move the vehicle slightly forward based on its direction
+        switch (direction) {
+            case UP -> y -= 10;
+            case RIGHT -> x += 10;
+            case DOWN -> y += 10;
+            case LEFT -> x -= 10;
+        }
     }
 
     public void roundAboutGo(Roundabout r) {
@@ -618,24 +726,36 @@ public class Vehicle {
         }
     }
 
+    // Getter for direction to be used by StopLight
+    public Direction getDirection() {
+        return direction;
+    }
+
+    // Standard getters and setters
     public Rectangle getCar() {
         return car;
     }
+
     public void setCar(Rectangle car) {
         this.car = car;
     }
+
     public int getLength() {
         return length;
     }
+
     public int getWidth() {
         return width;
     }
+
     public int getX() {
         return x;
     }
+
     public int getY() {
         return y;
     }
+
     public int getCurRotation() {
         return curRotation;
     }
