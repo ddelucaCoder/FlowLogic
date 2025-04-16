@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="for pull" />
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Fixed the Hazard disappearing bug">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -264,7 +266,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743763328574</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Fixed the Hazard disappearing bug">
+      <option name="closed" value="true" />
+      <created>1743764829331</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1743764829331</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -345,6 +355,7 @@
     <MESSAGE value="Implemented save/load for MultiLaneConnect" />
     <MESSAGE value="Attempt to fix hazard" />
     <MESSAGE value="for pull" />
-    <option name="LAST_COMMIT_MESSAGE" value="for pull" />
+    <MESSAGE value="Fixed the Hazard disappearing bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed the Hazard disappearing bug" />
   </component>
 </project>
