@@ -23,6 +23,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
+import javafx.application.Platform;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,8 +82,11 @@ public class UserInterface extends Application {
         title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
         Button newButton = new Button("New");
         Button loadButton = new Button("Load");
+        Button exitButton = new Button("Exit");
         newButton.setPrefSize(100, 20);
         loadButton.setPrefSize(100,20);
+        exitButton.setPrefSize(100,20);
+
         newButton.setOnAction(event -> {
             Stage dialog = new Stage();
             dialog.setTitle("FlowLogic");
@@ -111,8 +115,12 @@ public class UserInterface extends Application {
             dialog.setScene(s);
             dialog.showAndWait();
         });
+
         loadButton.setOnAction(e -> setupLoadMenu());
-        VBox root = new VBox(20, title, newButton, loadButton);
+
+        exitButton.setOnAction(e -> Platform.exit());
+
+        VBox root = new VBox(20, title, newButton, loadButton, exitButton);
         root.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -121,7 +129,7 @@ public class UserInterface extends Application {
         lastScene = scene;
     }
 
-    public static void setupBuildMenu(){
+    public static void setupBuildMenu() {
         //Stops user from resizing the window
         stage.setResizable(false);
 
@@ -324,18 +332,23 @@ public class UserInterface extends Application {
         Button simulate = new Button("Simulate");
         simulate.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         simulate.setOnAction(e -> {
-            scale.setY(maxZoom);
-            scale.setX(maxZoom);
-            int [] back = simPrompt(stage);
-
-
-
-            TrafficController tc = new TrafficController(back[0],back[1], grid);
-            Simulation sim = tc.runSimulation();
-            root.getChildren().remove(right);
-            root.getChildren().remove(left);
-            sim.display(stage, root, gridContainer, grid); // display the simulation
-            grid.synchronizeGrid();
+            if (Road.getNumInRoads() > 0 && Parking.getNumParking() > 0) {
+                scale.setY(maxZoom);
+                scale.setX(maxZoom);
+                int[] back = simPrompt(stage);
+                TrafficController tc = new TrafficController(back[0], back[1], grid);
+                Simulation sim = tc.runSimulation();
+                root.getChildren().remove(right);
+                root.getChildren().remove(left);
+                sim.display(stage, root, gridContainer, grid); // display the simulation
+                grid.synchronizeGrid();
+            }
+            else if (Road.getNumInRoads() == 0){
+                showErrorAlert("Please set an input road!");
+            }
+            else if (Parking.getNumParking() == 0) {
+                showErrorAlert("Please place a parking lot on the map!");
+            }
         });
         right.getChildren().add(simulate);
 
@@ -1213,6 +1226,7 @@ public class UserInterface extends Application {
         });
 
         removeButton.setOnAction(e -> {
+            Parking.decParking();
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
             options.getChildren().clear();
@@ -1554,8 +1568,10 @@ public class UserInterface extends Application {
         inRoad.setOnAction(event -> {
             if (inRoad.isSelected()) {
                 road.setInRoad(true);
+                road.incInRoads();
             } else {
                 road.setInRoad(false);
+                road.decInRoads();
             }
         });
     }

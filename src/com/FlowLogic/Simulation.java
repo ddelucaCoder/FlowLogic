@@ -1,7 +1,7 @@
 package com.FlowLogic;
 
 import javafx.application.Platform;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
@@ -12,6 +12,7 @@ import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.FlowLogic.UserInterface.GRID_SIZE;
@@ -73,10 +74,39 @@ public class Simulation {
         right.getChildren().add(back);
         AtomicReference<Boolean> exit = new AtomicReference<>(false);
         back.setOnAction(e -> {
-            UserInterface.setupBuildMenu();
-            exit.set(true);
+            // Confirm close with the user
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Confirm Simulation Exit");
+            confirmAlert.setHeaderText("Are you sure you want to close the simulation?");
+            confirmAlert.setContentText("You will have to remake it.");
 
+            if (confirmAlert.showAndWait().get() == ButtonType.OK) {
+                // User confirmed the close, so return to build menu
+                UserInterface.setupBuildMenu();
+                exit.set(true);
+            }
         });
+
+        AtomicInteger delay = new AtomicInteger(500); // starting delay in ms
+
+        // Create the slider and label
+        Slider delaySlider = new Slider(0, 2000, delay.get());
+        delaySlider.setShowTickLabels(true);
+        delaySlider.setShowTickMarks(true);
+        delaySlider.setMajorTickUnit(500);
+        delaySlider.setBlockIncrement(100);
+
+        Label delayLabel = new Label("Delay: " + delay.get() + " ms");
+
+        // Add listener to update the delay variable and label
+        delaySlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            int newDelay = newVal.intValue();
+            delay.set(newDelay);
+            delayLabel.setText("Delay: " + newDelay + " ms");
+            System.out.println("Slider updated, new delay: " + newDelay);
+        });
+
+        right.getChildren().addAll(delayLabel, delaySlider);
 
         new Thread(() -> {
             System.out.println(frames.size());
@@ -99,8 +129,8 @@ public class Simulation {
 
                         if (newObj instanceof Vehicle) {
                             Vehicle car = (Vehicle) newObj;
-                            int x = car.getX() + 16;
-                            int y = car.getY() + 16; //+16 should move it half a tile before scaling
+                            int x = car.getX();
+                            int y = car.getY();
                             double cell_size = (720 * 1.0)/GRID_SIZE;
                             x = (int) (((x * 1.0) /32) * cell_size);
                             y = (int) (((y * 1.0) /32) * cell_size);
@@ -137,7 +167,7 @@ public class Simulation {
                 });
 
                 try {
-                    Thread.sleep(1000); // Simulate delay, but UI won't freeze
+                    Thread.sleep(delay.get()); // Simulate delay, but UI won't freeze
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -129,15 +129,15 @@ public class Grid {
                         String name = properties.getString("name");
                         ArrayList<Vehicle> vehicleList = new ArrayList<>();
 
-                        /* Future Change: Check for saved vehicles. For now, not necessary
+
                         // Check if there are saved vehicles
                         if (properties.has("vehicleList")) {
                             JSONArray vehiclesArray = properties.getJSONArray("vehicleList");
                             for (int j = 0; j < vehiclesArray.length(); j++) {
-                                // Insert vehicle parsing here
+                                vehicleList.add((Vehicle) vehiclesArray.get(i));
                             }
                         }
-                        */
+
 
                         OneWayRoad oneWayRoad = new OneWayRoad(orientation, speedLimit, isInRoad, inCars, row, col, direction,
                                 numLanes, vehicleList);
@@ -780,6 +780,8 @@ public class Grid {
         int row = g.getRowNum();
         int col = g.getColNum();
 
+        System.out.println("Row: " + row + " Col: " + col);
+
         return new int[]{row * GRID_SIZE, col * GRID_SIZE};
     }
 
@@ -1268,6 +1270,10 @@ public class Grid {
         grid[rowNum][colNum].setColNum(colNum);
         grid[rowNum][colNum].setRowNum(rowNum);
         mergeRoads(rowNum, colNum);
+
+        if (newObject instanceof Parking) {
+            Parking.incParking();
+        }
 
         // automatically snap new roads into intersections
         if (newObject instanceof Road) {

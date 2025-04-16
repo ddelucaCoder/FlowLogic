@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
  * by the user.
  */
 public class Road implements GridObject {
+    private static int numInRoads = 0;
     private String name;
     private Orientation orientation;
     private int speedLimit;
@@ -139,5 +140,17 @@ public class Road implements GridObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public static int getNumInRoads() {
+        return numInRoads;
+    }
+
+    public void incInRoads() {
+        numInRoads++;
+    }
+
+    public void decInRoads() {
+        numInRoads--;
     }
 }

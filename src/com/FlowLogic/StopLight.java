@@ -1,8 +1,8 @@
 package com.FlowLogic;
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.transform.Rotate;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class StopLight extends Intersection implements GridObject {
     private int timingOne; // vertical light (top-bottom)
@@ -15,7 +15,7 @@ public class StopLight extends Intersection implements GridObject {
     private int rowNum;
     private int colNum;
 
-    private int YELLOW_TIMING = 5; // TODO: adjust this
+    private int YELLOW_TIMING = 5;
     private Image imageFile;
     private Image redGreen4WayImage;
     private Image redYellow4WayImage;
@@ -24,6 +24,10 @@ public class StopLight extends Intersection implements GridObject {
     private Image allRed4WayImage;
 
     private int timer = 10;
+
+    // Queues for vehicles waiting at the light
+    private Queue<Vehicle> verticalQueue; // For UP/DOWN traffic
+    private Queue<Vehicle> horizontalQueue; // For LEFT/RIGHT traffic
 
     public StopLight(Road roadOne, Road roadTwo, int timingOne, int timingTwo, int lightOneColor, int lightTwoColor, Road[] roadList, int rowNum, int colNum) {
         super(rowNum, colNum, roadList);
@@ -37,6 +41,10 @@ public class StopLight extends Intersection implements GridObject {
         this.yellowRed4WayImage = new Image("file:Images/YellowRed4WayStopLight.png");
         this.allRed4WayImage = new Image("file:Images/AllRed4WayStopLight.png");
         this.imageFile = new Image("file:Images/RedGreen4WayStopLight.png");
+
+        // Initialize the vehicle queues
+        this.verticalQueue = new LinkedList<>();
+        this.horizontalQueue = new LinkedList<>();
     }
 
     public StopLight(StopLight s) {
@@ -53,8 +61,11 @@ public class StopLight extends Intersection implements GridObject {
         this.yellowRed4WayImage = new Image("file:Images/YellowRed4WayStopLight.png");
         this.allRed4WayImage = new Image("file:Images/AllRed4WayStopLight.png");
         this.imageFile = s.getImageFile();
-    }
 
+        // Copy the queues
+        this.verticalQueue = new LinkedList<>(s.getVerticalQueue());
+        this.horizontalQueue = new LinkedList<>(s.getHorizontalQueue());
+    }
 
     public void initializeStopLightGraphics() {
         if (lightOneColor == RED) {
@@ -73,16 +84,18 @@ public class StopLight extends Intersection implements GridObject {
      * If its on green it will change to yellow for 5 counts
      * If on red it will switch to green once the green light has turned red
      *
-     * @return boolean : was successful
+     * @return int : timing for the next light state
      */
     public int switchLights() {
         if (lightOneColor == RED && lightTwoColor == RED) {
             lightOneColor = GREEN;
+            releaseVehicles(true, false); // Release vertical traffic
         }
         if (lightOneColor == YELLOW) {
             lightOneColor = RED;
             lightTwoColor = GREEN;
             this.imageFile = getRedGreen4WayImage();
+            releaseVehicles(false, true); // Release horizontal traffic
             return timingTwo;
         } else if (lightOneColor == GREEN) {
             lightOneColor = YELLOW;
@@ -93,6 +106,7 @@ public class StopLight extends Intersection implements GridObject {
             lightTwoColor = RED;
             lightOneColor = GREEN;
             this.imageFile = getRedGreen4WayImage();
+            releaseVehicles(true, false); // Release vertical traffic
             return timingOne;
         } else if (lightTwoColor == GREEN) {
             lightTwoColor = YELLOW;
@@ -104,8 +118,42 @@ public class StopLight extends Intersection implements GridObject {
     }
 
     /**
+     * Releases vehicles from the appropriate queue when the light changes
+     * @param releaseVertical true to release vertical traffic (UP/DOWN)
+     * @param releaseHorizontal true to release horizontal traffic (LEFT/RIGHT)
+     */
+    private void releaseVehicles(boolean releaseVertical, boolean releaseHorizontal) {
+        if (releaseVertical) {
+            while (!verticalQueue.isEmpty()) {
+                Vehicle v = verticalQueue.poll();
+                v.stopLightLetGo();
+            }
+        }
+
+        if (releaseHorizontal) {
+            while (!horizontalQueue.isEmpty()) {
+                Vehicle v = horizontalQueue.poll();
+                v.stopLightLetGo();
+            }
+        }
+    }
+
+    /**
+     * Add a vehicle to the appropriate queue based on its direction
+     * @param vehicle the vehicle to add to the queue
+     */
+    public void addToQueue(Vehicle vehicle) {
+        Direction dir = vehicle.getDirection();
+        if (dir == Direction.UP || dir == Direction.DOWN) {
+            verticalQueue.add(vehicle);
+        } else {
+            horizontalQueue.add(vehicle);
+        }
+    }
+
+    /**
      * Called by the simulation to get and change the state of the light at hand
-     * @return true if there was a change, false otherwise
+     * @return Step containing before and after states if there was a change
      */
     public Step tick() {
         timer--;
@@ -117,7 +165,16 @@ public class StopLight extends Intersection implements GridObject {
         return null;
     }
 
-    // getters and setters
+    // Add getters for the queues
+    public Queue<Vehicle> getVerticalQueue() {
+        return verticalQueue;
+    }
+
+    public Queue<Vehicle> getHorizontalQueue() {
+        return horizontalQueue;
+    }
+
+    // Existing getters and setters...
     @Override
     public Image getImageFile() {
         return imageFile;
@@ -127,6 +184,7 @@ public class StopLight extends Intersection implements GridObject {
     public void setImageFile(Image imageFile) {
         this.imageFile = imageFile;
     }
+
     public int getTimingOne() {
         return timingOne;
     }
@@ -173,8 +231,8 @@ public class StopLight extends Intersection implements GridObject {
 
     public void setRowNum(int newRow) {
         this.rowNum = newRow;
-
     }
+
     public Image getRedGreen4WayImage() {
         return redGreen4WayImage;
     }

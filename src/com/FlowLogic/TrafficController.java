@@ -15,6 +15,8 @@ public class TrafficController {
     private ArrayList<Road> destinations;
     private ArrayList<Road> entrances;
 
+    private int time_between = 5;
+
     private Grid grid;
 
     private final Random random = new Random();
@@ -59,11 +61,11 @@ public class TrafficController {
 
 
         // generate cars and their in-roads and out-roads and time of entrance and destination
-
+        int currentTime = 0;
         // get each car's route
         for (Vehicle v : vehicles) {
             v.setInOut(getRandomInRoad(), getRandomDestination());
-            v.setTimeIn(0);//TODO: (int) (Math.random() *  totalTime));
+            v.setTimeIn(currentTime += time_between);//TODO: (int) (Math.random() *  totalTime));
             v.findPath(grid.gridToGraph(), grid.intersections);
         }
 
@@ -89,7 +91,7 @@ public class TrafficController {
 
             for (Vehicle v : vehicles) {
                 // update each vehicle
-                Step s = v.tick(grid);
+                Step s = v.tick(grid, vehicles);
                 // add old / new vehicles to the sim
                 if (s != null && (s.getNewObject() == null || !s.getNewObject().equals(s.getOldObject()))) {
                     f.addStep(s);
