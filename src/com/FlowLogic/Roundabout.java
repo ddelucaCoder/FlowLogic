@@ -66,8 +66,6 @@ public class Roundabout extends Intersection{
      * Getter and Setter Methods
      */
 
-
-
     public Boolean[] getAvailableSpots() {
         return availableSpots;
     }
