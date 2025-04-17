@@ -4,6 +4,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import static com.FlowLogic.UserInterface.GRID_SIZE;
+
 
 public class TrafficController {
 
@@ -31,9 +33,12 @@ public class TrafficController {
         vehicles = new ArrayList<>();
         destinations = new ArrayList<>();
         entrances = new ArrayList<>();
+        double cell_size = (720 * 1.0)/GRID_SIZE;
         for (int i = 0; i < numCars; i++) {
             Random ran = new Random();
-            vehicles.add(new Vehicle(ran.nextInt(6) -3 + avgSize));
+            int len = ran.nextInt(6) -3 + avgSize;
+            len = ((int) (((len * 1.0) /32) * cell_size)) / 2;
+            vehicles.add(new Vehicle(len));
         }
         intersections = g.intersections;
         System.out.println("Num intersections: " + intersections.size());

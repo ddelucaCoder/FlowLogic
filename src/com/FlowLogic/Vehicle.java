@@ -6,6 +6,7 @@ import java.util.*;
 
 import static com.FlowLogic.CarState.*;
 import static com.FlowLogic.Direction.*;
+import static com.FlowLogic.UserInterface.GRID_SIZE;
 
 /**
  * Vehicle class that handles vehicle behavior in traffic simulation.
@@ -14,7 +15,7 @@ import static com.FlowLogic.Direction.*;
 public class Vehicle {
     // Vehicle physical properties
     private int length;
-    private int width = 10;
+    private int width = ((int )(((10 * 1.0) /32) * ((720 * 1.0)/GRID_SIZE))) / 2;
     private Rectangle car;
 
     // Vehicle position and movement
