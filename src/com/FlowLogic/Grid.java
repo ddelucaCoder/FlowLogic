@@ -1063,7 +1063,7 @@ public class Grid {
                         count += (MAX_SPEED_LIMIT - d.getSpeedLimit() + 1); // weighted graph
                         if (checkAroundDest(d)) {
                             lastID = d.getIntersectionID();
-                            break;
+                            graph[r.getIntersectionID()][lastID] = count; // add to graph, but don't stop traversing
                         }
                         cur = switch (d.getDirection()) {
                             case UP -> d.getRowNum() - 1 >= 0 ? getAtSpot(d.getRowNum() - 1, d.getColNum()) : null;
