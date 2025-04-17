@@ -39,15 +39,18 @@ public class TrafficController {
         System.out.println("Num intersections: " + intersections.size());
         for (GridObject obj : grid.intersections) {
             if (obj instanceof OneWayRoad r) {
-                System.out.println("X: " + r.getColNum() + " Y: " + r.getRowNum());
                 if (grid.checkAroundDest(r)) {
+                    System.out.println("Dest: x: " + r.getColNum() + " y: " + r.getRowNum());
                     destinations.add(r);
                 }
                 if (r.isInRoad()) {
+                    System.out.println("Ent: x: " + r.getColNum() + " y: " + r.getRowNum());
                     entrances.add(r);
                 }
             }
         }
+        System.out.println("Num Entrances: " + entrances.size());
+        System.out.println("Num Destinations: " + destinations.size());
     }
 
     private Road getRandomInRoad() {
