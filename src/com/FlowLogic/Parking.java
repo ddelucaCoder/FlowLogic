@@ -29,6 +29,7 @@ public class Parking implements GridObject {
         this.yLength = yLength;
         this.parkingCapacity = parkingCapacity;
         this.numCars = numCars;
+        //numParking++;
         imageFile = new Image("file:Images/ParkingLot.png");
     }
 

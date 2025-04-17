@@ -1411,9 +1411,8 @@ public class UserInterface extends Application {
                 (col == 0 && road.getDirection() == Direction.RIGHT) ||
                 (col == grid.getNumColumns() - 1 && road.getDirection() == Direction.LEFT))
         {
-            if (((OneWayRoad) grid.getGrid()[row][col]).isInRoad()) {
-                inRoad.setSelected(true);
-            }
+            // default to in road if needed
+            inRoad.setSelected(((OneWayRoad) grid.getGrid()[row][col]).isInRoad());
             options.getChildren().add(inRoad);
         }
 
@@ -1568,10 +1567,8 @@ public class UserInterface extends Application {
         inRoad.setOnAction(event -> {
             if (inRoad.isSelected()) {
                 road.setInRoad(true);
-                road.incInRoads();
             } else {
                 road.setInRoad(false);
-                road.decInRoads();
             }
         });
     }
