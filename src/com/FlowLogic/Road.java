@@ -29,6 +29,9 @@ public class Road implements GridObject {
         this.orientation = orientation;
         this.speedLimit = speedLimit;
         this.isInRoad = isInRoad;
+        if (isInRoad) {
+            numInRoads++;
+        }
         this.inCars = inCars;
         this.rowNum = rowNum;
         this.colNum = colNum;
@@ -99,6 +102,11 @@ public class Road implements GridObject {
     }
 
     public void setInRoad(boolean inRoad) {
+        if (!isInRoad && inRoad) {
+            numInRoads++;
+        } else if (isInRoad && !inRoad) {
+            numInRoads--;
+        }
         isInRoad = inRoad;
     }
 
@@ -144,13 +152,5 @@ public class Road implements GridObject {
 
     public static int getNumInRoads() {
         return numInRoads;
-    }
-
-    public void incInRoads() {
-        numInRoads++;
-    }
-
-    public void decInRoads() {
-        numInRoads--;
     }
 }
