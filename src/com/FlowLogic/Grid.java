@@ -78,6 +78,8 @@ public class Grid {
         imgToObj.put("GreenRed4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("RedGreen4WayStopLight.png", new StopLight(null, null, 0, 0, 0, 0, new Road[4], 0, 0));
         imgToObj.put("Hazard.png", new Hazard(0 ,0));
+        imgToObj.put("CrosswalkVertical.png", new Crosswalk(Orientation.VERTICAL, 0, false, 0, 0, 0, Direction.UP, 0, null));
+        imgToObj.put("CrosswalkHorizontal.png", new Crosswalk(Orientation.HORIZONTAL, 0, false, 0, 0, 0, Direction.RIGHT, 0, null));
     }
 
     /**
@@ -257,6 +259,35 @@ public class Grid {
                         hazardRoad.setName(name);
                         hazard.setCoveredObject(hazardRoad);
                         gridObject = hazard;
+                        break;
+
+                    case "Crosswalk":
+                        Orientation orient = Orientation.valueOf(properties.getString("orientation"));
+                        int speed = properties.getInt("speedLimit");
+                        int len = properties.getInt("length");
+                        boolean isInRd = properties.getBoolean("isInRoad");
+                        int inCar = properties.getInt("inCars");
+                        Direction dir = Direction.valueOf(properties.getString("direction"));
+                        int numLane = properties.getInt("numLanes");
+                        String n = properties.getString("name");
+                        ArrayList<Vehicle> vehicleLists = new ArrayList<>();
+
+
+                        // Check if there are saved vehicles
+                        if (properties.has("vehicleList")) {
+                            JSONArray vehiclesArray = properties.getJSONArray("vehicleList");
+                            for (int j = 0; j < vehiclesArray.length(); j++) {
+                                vehicleLists.add((Vehicle) vehiclesArray.get(i));
+                            }
+                        }
+
+
+                        Crosswalk crosswalk = new Crosswalk(orient, speed, isInRd, inCar, row, col, dir,
+                                numLane, vehicleLists);
+                        crosswalk.setLength(len);
+                        crosswalk.setName(n);
+
+                        gridObject = crosswalk;
                         break;
                 }
                 // Add everything to the grid
@@ -459,6 +490,16 @@ public class Grid {
                     }
                     else if (obj instanceof Hazard hazard) {
                         OneWayRoad road = (OneWayRoad) hazard.getCoveredObject();
+                        properties.put("orientation", road.getOrientation());
+                        properties.put("speedLimit", road.getSpeedLimit());
+                        properties.put("length", road.getLength());
+                        properties.put("isInRoad", road.isInRoad());
+                        properties.put("inCars", road.getInCars());
+                        properties.put("direction", road.getDirection());
+                        properties.put("numLanes", road.getNumLanes());
+                        properties.put("vehicleList", road.getVehicleList());
+                        properties.put("name", road.getName());
+                    } else if (obj instanceof Crosswalk road) {
                         properties.put("orientation", road.getOrientation());
                         properties.put("speedLimit", road.getSpeedLimit());
                         properties.put("length", road.getLength());

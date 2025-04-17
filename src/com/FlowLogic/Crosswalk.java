@@ -34,7 +34,7 @@ public class Crosswalk extends OneWayRoad implements GridObject {
 
     @Override
     public Image getImageFile() {
-        return null;
+        return this.imageFile;
     }
 
     @Override
