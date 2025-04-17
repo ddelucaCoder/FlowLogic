@@ -261,7 +261,7 @@ public class Grid {
                 }
                 // Add everything to the grid
                 if (gridObject != null) {
-                    grid[row][col] = gridObject;
+                    addObject(gridObject, row, col);
                     if (gridObject instanceof OneWayRoad) {
                         mergeRoads(row,col);
                     }
@@ -732,6 +732,13 @@ public class Grid {
         if (obj == null) {
             return;
         }
+
+        // special cases for in roads and parking
+        if (obj instanceof OneWayRoad r && r.isInRoad()) {
+            r.setInRoad(false);
+        } else if (obj instanceof Parking) { // TODO: MAKE THIS WORK WITH THE RECURSION
+            Parking.decParking();
+        }
         grid[row][col] = null;
         frontGrid[row][col] = null;
         if (obj == getAtSpot(row - 1, col)) {
@@ -973,13 +980,12 @@ public class Grid {
 
 
     public int[][] gridToGraph() {
-        //TODO: ADD DESTINATIONS AND IN ROADS
         if (intersections != null) {
             for (GridObject i : intersections) {
                 if (i instanceof Intersection in) {
                     in.setIntersectionID(-1);
-                } else if (i instanceof Road) {
-                    ((Road) i).setIntersectionID(-1);
+                } else if (i instanceof Road r) {
+                    r.setIntersectionID(-1);
                 }
             }
         }
@@ -1057,7 +1063,7 @@ public class Grid {
                         count += (MAX_SPEED_LIMIT - d.getSpeedLimit() + 1); // weighted graph
                         if (checkAroundDest(d)) {
                             lastID = d.getIntersectionID();
-                            break;
+                            graph[r.getIntersectionID()][lastID] = count; // add to graph, but don't stop traversing
                         }
                         cur = switch (d.getDirection()) {
                             case UP -> d.getRowNum() - 1 >= 0 ? getAtSpot(d.getRowNum() - 1, d.getColNum()) : null;
@@ -1273,6 +1279,15 @@ public class Grid {
 
         if (newObject instanceof Parking) {
             Parking.incParking();
+        }
+
+        if (grid[rowNum][colNum] instanceof OneWayRoad road) {
+            if ((rowNum == 0 && road.getDirection() == Direction.DOWN) ||
+                (rowNum == numRows - 1 && road.getDirection() == Direction.UP) ||
+                (colNum == 0 && road.getDirection() == Direction.RIGHT) ||
+                (colNum == numColumns - 1 && road.getDirection() == Direction.LEFT)) {
+                road.setInRoad(true);
+            }
         }
 
         // automatically snap new roads into intersections

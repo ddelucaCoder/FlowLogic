@@ -1,5 +1,6 @@
 package com.FlowLogic;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -21,8 +22,11 @@ public class TrafficController {
 
     private final Random random = new Random();
 
+    private int[][] graph;
+
     public TrafficController(int avgSize, int numCars, Grid g) {
-        g.gridToGraph();
+        graph = g.gridToGraph();
+        System.out.println("Graph: " + Arrays.deepToString(graph));
         grid = g;
         vehicles = new ArrayList<>();
         destinations = new ArrayList<>();
@@ -32,17 +36,21 @@ public class TrafficController {
             vehicles.add(new Vehicle(ran.nextInt(6) -3 + avgSize));
         }
         intersections = g.intersections;
-        System.out.println(intersections.size());
+        System.out.println("Num intersections: " + intersections.size());
         for (GridObject obj : grid.intersections) {
             if (obj instanceof OneWayRoad r) {
                 if (grid.checkAroundDest(r)) {
+                    System.out.println("Dest: x: " + r.getColNum() + " y: " + r.getRowNum());
                     destinations.add(r);
                 }
                 if (r.isInRoad()) {
+                    System.out.println("Ent: x: " + r.getColNum() + " y: " + r.getRowNum());
                     entrances.add(r);
                 }
             }
         }
+        System.out.println("Num Entrances: " + entrances.size());
+        System.out.println("Num Destinations: " + destinations.size());
     }
 
     private Road getRandomInRoad() {
@@ -65,8 +73,8 @@ public class TrafficController {
         // get each car's route
         for (Vehicle v : vehicles) {
             v.setInOut(getRandomInRoad(), getRandomDestination());
-            v.setTimeIn(currentTime += time_between);//TODO: (int) (Math.random() *  totalTime));
-            v.findPath(grid.gridToGraph(), grid.intersections);
+            v.setTimeIn(currentTime += time_between);
+            v.findPath(graph, grid.intersections);
         }
 
         // run simulation
