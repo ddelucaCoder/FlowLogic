@@ -73,18 +73,40 @@ public class Simulation {
         back.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         right.getChildren().add(back);
         AtomicReference<Boolean> exit = new AtomicReference<>(false);
+
         back.setOnAction(e -> {
             // Confirm close with the user
             Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
             confirmAlert.setTitle("Confirm Simulation Exit");
             confirmAlert.setHeaderText("Are you sure you want to close the simulation?");
-            confirmAlert.setContentText("You will have to remake it.");
 
             if (confirmAlert.showAndWait().get() == ButtonType.OK) {
                 // User confirmed the close, so return to build menu
                 UserInterface.setupBuildMenu();
                 exit.set(true);
             }
+        });
+
+        VBox left = new VBox();
+        left.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
+        left.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
+        left.setStyle("-fx-background-color: #D3D3D3;");
+
+        AnchorPane.setLeftAnchor(left, 0.0);
+        AnchorPane.setTopAnchor(left, 0.0);     // Set top anchor
+        AnchorPane.setBottomAnchor(left, 0.0);  // Set bottom anchor
+        root.getChildren().add(left);
+
+        Button suggestion = new Button("Create Suggestions");
+        suggestion.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+        left.getChildren().add(suggestion);
+        suggestion.setOnAction(e -> {
+            // Confirm close with the user
+            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
+            infoAlert.setTitle("Suggestions Menu");
+            infoAlert.setHeaderText("COMING SOON™");
+
+            infoAlert.showAndWait();
         });
 
         AtomicInteger delay = new AtomicInteger(500); // starting delay in ms
