@@ -1,6 +1,7 @@
 package com.FlowLogic;
 
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -21,6 +22,11 @@ public class Simulation {
     int numVehicles;
     ArrayList<Vehicle> vehicles;
     ArrayList<Frame> frames;
+    int avgTimeAtIntersections = 0;
+    int avgTripTime = 0;
+    int maxTimeAtIntersections = 0;
+    int minTimeAtIntersections = 0;
+    int numActiveVehicles = 0;
 
     public Simulation(int numVehicles) {
         this.numVehicles = numVehicles;//This and next line may need to be changed based
@@ -109,6 +115,28 @@ public class Simulation {
             infoAlert.showAndWait();
         });
 
+        Label statisticsTitle = new Label("Simulation Statistics:");
+        statisticsTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+
+        Label avgTripTimeLabel = new Label("Average Trip Time: " + avgTripTime);
+        avgTripTimeLabel.setStyle("-fx-font-size: 16px;");
+
+        Label avgIntersectionWaitLabel = new Label("Average Intersection Wait Time: " + avgTimeAtIntersections);
+        avgIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label maxIntersectionWaitLabel = new Label("Max Intersection Wait Time: " + maxTimeAtIntersections);
+        maxIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label minIntersectionWaitLabel = new Label("Min Intersection Wait Time: " + minTimeAtIntersections);
+        minIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label numActiveVehiclesLabel = new Label("Min Intersection Wait Time: " + numActiveVehicles);
+        numActiveVehiclesLabel.setStyle("-fx-font-size: 16px;");
+
+
+        left.getChildren().addAll(statisticsTitle, avgTripTimeLabel, avgIntersectionWaitLabel, maxIntersectionWaitLabel,
+                minIntersectionWaitLabel, numActiveVehiclesLabel);
+
         AtomicInteger delay = new AtomicInteger(500); // starting delay in ms
 
         // Create the slider and label
@@ -138,6 +166,7 @@ public class Simulation {
                 }
                 Platform.runLater(() -> { // Ensures UI updates happen on JavaFX thread
                     System.out.println("Rendering frame");
+                    updateStatisticsLabels(left);
                     for (Step s : f.getSteps()) {
                         Object oldObj = s.oldObject;
                         Object newObj = s.newObject;
@@ -198,5 +227,47 @@ public class Simulation {
 
         //Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+    }
+
+    /**
+     * Updates the statistics labels in the left VBox panel with current simulation data allowing
+     * statistics to be updated every frame
+     * @param left The VBox containing the statistics labels
+     */
+    public void updateStatisticsLabels(VBox left) {
+        // Get current children
+        ArrayList<Node> nodesToKeep = new ArrayList<>();
+
+        // Keep first two elements (suggestions button and title)
+        for (int i = 0; i < 2; i++) {
+            if (i < left.getChildren().size()) {
+                nodesToKeep.add(left.getChildren().get(i));
+            }
+        }
+
+        // Clear all existing children
+        left.getChildren().clear();
+
+        // Add back the title/label we saved
+        left.getChildren().addAll(nodesToKeep);
+
+        Label avgTripTimeLabel = new Label("Average Trip Time: " + avgTripTime);
+        avgTripTimeLabel.setStyle("-fx-font-size: 16px;");
+
+        Label avgIntersectionWaitLabel = new Label("Average Intersection Wait Time: " + avgTimeAtIntersections);
+        avgIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label maxIntersectionWaitLabel = new Label("Max Intersection Wait Time: " + maxTimeAtIntersections);
+        maxIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label minIntersectionWaitLabel = new Label("Min Intersection Wait Time: " + minTimeAtIntersections);
+        minIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label numActiveVehiclesLabel = new Label("Active Vehicles: " + numActiveVehicles);
+        numActiveVehiclesLabel.setStyle("-fx-font-size: 16px;");
+
+        // Add all the statistics labels to the VBox
+        left.getChildren().addAll(avgTripTimeLabel, avgIntersectionWaitLabel,
+                maxIntersectionWaitLabel, minIntersectionWaitLabel, numActiveVehiclesLabel);
     }
 }
