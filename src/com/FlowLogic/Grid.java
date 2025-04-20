@@ -58,6 +58,23 @@ public class Grid {
         populateMap();
     }
 
+    public Grid(Grid g) { // Clone Constructor
+        this.numRows = g.numRows;
+        this.numColumns = g.numColumns;
+        this.grid = new GridObject[numRows][numColumns];
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                this.grid[i][j] = g.grid[i][j];
+            }
+        }
+        this.frontGrid = new Rectangle[numRows][numColumns];
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                this.frontGrid[i][j] = g.frontGrid[i][j];
+            }
+        }
+    }
+
     private void populateMap() {
         imgToObj.put("RoadImageDown.png", new OneWayRoad(Orientation.VERTICAL, Direction.DOWN));
         imgToObj.put("RoadImage.png", new OneWayRoad(Orientation.VERTICAL, UP));

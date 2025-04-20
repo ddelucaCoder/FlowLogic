@@ -50,6 +50,9 @@ public class UserInterface extends Application {
     private static double offsetY = 0;
     public static Grid grid = new Grid(0,0);
 
+    //Stores the last 10 grid states
+    public static CappedStack<Grid> undo = new CappedStack<>(10);
+
     // Tracks if the User is Panning the screen disables clicking events
     private static boolean pan = false;
 
