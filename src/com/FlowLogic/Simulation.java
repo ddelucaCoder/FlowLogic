@@ -23,7 +23,7 @@ public class Simulation {
     ArrayList<Vehicle> vehicles;
     ArrayList<Frame> frames;
     int avgTimeAtIntersections = 0;
-    int avgTripTime = 0;
+    int avgTripTime = 360;
     int maxTimeAtIntersections = 0;
     int minTimeAtIntersections = 0;
     int numActiveVehicles = 0;
@@ -109,9 +109,27 @@ public class Simulation {
         suggestion.setOnAction(e -> {
             // Confirm close with the user
             Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
+            infoAlert.setResizable(true);
+            infoAlert.getDialogPane().setPrefSize(700, 500); // Make wider and taller
             infoAlert.setTitle("Suggestions Menu");
-            infoAlert.setHeaderText("COMING SOON™");
+            String suggestionText = "";
+            int numSuggestions = 0;
+            if (avgTimeAtIntersections > 60) {
+                numSuggestions++;
+                suggestionText = suggestionText + numSuggestions + ". Cars appear to spend a long time at intersections. Consider expanding the road to allow more cars through!\n";
+            }
 
+            if (avgTripTime > 120) {
+                numSuggestions++;
+                suggestionText = suggestionText + numSuggestions + ". Cars appear to be taking quite some time to reach their destination from certain entry points. Consider creating a shorter path.\n";
+            }
+
+            if (suggestionText.isEmpty()) {
+                suggestionText = "No suggestions to be made!";
+            }
+            infoAlert.setHeaderText("Number of Suggestions: " + numSuggestions);
+
+            infoAlert.setContentText(suggestionText);
             infoAlert.showAndWait();
         });
 
