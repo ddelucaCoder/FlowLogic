@@ -64,7 +64,9 @@ public class Grid {
         this.grid = new GridObject[numRows][numColumns];
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numColumns; j++) {
-                this.grid[i][j] = g.grid[i][j];
+                if (g.grid[i][j] != null){
+                    this.grid[i][j] = g.grid[i][j].clone();
+                }
             }
         }
         this.frontGrid = new Rectangle[numRows][numColumns];
@@ -1410,7 +1412,6 @@ public class Grid {
      * This function updates the frontend to represent the backend
      */
     public void synchronizeGrid(){
-        UserInterface.refreshGrid(numRows);
         for (int i = 0; i < numRows; i++) {
             for (int k = 0; k < numColumns; k++) {
                 if (grid[i][k] != null) {

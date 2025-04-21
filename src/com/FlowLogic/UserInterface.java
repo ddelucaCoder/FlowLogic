@@ -1034,6 +1034,7 @@ public class UserInterface extends Application {
 
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> {
+            saveState();
             String input = sizeField.getText();
             int size;
             if (input.isEmpty()) {
@@ -1133,6 +1134,7 @@ public class UserInterface extends Application {
         });
 
         submitButton.setOnAction(e -> {
+            saveState();
             int xLenNew = Integer.parseInt(xLengthField.getText());
             int yLenNew = Integer.parseInt(yLengthField.getText());
             int popNew = Integer.parseInt(populationField.getText());
@@ -1221,6 +1223,7 @@ public class UserInterface extends Application {
         options.getChildren().add(closeButton);
 
         submitButton.setOnAction(e -> {
+            saveState();
             int xLenNew = Integer.parseInt(xLengthField.getText());
             int yLenNew = Integer.parseInt(yLengthField.getText());
             int popNew = Integer.parseInt(parkingField.getText());
@@ -1377,7 +1380,7 @@ public class UserInterface extends Application {
         String name = ((Road)obj).getName();
         OneWayRoad oneRoad = (OneWayRoad)obj;
         Image image = oneRoad.getImageFile();
-        String multiLane = ("MultiLaneConnector: " + ((Road) obj).getLaneContainer().getCount());
+        //String multiLane = ("MultiLaneConnector: " + ((Road) obj).getLaneContainer().getCount());
 
         Label titleLabel = new Label(name + " Options");
         Button renameButt = new Button("Rename Road");
@@ -1390,7 +1393,7 @@ public class UserInterface extends Application {
         TextField speedField = new TextField();
         Button closeButton = new Button("Close Road Options");
         CheckBox inRoad = new CheckBox("Make Input Road");
-        Label multiLabel = new Label(multiLane);
+        //Label multiLabel = new Label(multiLane);
         Button addLaneRight = new Button("Add Lane to the Right");
         Button addLaneLeft = new Button("Add Lane to the Left");
 
@@ -1413,7 +1416,7 @@ public class UserInterface extends Application {
         options.getChildren().add(removeButton);
         options.getChildren().add(speedLabel);
         options.getChildren().add(speedField);
-        options.getChildren().add(multiLabel);
+        //options.getChildren().add(multiLabel);
         options.getChildren().add(addLaneLeft);
         options.getChildren().add(addLaneRight);
         options.getChildren().add(closeButton);
@@ -1435,6 +1438,7 @@ public class UserInterface extends Application {
             if (oneDir == UP) {
                 Rectangle cell = grid.getFrontGrid()[row][col + 1];
                 if (!(cell.getFill() instanceof ImagePattern)) {
+                    saveState();
                     cell.setFill(new ImagePattern(image));
                     grid.placeObjectByImage("RoadImage.png", row, col + 1);
                     System.out.println(image.getUrl());
@@ -1442,6 +1446,7 @@ public class UserInterface extends Application {
             } else if (oneDir == Direction.DOWN) {
                 Rectangle cell = grid.getFrontGrid()[row][col - 1];
                 if (!(cell.getFill() instanceof ImagePattern)) {
+                    saveState();
                     cell.setFill(new ImagePattern(image));
                     grid.placeObjectByImage("RoadImageDown.png", row, col - 1);
                     System.out.println(image);
@@ -1449,6 +1454,7 @@ public class UserInterface extends Application {
             } else if (oneDir == Direction.RIGHT) {
                 Rectangle cell = grid.getFrontGrid()[row + 1][col];
                 if (!(cell.getFill() instanceof ImagePattern)) {
+                    saveState();
                     cell.setFill(new ImagePattern(image));
                     grid.placeObjectByImage("RoadImageRight.png", row + 1, col);
                     System.out.println(image);
@@ -1456,6 +1462,7 @@ public class UserInterface extends Application {
             } else if (oneDir == Direction.LEFT) {
                 Rectangle cell = grid.getFrontGrid()[row - 1][col];
                 if (!(cell.getFill() instanceof ImagePattern)) {
+                    saveState();
                     cell.setFill(new ImagePattern(image));
                     grid.placeObjectByImage("RoadImageLeft.png", row - 1, col);
                     System.out.println(image);
@@ -1468,6 +1475,7 @@ public class UserInterface extends Application {
             if (oneDir == UP) {
                 Rectangle cell = grid.getFrontGrid()[row][col - 1];
                 if (!(cell.getFill() instanceof ImagePattern)) {
+                    saveState();
                     cell.setFill(new ImagePattern(image));
                     grid.placeObjectByImage("RoadImage.png", row, col - 1);
                     System.out.println(image);
@@ -1475,6 +1483,7 @@ public class UserInterface extends Application {
             } else if (oneDir == Direction.DOWN) {
                 Rectangle cell = grid.getFrontGrid()[row][col + 1];
                 if (!(cell.getFill() instanceof ImagePattern)) {
+                    saveState();
                     cell.setFill(new ImagePattern(image));
                     grid.placeObjectByImage("RoadImageDown.png", row, col + 1);
                     System.out.println(image);
@@ -1482,6 +1491,7 @@ public class UserInterface extends Application {
             } else if (oneDir == Direction.RIGHT) {
                 Rectangle cell = grid.getFrontGrid()[row - 1][col];
                 if (!(cell.getFill() instanceof ImagePattern)) {
+                    saveState();
                     cell.setFill(new ImagePattern(image));
                     grid.placeObjectByImage("RoadImageRight.png", row - 1, col);
                     System.out.println(image);
@@ -1489,6 +1499,7 @@ public class UserInterface extends Application {
             } else if (oneDir == Direction.LEFT) {
                 Rectangle cell = grid.getFrontGrid()[row + 1][col];
                 if (!(cell.getFill() instanceof ImagePattern)) {
+                    saveState();
                     cell.setFill(new ImagePattern(image));
                     grid.placeObjectByImage("RoadImageLeft.png", row + 1, col);
                     System.out.println(image);
@@ -1497,7 +1508,7 @@ public class UserInterface extends Application {
         });
 
         upButt.setOnAction(e -> {
-
+            saveState();
             Rectangle cell = grid.getFrontGrid()[row][col];
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImage.png")));
             grid.placeObjectByImage("RoadImage.png", row, col);
@@ -1510,7 +1521,7 @@ public class UserInterface extends Application {
         });
 
         downButt.setOnAction(e -> {
-
+            saveState();
             Rectangle cell = grid.getFrontGrid()[row][col];
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImageDown.png")));
             grid.placeObjectByImage("RoadImageDown.png", row, col);
@@ -1522,7 +1533,7 @@ public class UserInterface extends Application {
         });
 
         leftButt.setOnAction(e -> {
-
+            saveState();
             Rectangle cell = grid.getFrontGrid()[row][col];
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImageLeft.png")));
             grid.placeObjectByImage("RoadImageLeft.png", row, col);
@@ -1535,7 +1546,7 @@ public class UserInterface extends Application {
         });
 
         rightButt.setOnAction(e -> {
-
+            saveState();
             Rectangle cell = grid.getFrontGrid()[row][col];
             cell.setFill(new ImagePattern(new Image("file:Images/RoadImageRight.png")));
             grid.placeObjectByImage("RoadImageRight.png", row, col);
@@ -1547,6 +1558,7 @@ public class UserInterface extends Application {
         });
 
         removeButton.setOnAction(e -> {
+            saveState();
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
             options.getChildren().clear();
@@ -1554,6 +1566,7 @@ public class UserInterface extends Application {
         });
 
         renameButt.setOnAction(e -> {
+            saveState();
             openRoadRenameDialog((Road)obj);
             options.getChildren().clear();
 
@@ -1607,6 +1620,7 @@ public class UserInterface extends Application {
         options.getChildren().add(closeButton);
 
         fixRoad.setOnAction(e -> {
+            saveState();
             grid.synchronizeGrid();
             Rectangle cell = grid.getFrontGrid()[row][col];
             System.out.println(grid.getFrontGrid()[row][col].toString());
@@ -1663,6 +1677,7 @@ public class UserInterface extends Application {
         options.getChildren().add(closeButton);
 
         flipDirectionButton.setOnAction(e -> {
+            saveState();
             // For each connected road tile, flip its direction
             for (int[] coord : connectedRoads) {
                 int r = coord[0];
@@ -1711,6 +1726,7 @@ public class UserInterface extends Application {
 
         renameRoadButton.setOnAction(e -> {
             // Use the new renameConnectedRoads function
+            saveState();
             boolean renameSuccessful = renameConnectedRoads(mainLayout, grid, connectedRoads);
 
             if (renameSuccessful) {
@@ -1734,6 +1750,7 @@ public class UserInterface extends Application {
         });
 
         removeButton.setOnAction(e -> {
+            saveState();
             // Remove all connected road tiles
             for (int[] coord : connectedRoads) {
                 grid.remove(coord[0], coord[1]);
@@ -1777,6 +1794,7 @@ public class UserInterface extends Application {
 
             // Create buttons for each intersection type except current one
             if (!(currentObject instanceof Roundabout)) {
+                saveState();
                 Button roundaboutButton = new Button("Roundabout");
                 roundaboutButton.setOnAction(event -> {
                     Road[] roads = null;
@@ -1798,6 +1816,7 @@ public class UserInterface extends Application {
             }
 
             if (!(currentObject instanceof StopSign)) {
+                saveState();
                 Button stopSignButton = new Button("Stop Sign");
                 stopSignButton.setOnAction(event -> {
                     Road[] roads = null;
@@ -1819,6 +1838,7 @@ public class UserInterface extends Application {
             }
 
             if (!(currentObject instanceof StopLight)) {
+                saveState();
                 Button stopLightButton = new Button("Stop Light");
                 stopLightButton.setOnAction(event -> {
                     Road[] roads = null;
@@ -1854,6 +1874,7 @@ public class UserInterface extends Application {
                     (currentObject instanceof StopLight)) {
                 Button basicIntersectionButton = new Button("Basic Intersection");
                 basicIntersectionButton.setOnAction(event -> {
+                    saveState();
                     Road[] roads = null;
 
                     // Preserve connected roads
@@ -1882,6 +1903,7 @@ public class UserInterface extends Application {
         });
 
         removeButton.setOnAction(e -> {
+            saveState();
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
             options.getChildren().clear();
@@ -1936,6 +1958,7 @@ public class UserInterface extends Application {
         options.getChildren().add(closeButton);
 
         submitButton.setOnAction(e -> {
+            saveState();
             int vert = Integer.parseInt(verticalField.getText());
             int hor = Integer.parseInt(horizontalField.getText());
             grid.updateTiming(light, vert, hor);
