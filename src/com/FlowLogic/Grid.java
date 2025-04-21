@@ -1416,6 +1416,9 @@ public class Grid {
                 if (grid[i][k] != null) {
                     frontGrid[i][k].setFill(new ImagePattern(grid[i][k].getImageFile()));
                 }
+                else {
+                    frontGrid[i][k].setFill(null);
+                }
             }
         }
         UserInterface.refreshGrid(numRows);

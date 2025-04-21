@@ -223,6 +223,7 @@ public class UserInterface extends Application {
         });
 
         gridContainer.setOnDragDropped(event -> {
+            saveState();
             //Fills the cell with the image
             Dragboard db = event.getDragboard();
             Image dbImage = db.getImage();
@@ -291,7 +292,6 @@ public class UserInterface extends Application {
                 grid.placeObjectByImage(db.getString(), row, col);
                 System.out.println(db.getString());
             }
-
             // Update container classes for roads
         });
 
@@ -354,6 +354,17 @@ public class UserInterface extends Application {
             }
         });
         right.getChildren().add(simulate);
+
+        Button undoButton = new Button("Undo");
+        undoButton.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+        undoButton.setOnAction(e -> {
+            if (!undo.isEmpty()) {
+                System.out.println("Pop!");
+                grid = undo.pop();
+                grid.synchronizeGrid();
+            }
+        });
+        right.getChildren().add(undoButton);
 
         // Add a checkbox under the menu button
         selectEntireRoadCheckbox = new CheckBox("Toggle Select Entire Road");
@@ -1943,6 +1954,11 @@ public class UserInterface extends Application {
         });
 
 
+    }
+
+    public static void saveState() {
+        Grid g = new Grid(grid);//Makes a copy
+        undo.add(g);//Saves copy
     }
 
 
