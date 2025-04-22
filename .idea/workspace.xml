@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Added the basic vehicle interaction logic">
+    <list default="true" id="c153a30a-a078-4f3b-a9f6-7dfd21e2e20a" name="Changes" comment="Crosswalk functionality for load/save">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/FlowLogic/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/FlowLogic/Vehicle.java" afterDir="false" />
     </list>
@@ -51,7 +51,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "dom__dev",
+    "git-widget-placeholder": "isaac-dev",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -83,6 +83,7 @@
       <workItem from="1740664465878" duration="1514000" />
       <workItem from="1740752532896" duration="1056000" />
       <workItem from="1743550897074" duration="29654000" />
+      <workItem from="1744903525405" duration="10155000" />
     </task>
     <task id="LOCAL-00001" summary="implemented onewayroad class">
       <option name="closed" value="true" />
@@ -275,7 +276,23 @@
       <option name="project" value="LOCAL" />
       <updated>1744292680101</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Made Crosswalk class and Image files">
+      <option name="closed" value="true" />
+      <created>1744905845167</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1744905845168</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Crosswalk functionality for load/save">
+      <option name="closed" value="true" />
+      <created>1744924520719</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1744924520719</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -333,7 +350,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="implemented onewayroad class" />
     <MESSAGE value="implemented road class" />
     <MESSAGE value="implemented twowayroad class" />
     <MESSAGE value="implemented a skeleton vehicle class to use in the road class" />
@@ -357,6 +373,8 @@
     <MESSAGE value="Attempt to fix hazard" />
     <MESSAGE value="for pull" />
     <MESSAGE value="Added the basic vehicle interaction logic" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added the basic vehicle interaction logic" />
+    <MESSAGE value="Made Crosswalk class and Image files" />
+    <MESSAGE value="Crosswalk functionality for load/save" />
+    <option name="LAST_COMMIT_MESSAGE" value="Crosswalk functionality for load/save" />
   </component>
 </project>

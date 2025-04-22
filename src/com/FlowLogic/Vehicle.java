@@ -1,5 +1,7 @@
 package com.FlowLogic;
 
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 import java.util.*;
@@ -74,6 +76,8 @@ public class Vehicle {
         Rectangle newCar = new Rectangle(-100, -100, width, length);
         newCar.setRotate(curRotation);
         newCar.setVisible(true);
+        //Image image = new Image("file:Images/BlueCar.png");
+        //newCar.setFill(new ImagePattern(image));
         this.car = newCar;
     }
 
