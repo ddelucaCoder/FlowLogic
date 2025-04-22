@@ -983,29 +983,38 @@ public class Grid {
         return false;
     }
 
-    private void getOutRoadsAroundHelper(Intersection i, ArrayList<OneWayRoad> response) {
+    private void getOutRoadsAroundHelper(Intersection i, ArrayList<OneWayRoad> response, Set<Intersection> visited) {
+        // Add this intersection to the visited set
+        visited.add(i);
+
         int row = i.getRowNum();
         int col = i.getColNum();
+
         // MAKE RECURSIVE CALLS TO THE INTERSECTIONS AROUND IT
+        // Only call recursively if we haven't visited this intersection before
         if (row + 1 < numRows
             && getAtSpot(row + 1, col) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID() ) {
-            getOutRoadsAroundHelper(j, response);
+            && j.getIntersectionID() == i.getIntersectionID()
+            && !visited.contains(j)) {
+            getOutRoadsAroundHelper(j, response, visited);
         }
         if (row - 1 >= 0 &&
             getAtSpot(row - 1, col) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID() ) {
-            getOutRoadsAroundHelper(j, response);
+            && j.getIntersectionID() == i.getIntersectionID()
+            && !visited.contains(j)) {
+            getOutRoadsAroundHelper(j, response, visited);
         }
         if (col + 1 < numColumns
             && getAtSpot(row, col + 1) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID() ) {
-            getOutRoadsAroundHelper(j, response);
+            && j.getIntersectionID() == i.getIntersectionID()
+            && !visited.contains(j)) {
+            getOutRoadsAroundHelper(j, response, visited);
         }
         if (col - 1 >= 0 &&
             getAtSpot(row, col - 1) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID() ) {
-            getOutRoadsAroundHelper(j, response);
+            && j.getIntersectionID() == i.getIntersectionID()
+            && !visited.contains(j)) {
+            getOutRoadsAroundHelper(j, response, visited);
         }
 
         // ADD THE RIGHT ROADS TO THE LIST
@@ -1029,15 +1038,14 @@ public class Grid {
             && r.getDirection() == LEFT) {
             response.add(r);
         }
-
     }
 
     private ArrayList<OneWayRoad> getOutRoadsAround(Intersection i) {
         ArrayList<OneWayRoad> response = new ArrayList<>();
-        getOutRoadsAroundHelper(i, response);
+        Set<Intersection> visited = new HashSet<>();
+        getOutRoadsAroundHelper(i, response, visited);
         return response;
     }
-
 
     public int[][] gridToGraph() {
         if (intersections != null) {
