@@ -1,6 +1,7 @@
 package com.FlowLogic;
 
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -21,6 +22,11 @@ public class Simulation {
     int numVehicles;
     ArrayList<Vehicle> vehicles;
     ArrayList<Frame> frames;
+    int avgTimeAtIntersections = 0;
+    int avgTripTime = 360;
+    int maxTimeAtIntersections = 0;
+    int minTimeAtIntersections = 0;
+    int numActiveVehicles = 0;
 
     public Simulation(int numVehicles) {
         this.numVehicles = numVehicles;//This and next line may need to be changed based
@@ -73,12 +79,12 @@ public class Simulation {
         back.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         right.getChildren().add(back);
         AtomicReference<Boolean> exit = new AtomicReference<>(false);
+
         back.setOnAction(e -> {
             // Confirm close with the user
             Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
             confirmAlert.setTitle("Confirm Simulation Exit");
             confirmAlert.setHeaderText("Are you sure you want to close the simulation?");
-            confirmAlert.setContentText("You will have to remake it.");
 
             if (confirmAlert.showAndWait().get() == ButtonType.OK) {
                 // User confirmed the close, so return to build menu
@@ -86,6 +92,68 @@ public class Simulation {
                 exit.set(true);
             }
         });
+
+        VBox left = new VBox();
+        left.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
+        left.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
+        left.setStyle("-fx-background-color: #D3D3D3;");
+
+        AnchorPane.setLeftAnchor(left, 0.0);
+        AnchorPane.setTopAnchor(left, 0.0);     // Set top anchor
+        AnchorPane.setBottomAnchor(left, 0.0);  // Set bottom anchor
+        root.getChildren().add(left);
+
+        Button suggestion = new Button("Create Suggestions");
+        suggestion.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+        left.getChildren().add(suggestion);
+        suggestion.setOnAction(e -> {
+            // Confirm close with the user
+            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
+            infoAlert.setResizable(true);
+            infoAlert.getDialogPane().setPrefSize(700, 500); // Make wider and taller
+            infoAlert.setTitle("Suggestions Menu");
+            String suggestionText = "";
+            int numSuggestions = 0;
+            if (avgTimeAtIntersections > 60) {
+                numSuggestions++;
+                suggestionText = suggestionText + numSuggestions + ". Cars appear to spend a long time at intersections. Consider expanding the road to allow more cars through!\n";
+            }
+
+            if (avgTripTime > 120) {
+                numSuggestions++;
+                suggestionText = suggestionText + numSuggestions + ". Cars appear to be taking quite some time to reach their destination from certain entry points. Consider creating a shorter path.\n";
+            }
+
+            if (suggestionText.isEmpty()) {
+                suggestionText = "No suggestions to be made!";
+            }
+            infoAlert.setHeaderText("Number of Suggestions: " + numSuggestions);
+
+            infoAlert.setContentText(suggestionText);
+            infoAlert.showAndWait();
+        });
+
+        Label statisticsTitle = new Label("Simulation Statistics:");
+        statisticsTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+
+        Label avgTripTimeLabel = new Label("Average Trip Time: " + avgTripTime);
+        avgTripTimeLabel.setStyle("-fx-font-size: 16px;");
+
+        Label avgIntersectionWaitLabel = new Label("Average Intersection Wait Time: " + avgTimeAtIntersections);
+        avgIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label maxIntersectionWaitLabel = new Label("Max Intersection Wait Time: " + maxTimeAtIntersections);
+        maxIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label minIntersectionWaitLabel = new Label("Min Intersection Wait Time: " + minTimeAtIntersections);
+        minIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label numActiveVehiclesLabel = new Label("Min Intersection Wait Time: " + numActiveVehicles);
+        numActiveVehiclesLabel.setStyle("-fx-font-size: 16px;");
+
+
+        left.getChildren().addAll(statisticsTitle, avgTripTimeLabel, avgIntersectionWaitLabel, maxIntersectionWaitLabel,
+                minIntersectionWaitLabel, numActiveVehiclesLabel);
 
         AtomicInteger delay = new AtomicInteger(500); // starting delay in ms
 
@@ -116,6 +184,7 @@ public class Simulation {
                 }
                 Platform.runLater(() -> { // Ensures UI updates happen on JavaFX thread
                     System.out.println("Rendering frame");
+                    updateStatisticsLabels(left);
                     for (Step s : f.getSteps()) {
                         Object oldObj = s.oldObject;
                         Object newObj = s.newObject;
@@ -176,5 +245,47 @@ public class Simulation {
 
         //Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+    }
+
+    /**
+     * Updates the statistics labels in the left VBox panel with current simulation data allowing
+     * statistics to be updated every frame
+     * @param left The VBox containing the statistics labels
+     */
+    public void updateStatisticsLabels(VBox left) {
+        // Get current children
+        ArrayList<Node> nodesToKeep = new ArrayList<>();
+
+        // Keep first two elements (suggestions button and title)
+        for (int i = 0; i < 2; i++) {
+            if (i < left.getChildren().size()) {
+                nodesToKeep.add(left.getChildren().get(i));
+            }
+        }
+
+        // Clear all existing children
+        left.getChildren().clear();
+
+        // Add back the title/label we saved
+        left.getChildren().addAll(nodesToKeep);
+
+        Label avgTripTimeLabel = new Label("Average Trip Time: " + avgTripTime);
+        avgTripTimeLabel.setStyle("-fx-font-size: 16px;");
+
+        Label avgIntersectionWaitLabel = new Label("Average Intersection Wait Time: " + avgTimeAtIntersections);
+        avgIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label maxIntersectionWaitLabel = new Label("Max Intersection Wait Time: " + maxTimeAtIntersections);
+        maxIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label minIntersectionWaitLabel = new Label("Min Intersection Wait Time: " + minTimeAtIntersections);
+        minIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+
+        Label numActiveVehiclesLabel = new Label("Active Vehicles: " + numActiveVehicles);
+        numActiveVehiclesLabel.setStyle("-fx-font-size: 16px;");
+
+        // Add all the statistics labels to the VBox
+        left.getChildren().addAll(avgTripTimeLabel, avgIntersectionWaitLabel,
+                maxIntersectionWaitLabel, minIntersectionWaitLabel, numActiveVehiclesLabel);
     }
 }

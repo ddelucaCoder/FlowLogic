@@ -47,32 +47,12 @@ public class StopSign extends Intersection {
      */
     public void addToIntersection(Vehicle vehicle) {
         if (!queue.contains(vehicle)) { // Avoid duplicate entries
+            if (queue.isEmpty()) {
+                timer = WAIT_TIME;
+            }
             queue.add(vehicle);
             System.out.println("Vehicle added to stop sign queue, queue size: " + queue.size());
         }
-    }
-
-    /**
-     * This function removes the first vehicle from the queue
-     * To be used when the proper waiting time for the vehicle as the first
-     * car at the stop sign
-     *
-     * @return boolean indicating if a vehicle was removed
-     */
-    public boolean goThroughIntersection(Vehicle vehicle) {
-        if (!queue.isEmpty()) {
-            // If the specified vehicle is at the front of the queue, remove it
-            if (queue.peek() == vehicle) {
-                queue.poll();
-                return true;
-            }
-            // If looking for a specific vehicle anywhere in the queue
-            else if (queue.contains(vehicle)) {
-                queue.remove(vehicle);
-                return true;
-            }
-        }
-        return false;
     }
 
     // Getters and Setters

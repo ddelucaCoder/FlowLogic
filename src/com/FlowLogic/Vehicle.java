@@ -281,7 +281,7 @@ public class Vehicle {
 
                 if (lightState == light.RED) {
                     // Original code for stopping at red light when not in intersection
-                    if (i < 20) { // Very close to the light
+                    if (i < 15) { // Very close to the light
                         // Only stop if not already in intersection and not already stopped at this light
                         if (lastStopped != light) {
                             // Store the intersection coordinates for future use
@@ -374,20 +374,21 @@ public class Vehicle {
         // IMPROVED STOP SIGN HANDLING - Look ahead further based on speed
         for (int i = 0; i < lookAheadDistance; i += 16) {
             if (getCurrentGridObject(g, front(i)) instanceof StopSign s) {
-                // Begin deceleration earlier - gradual approach
-                if (i > 64) {
-                    // Far from stop sign, start gradual deceleration
-                    speed = i / 3;
-                    if (speed < 5) speed = 5; // Maintain minimum speed unless very close
-                    return true;
-                } else if (i <= 64 && i > 20) {
-                    // Getting closer, more significant deceleration
-                    speed = i / 4;
-                    if (speed < 3) speed = 3;
-                    return true;
-                } else if (i <= 20) {
-                    // Very close to the stop sign
-                    if (lastStopped != s) {
+                if (lastStopped != s) {
+                    // Begin deceleration earlier - gradual approach
+                    if (i > 64) {
+                        // Far from stop sign, start gradual deceleration
+                        speed = i / 3;
+                        if (speed < 5) speed = 5; // Maintain minimum speed unless very close
+                        return true;
+                    } else if (i <= 64 && i > 20) {
+                        // Getting closer, more significant deceleration
+                        speed = i / 4;
+                        if (speed < 3) speed = 3;
+                        return true;
+                    } else if (i <= length + 5) {
+                        // Very close to the stop sign
+
                         // Store the intersection coordinates for future use
                         int[] coords = Grid.getRealCoords(s);
                         lastIntersectionX = coords[1];
@@ -496,7 +497,7 @@ public class Vehicle {
                 // Coming from left to right (positive X direction)
                 // Stop at left of intersection
                 targetCenterX = intersectionX - length / 2;  // Position vehicle center at stop line
-                targetCenterY = intersectionCenterY;  // Center vertically with intersection
+                targetCenterY = intersectionCenterY + width / 2;  // Center vertically with intersection
                 break;
             default:
                 // Should never happen, but just in case
@@ -581,11 +582,39 @@ public class Vehicle {
         // For vehicles heading in the same direction
         if (direction != other.direction) return false;
 
+        int myCenterX = 0;
+        int myCenterY = 0;
+        int otherCenterX = 0;
+        int otherCenterY = 0;
+
         // Calculate centers
-        int myCenterX = x + width/2;
-        int myCenterY = y + length/2;
-        int otherCenterX = other.x + other.width/2;
-        int otherCenterY = other.y + other.length/2;
+        switch (direction) {
+            case UP:
+                myCenterX = x + width/2;
+                myCenterY = y + length/2;
+                otherCenterX = other.x + other.width/2;
+                otherCenterY = other.y + other.length/2;
+                break;
+            case DOWN:
+                myCenterX = x + width/2;
+                myCenterY = y + length/2;
+                otherCenterX = other.x + other.width/2;
+                otherCenterY = other.y + other.length/2;
+                break;
+            case LEFT:
+                myCenterX = x + length/2;
+                myCenterY = y + width/2;
+                otherCenterX = other.x + other.length/2;
+                otherCenterY = other.y + other.width/2;
+                break;
+            case RIGHT:
+                myCenterX = x + length/2;
+                myCenterY = y + width/2;
+                otherCenterX = other.x + other.length/2;
+                otherCenterY = other.y + other.width/2;
+                break;
+        }
+
 
         switch (direction) {
             case UP:
@@ -976,9 +1005,6 @@ public class Vehicle {
                 System.out.println("Vehicle turning at stop sign from " + direction + " to " + nextDirection);
             }
         }
-
-        // Reset intersection references to avoid getting stuck
-        lastStopped = null;
         currentIntersection = null;
 
         // Ensure car is visible and active

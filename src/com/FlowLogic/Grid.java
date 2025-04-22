@@ -58,6 +58,25 @@ public class Grid {
         populateMap();
     }
 
+    public Grid(Grid g) { // Clone Constructor
+        this.numRows = g.numRows;
+        this.numColumns = g.numColumns;
+        this.grid = new GridObject[numRows][numColumns];
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                if (g.grid[i][j] != null){
+                    this.grid[i][j] = g.grid[i][j].clone();
+                }
+            }
+        }
+        this.frontGrid = new Rectangle[numRows][numColumns];
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numColumns; j++) {
+                this.frontGrid[i][j] = g.frontGrid[i][j];
+            }
+        }
+    }
+
     private void populateMap() {
         imgToObj.put("RoadImageDown.png", new OneWayRoad(Orientation.VERTICAL, Direction.DOWN));
         imgToObj.put("RoadImage.png", new OneWayRoad(Orientation.VERTICAL, UP));
@@ -964,29 +983,38 @@ public class Grid {
         return false;
     }
 
-    private void getOutRoadsAroundHelper(Intersection i, ArrayList<OneWayRoad> response) {
+    private void getOutRoadsAroundHelper(Intersection i, ArrayList<OneWayRoad> response, Set<Intersection> visited) {
+        // Add this intersection to the visited set
+        visited.add(i);
+
         int row = i.getRowNum();
         int col = i.getColNum();
+
         // MAKE RECURSIVE CALLS TO THE INTERSECTIONS AROUND IT
+        // Only call recursively if we haven't visited this intersection before
         if (row + 1 < numRows
             && getAtSpot(row + 1, col) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID() ) {
-            getOutRoadsAroundHelper(j, response);
+            && j.getIntersectionID() == i.getIntersectionID()
+            && !visited.contains(j)) {
+            getOutRoadsAroundHelper(j, response, visited);
         }
         if (row - 1 >= 0 &&
             getAtSpot(row - 1, col) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID() ) {
-            getOutRoadsAroundHelper(j, response);
+            && j.getIntersectionID() == i.getIntersectionID()
+            && !visited.contains(j)) {
+            getOutRoadsAroundHelper(j, response, visited);
         }
         if (col + 1 < numColumns
             && getAtSpot(row, col + 1) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID() ) {
-            getOutRoadsAroundHelper(j, response);
+            && j.getIntersectionID() == i.getIntersectionID()
+            && !visited.contains(j)) {
+            getOutRoadsAroundHelper(j, response, visited);
         }
         if (col - 1 >= 0 &&
             getAtSpot(row, col - 1) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID() ) {
-            getOutRoadsAroundHelper(j, response);
+            && j.getIntersectionID() == i.getIntersectionID()
+            && !visited.contains(j)) {
+            getOutRoadsAroundHelper(j, response, visited);
         }
 
         // ADD THE RIGHT ROADS TO THE LIST
@@ -1010,15 +1038,14 @@ public class Grid {
             && r.getDirection() == LEFT) {
             response.add(r);
         }
-
     }
 
     private ArrayList<OneWayRoad> getOutRoadsAround(Intersection i) {
         ArrayList<OneWayRoad> response = new ArrayList<>();
-        getOutRoadsAroundHelper(i, response);
+        Set<Intersection> visited = new HashSet<>();
+        getOutRoadsAroundHelper(i, response, visited);
         return response;
     }
-
 
     public int[][] gridToGraph() {
         if (intersections != null) {
@@ -1393,11 +1420,13 @@ public class Grid {
      * This function updates the frontend to represent the backend
      */
     public void synchronizeGrid(){
-        UserInterface.refreshGrid(numRows);
         for (int i = 0; i < numRows; i++) {
             for (int k = 0; k < numColumns; k++) {
                 if (grid[i][k] != null) {
                     frontGrid[i][k].setFill(new ImagePattern(grid[i][k].getImageFile()));
+                }
+                else {
+                    frontGrid[i][k].setFill(null);
                 }
             }
         }
