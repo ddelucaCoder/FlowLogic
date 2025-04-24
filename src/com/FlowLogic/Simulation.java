@@ -3,6 +3,7 @@ package com.FlowLogic;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
@@ -205,11 +206,26 @@ public class Simulation {
                             Rectangle update = car.getCar();
                             update.setX(x);
                             update.setY(y);
+                            //update.setFill(car.getCar().getFill());
+                            Image image;
+                            if (car.getLength() <= 15) {
+                                image = new Image("file:Images/Prius.png");
+                            } else if (car.getLength() <= 20) {
+                                image = new Image("file:Images/BlueCar.png");
+                            } else if (car.getLength() <= 25) {
+                                image = new Image("file:Images/BusTaxi.png");
+                            } else {
+                                image = new Image("file:Images/Semi.png");
+                            }
+                            update.setFill(new ImagePattern(image));
+                            System.out.println("Car image file is: " + car.getCar().getFill() );
+                            //update.setStroke(Color.BLACK);
+                            //update.setStrokeWidth(2);
                             update.setWidth(((car.getWidth() * 1.0) /32) * cell_size / 2);
                             update.setHeight(((car.getLength() * 1.0) /32) * cell_size / 2);
-                            update.setFill(Color.BLUE);
-                            update.setStroke(Color.BLACK);
-                            update.setStrokeWidth(2);
+                            //update.setFill(Color.BLUE);
+                            //update.setStroke(Color.BLACK);
+                            //update.setStrokeWidth(2);
                             update.setRotate(car.getCurRotation());
                             if (!gridGroup.getChildren().contains(car.getCar())) {
                                 gridGroup.getChildren().add(car.getCar());
