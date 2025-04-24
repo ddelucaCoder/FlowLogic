@@ -419,7 +419,6 @@ public class Vehicle {
                         }
                     }
                 }
-
             }
         }
 
@@ -798,21 +797,25 @@ public class Vehicle {
                     if (x > oldX) {
                         for (int i = oldX; i <= x; i += 32) {
                             if (getCurrentGridObject(g, new int[]{i, y}) instanceof StopLight s && s == intersectionPath.get(1)) {
-                                System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
-                                lastSensedLight = s;
-                                intersectionPath.remove(0);
-                                lastDir = directionPath.remove(0);
-                                direction = directionPath.get(0);
+                                if (directionPath.get(0) == directionPath.get(1)) {
+                                    System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
+                                    lastSensedLight = s;
+                                    intersectionPath.remove(0);
+                                    lastDir = directionPath.remove(0);
+                                    direction = directionPath.get(0);
+                                }
                             }
                         }
                     } else {
                         for (int i = x; i <= oldX; i += 32) {
                             if (getCurrentGridObject(g, new int[]{i, y}) instanceof StopLight s && s == intersectionPath.get(1)) {
-                                System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
-                                lastSensedLight = s;
-                                intersectionPath.remove(0);
-                                lastDir = directionPath.remove(0);
-                                direction = directionPath.get(0);
+                                if (directionPath.get(0) == directionPath.get(1)) {
+                                    System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
+                                    lastSensedLight = s;
+                                    intersectionPath.remove(0);
+                                    lastDir = directionPath.remove(0);
+                                    direction = directionPath.get(0);
+                                }
                             }
                         }
                     }
@@ -820,21 +823,25 @@ public class Vehicle {
                     if (y > oldY) {
                         for (int i = oldY; i <= y; i += 32) {
                             if (getCurrentGridObject(g, new int[]{x, i}) instanceof StopLight s && s == intersectionPath.get(1)) {
-                                System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
-                                lastSensedLight = s;
-                                intersectionPath.remove(0);
-                                lastDir = directionPath.remove(0);
-                                direction = directionPath.get(0);
+                                if (directionPath.get(0) == directionPath.get(1)) {
+                                    System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
+                                    lastSensedLight = s;
+                                    intersectionPath.remove(0);
+                                    lastDir = directionPath.remove(0);
+                                    direction = directionPath.get(0);
+                                }
                             }
                         }
                     } else {
                         for (int i = y; i <= oldY; i += 32) {
                             if (getCurrentGridObject(g, new int[]{x, i}) instanceof StopLight s && s == intersectionPath.get(1)) {
-                                System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
-                                lastSensedLight = s;
-                                intersectionPath.remove(0);
-                                lastDir = directionPath.remove(0);
-                                direction = directionPath.get(0);
+                                if (directionPath.get(0) == directionPath.get(1)) {
+                                    System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
+                                    lastSensedLight = s;
+                                    intersectionPath.remove(0);
+                                    lastDir = directionPath.remove(0);
+                                    direction = directionPath.get(0);
+                                }
                             }
                         }
                     }
@@ -858,7 +865,12 @@ public class Vehicle {
                     || (lastDir == UP && direction == LEFT) // correct
                     || (lastDir == LEFT && direction == DOWN)) { // correct
                     return this.turnLeft();
+                } else {
+                    System.out.println("Turning but directions don't match");
+                    System.out.println("Cur Dir: " + this.direction + " Last Dir: " + this.lastDir);
                 }
+            } else {
+                System.out.println("Turning but doesn't work");
             }
         } else if (state == ROUND_ABOUT_GO) {
             // Handle roundabout movement
@@ -1094,19 +1106,15 @@ public class Vehicle {
         speed = 5;
         System.out.println("Vehicle speed set to: " + speed);
 
-        boolean alreadyRemoved = false;
 
 
         // Update path information
         if (!intersectionPath.isEmpty()) {
-            if (intersectionPath.get(0) != lastSensedLight) {
                 System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
                 intersectionPath.remove(0);
-            } else {
-                alreadyRemoved = true;
-            }
+
         }
-        if (!directionPath.isEmpty() && !alreadyRemoved) {
+        if (!directionPath.isEmpty()) {
             lastDir = directionPath.remove(0);
             direction = directionPath.get(0);
             System.out.println("New Direction = " + direction);
