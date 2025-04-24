@@ -961,6 +961,27 @@ public class Grid {
 
     }
 
+    private void groupRoundabouts(Roundabout round, int row, int col) {
+        // BASE CASE: round == spot, not intersection
+        GridObject obj = getAtSpot(row, col);
+        if (!(obj instanceof Intersection)) return;
+        //if (obj == round) return;
+
+        grid[row][col] = round; // replace with original
+
+        if (row + 1 < numRows) { // Downward
+            groupRoundabouts(round, row + 1, col);
+        }
+        if (col + 1 < numColumns) { // To the right
+            groupRoundabouts(round, row, col + 1);
+        }
+        synchronizeGrid();
+    }
+
+    private void displayBigRoundabout(int row, int col, Roundabout round) {
+
+    }
+
     public boolean checkAroundDest(Road r) {
         int row = r.getRowNum();
         int col = r.getColNum();
@@ -981,67 +1002,59 @@ public class Grid {
         return false;
     }
 
-    private void getOutRoadsAroundHelper(Intersection i, ArrayList<OneWayRoad> response, Set<Intersection> visited) {
+    private void getOutRoadsAroundHelper(int row, int col, ArrayList<OneWayRoad> response) {
         // Add this intersection to the visited set
-        visited.add(i);
 
-        int row = i.getRowNum();
-        int col = i.getColNum();
+        Intersection i = (Intersection) getAtSpot(row, col);
+
+        System.out.println("Checking");
 
         // MAKE RECURSIVE CALLS TO THE INTERSECTIONS AROUND IT
         // Only call recursively if we haven't visited this intersection before
         if (row + 1 < numRows
             && getAtSpot(row + 1, col) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID()
-            && !visited.contains(j)) {
-            getOutRoadsAroundHelper(j, response, visited);
-        }
-        if (row - 1 >= 0 &&
-            getAtSpot(row - 1, col) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID()
-            && !visited.contains(j)) {
-            getOutRoadsAroundHelper(j, response, visited);
+            && j.getIntersectionID() == i.getIntersectionID()) {
+            getOutRoadsAroundHelper(row + 1, col, response);
+            System.out.println("VISITED DOWN");
         }
         if (col + 1 < numColumns
             && getAtSpot(row, col + 1) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID()
-            && !visited.contains(j)) {
-            getOutRoadsAroundHelper(j, response, visited);
+            && j.getIntersectionID() == i.getIntersectionID()) {
+            getOutRoadsAroundHelper(row, col + 1, response);
+            System.out.println("VISITED RIGHT");
         }
-        if (col - 1 >= 0 &&
-            getAtSpot(row, col - 1) instanceof Intersection j
-            && j.getIntersectionID() == i.getIntersectionID()
-            && !visited.contains(j)) {
-            getOutRoadsAroundHelper(j, response, visited);
-        }
+
 
         // ADD THE RIGHT ROADS TO THE LIST
         if (row + 1 < numRows
             && getAtSpot(row + 1, col) instanceof OneWayRoad r
             && r.getDirection() == DOWN) {
+            System.out.println("ADDED A ROAD DOWN");
             response.add(r);
         }
         if (row - 1 >= 0 &&
             getAtSpot(row - 1, col) instanceof OneWayRoad r
             && r.getDirection() == UP) {
             response.add(r);
+            System.out.println("ADDED A ROAD UP");
         }
         if (col + 1 < numColumns
             && getAtSpot(row, col + 1) instanceof OneWayRoad r
             && r.getDirection() == RIGHT) {
             response.add(r);
+            System.out.println("ADDED A ROAD RIGHT");
         }
         if (col - 1 >= 0 &&
             getAtSpot(row, col - 1) instanceof OneWayRoad r
             && r.getDirection() == LEFT) {
             response.add(r);
+            System.out.println("ADDED A ROAD LEFT");
         }
     }
 
     private ArrayList<OneWayRoad> getOutRoadsAround(Intersection i) {
         ArrayList<OneWayRoad> response = new ArrayList<>();
-        Set<Intersection> visited = new HashSet<>();
-        getOutRoadsAroundHelper(i, response, visited);
+        getOutRoadsAroundHelper(i.getRowNum(), i.getColNum(), response);
         return response;
     }
 
@@ -1062,8 +1075,16 @@ public class Grid {
             for (int j = 0; j < numColumns; j++) {
                 if (getAtSpot(i, j) instanceof Intersection in) {
                     if (in.getIntersectionID() == -1) {
-                        groupIntersections(numIntersections++, i, j);
-                        intersections.add(in);
+                        if (in instanceof Roundabout r) { // group together big ones
+                            r.setIntersectionID(numIntersections++);
+                            intersections.add(r);
+                            groupRoundabouts(r, i, j);
+                            displayBigRoundabout(i, j, r);
+                            r.is2x2 = (r == getAtSpot(r.getRowNum() + 1, r.getColNum() + 1));
+                        } else {
+                            groupIntersections(numIntersections++, i, j);
+                            intersections.add(in);
+                        }
                     }
                 } else if (getAtSpot(i, j) instanceof OneWayRoad r && r.isInRoad()) { // ADDED IN ROADS TO GRAPH
                     intersections.add(r);
@@ -1082,6 +1103,7 @@ public class Grid {
         for (GridObject obj : intersections) {
             if (obj instanceof Intersection i) {
                 ArrayList<OneWayRoad> roads = getOutRoadsAround(i);
+                System.out.println("ROADS: " + roads.toString());
                 int originalID = i.getIntersectionID();
                 for (OneWayRoad r : roads) {
                     GridObject cur = r;

@@ -974,64 +974,132 @@ public class Vehicle {
             int roundX = coords[1];
             int roundY = coords[0];
 
-            // Calculate center of the roundabout
-            int centerX = roundX + (Grid.GRID_SIZE / 2);
-            int centerY = roundY + (Grid.GRID_SIZE / 2);
+            if (curRoundabout.is2x2) {
+                // Calculate center of the roundabout
+                int centerX = roundX + Grid.GRID_SIZE;
+                int centerY = roundY + Grid.GRID_SIZE;
 
-            // Convert to top-left position for rectangle
-            x = centerX - (width / 2);
-            y = centerY - (length / 2);
+                // Convert to top-left position for rectangle
+                x = centerX - (width / 2);
+                y = centerY - (length / 2);
 
-            // Set rotation and direction based on position
-            switch (roundAboutPos) {
-                case 0: // Right side of roundabout
-                    this.curRotation = 90;  // Facing right
-                    this.direction = RIGHT;
-                    if (directionPath.get(0) == RIGHT) {
-                        this.state = FORWARD;
-                        curRoundabout.availableSpots[roundAboutPos] = true;
-                    }
-                    break;
-                case 1: // Top of roundabout
-                    this.curRotation = 0;   // Facing up
-                    this.direction = UP;
-                    if (directionPath.get(0) == UP) {
-                        this.state = FORWARD;
-                        curRoundabout.availableSpots[roundAboutPos] = true;
-                    }
-                    break;
-                case 2: // Left side of roundabout
-                    this.curRotation = 270; // Facing left
-                    this.direction = LEFT;
-                    if (directionPath.get(0) == LEFT) {
-                        this.state = FORWARD;
-                        curRoundabout.availableSpots[roundAboutPos] = true;
-                    }
-                    break;
-                case 3: // Bottom of roundabout
-                    this.curRotation = 180; // Facing down
-                    this.direction = DOWN;
-                    if (directionPath.get(0) == DOWN) {
-                        this.state = FORWARD;
-                        curRoundabout.availableSpots[roundAboutPos] = true;
-                    }
-                    break;
-            }
+                // Set rotation and direction based on position
+                switch (roundAboutPos) {
+                    case 0: // Right side of roundabout
+                        this.curRotation = 90;  // Facing right
+                        this.direction = RIGHT;
+                        if (directionPath.get(0) == RIGHT) {
+                            this.state = FORWARD;
+                            curRoundabout.availableSpots[roundAboutPos] = true;
+                        }
+                        break;
+                    case 1: // Top of roundabout
+                        this.curRotation = 0;   // Facing up
+                        this.direction = UP;
+                        if (directionPath.get(0) == UP) {
+                            this.state = FORWARD;
+                            curRoundabout.availableSpots[roundAboutPos] = true;
+                        }
+                        break;
+                    case 2: // Left side of roundabout
+                        this.curRotation = 270; // Facing left
+                        this.direction = LEFT;
+                        if (directionPath.get(0) == LEFT) {
+                            this.state = FORWARD;
+                            curRoundabout.availableSpots[roundAboutPos] = true;
+                        }
+                        break;
+                    case 3: // Bottom of roundabout
+                        this.curRotation = 180; // Facing down
+                        this.direction = DOWN;
+                        if (directionPath.get(0) == DOWN) {
+                            this.state = FORWARD;
+                            curRoundabout.availableSpots[roundAboutPos] = true;
+                        }
+                        break;
 
-            // offset
-            switch (roundAboutPos) {
-                case 0: // Right side
-                    x += 10;
-                    break;
-                case 1: // Top
-                    y -= 10;
-                    break;
-                case 2: // Left side
-                    x -= 10;
-                    break;
-                case 3: // Bottom
-                    y += 10;
-                    break;
+                }
+
+                switch (roundAboutPos) {
+                    case 0: // Right side
+                        x += 16;
+                        y += 16;
+                        break;
+                    case 1: // Top
+                        y -= 16;
+                        x += 16;
+                        break;
+                    case 2: // Left side
+                        x -= 16;
+                        y -= 16;
+                        break;
+                    case 3: // Bottom
+                        y += 16;
+                        x -= 16;
+                        break;
+                }
+
+            } else {
+
+                // Calculate center of the roundabout
+                int centerX = roundX + (Grid.GRID_SIZE / 2);
+                int centerY = roundY + (Grid.GRID_SIZE / 2);
+
+                // Convert to top-left position for rectangle
+                x = centerX - (width / 2);
+                y = centerY - (length / 2);
+
+                // Set rotation and direction based on position
+                switch (roundAboutPos) {
+                    case 0: // Right side of roundabout
+                        this.curRotation = 90;  // Facing right
+                        this.direction = RIGHT;
+                        if (directionPath.get(0) == RIGHT) {
+                            this.state = FORWARD;
+                            curRoundabout.availableSpots[roundAboutPos] = true;
+                        }
+                        break;
+                    case 1: // Top of roundabout
+                        this.curRotation = 0;   // Facing up
+                        this.direction = UP;
+                        if (directionPath.get(0) == UP) {
+                            this.state = FORWARD;
+                            curRoundabout.availableSpots[roundAboutPos] = true;
+                        }
+                        break;
+                    case 2: // Left side of roundabout
+                        this.curRotation = 270; // Facing left
+                        this.direction = LEFT;
+                        if (directionPath.get(0) == LEFT) {
+                            this.state = FORWARD;
+                            curRoundabout.availableSpots[roundAboutPos] = true;
+                        }
+                        break;
+                    case 3: // Bottom of roundabout
+                        this.curRotation = 180; // Facing down
+                        this.direction = DOWN;
+                        if (directionPath.get(0) == DOWN) {
+                            this.state = FORWARD;
+                            curRoundabout.availableSpots[roundAboutPos] = true;
+                        }
+                        break;
+                }
+
+                // offset
+                switch (roundAboutPos) {
+                    case 0: // Right side
+                        x += 10;
+                        break;
+                    case 1: // Top
+                        y -= 10;
+                        break;
+                    case 2: // Left side
+                        x -= 10;
+                        break;
+                    case 3: // Bottom
+                        y += 10;
+                        break;
+                }
             }
 
             return new Step(old, new Vehicle(this));
@@ -1288,15 +1356,31 @@ public class Vehicle {
             GridObject next = tempPath.pop();
             intersectionPath.add(next);
 
-            Direction calculatedDirection;
-            if (next.getColNum() > prev.getColNum()) {
-                calculatedDirection = Direction.RIGHT;
-            } else if (next.getColNum() < prev.getColNum()) {
-                calculatedDirection = Direction.LEFT;
-            } else if (next.getRowNum() > prev.getRowNum()) {
-                calculatedDirection = Direction.DOWN;
+            Direction calculatedDirection = Direction.UP; // aribitrary
+            int colDiff = Math.abs(next.getColNum() - prev.getColNum());
+            int rowDiff = Math.abs(next.getRowNum() - prev.getRowNum());
+            if (colDiff > rowDiff) {
+                if (next.getColNum() > prev.getColNum()) {
+                    calculatedDirection = Direction.RIGHT;
+                } else if (next.getColNum() < prev.getColNum()) {
+                    calculatedDirection = Direction.LEFT;
+                }
+            } else if (rowDiff > colDiff) {
+                if (next.getRowNum() > prev.getRowNum()) {
+                    calculatedDirection = Direction.DOWN;
+                } else {
+                    calculatedDirection = Direction.UP;
+                }
             } else {
-                calculatedDirection = Direction.UP;
+                if (next.getColNum() > prev.getColNum()) {
+                    calculatedDirection = Direction.RIGHT;
+                } else if (next.getColNum() < prev.getColNum()) {
+                    calculatedDirection = Direction.LEFT;
+                } else if (next.getRowNum() > prev.getRowNum()) {
+                    calculatedDirection = Direction.DOWN;
+                } else {
+                    calculatedDirection = Direction.UP;
+                }
             }
 
             // NEW: Validate direction if next is a one-way road
