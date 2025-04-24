@@ -35,11 +35,11 @@ public class TrafficController {
         vehicles = new ArrayList<>();
         destinations = new ArrayList<>();
         entrances = new ArrayList<>();
-        double cell_size = (720 * 1.0)/GRID_SIZE;
+
         for (int i = 0; i < numCars; i++) {
             Random ran = new Random();
             int len = ran.nextInt(6) -3 + avgSize;
-            len = ((int) (((len * 1.0) /32) * cell_size)) / 2;
+
             vehicles.add(new Vehicle(len));
         }
         intersections = g.intersections;
