@@ -149,7 +149,7 @@ public class Vehicle {
             double distance = Math.sqrt(dx*dx + dy*dy);
 
             // If another vehicle is too close to our spawn point, don't spawn
-            if (distance < length + 3) {  // Added safety margin
+            if (distance < length + 1) {  // Added safety margin
                 return false; // Cannot spawn, location occupied
             }
         }

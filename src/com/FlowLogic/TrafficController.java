@@ -122,9 +122,9 @@ public class TrafficController {
         }
         return sim;
     }
-    public void rushHour(int time_between, int dist, int accel) {
-        this.time_between = time_between;
-        Vehicle.rushHour(dist, accel);
+    public void rushHour() {
+        this.time_between = 3;
+        Vehicle.rushHour(3, 3);
     }
 
 

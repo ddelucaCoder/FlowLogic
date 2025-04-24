@@ -355,8 +355,13 @@ public class UserInterface extends Application {
                 scale.setY(maxZoom);
                 scale.setX(maxZoom);
                 int[] back = simPrompt(stage);
+                if (back[0] == -1) {
+                    return;
+                }
                 TrafficController tc = new TrafficController(back[0], back[1], grid);
-                //tc.rushHour(3,6, 3);
+                if (back[2] != 0) {
+                    tc.rushHour();
+                }
                 Simulation sim = tc.runSimulation();
                 long avgTripTime = tc.getAvgTripTime();
                 System.out.println("Avg trip time = " + avgTripTime);
@@ -430,62 +435,50 @@ public class UserInterface extends Application {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
         popup.initOwner(owner);
-        popup.setTitle("Enter an Integer");
-        TextField inputField = new TextField();
-        inputField.setPromptText("Enter Number of Cars");
-        Label message = new Label();
-        message.setText("Enter Number of Cars");
-        Button okButton = new Button("OK");
-        Button cancelButton = new Button("Cancel");
-        final int[] userValue = {25, 10};  // Store value inside array to modify inside lambda
-        okButton.setOnAction(e -> {
-            String input = inputField.getText();
-            if (!input.isEmpty()) {
-                try {
-                    userValue[1] = Integer.parseInt(input);
-                } catch (NumberFormatException ex) {
-                    message.setText("Invalid input! Using default value.");
-                }
-            }
+        popup.setTitle("Simulation Settings");
+
+        TextField numCarsField = new TextField();
+        numCarsField.setPromptText("Number of Cars");
+
+        TextField avgSizeField = new TextField();
+        avgSizeField.setPromptText("Average Size of Car");
+
+        CheckBox rushHourBox = new CheckBox("Rush Hour Mode");
+
+        Label message = new Label("Enter simulation settings:");
+        final int[] userValue = {25, 10, 0};  // Default values
+
+        Button runButton = new Button("Run");
+        runButton.setOnAction(e -> {
+            try {
+                userValue[0] = Integer.parseInt(numCarsField.getText());
+            } catch (NumberFormatException ignored) { /* Keep default */ }
+
+            try {
+                userValue[1] = Integer.parseInt(avgSizeField.getText());
+            } catch (NumberFormatException ignored) { /* Keep default */ }
+
+            userValue[2] = rushHourBox.isSelected() ? 1 : 0;
+
             popup.close();
         });
+
+        Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> {
             popup.close();
+            userValue[0] = -1;
         });
-        VBox layout = new VBox(10, inputField, message, okButton, cancelButton);
+
+        HBox buttonRow = new HBox(10, runButton, cancelButton);
+        buttonRow.setAlignment(Pos.CENTER);
+
+        VBox layout = new VBox(10, message, numCarsField, avgSizeField, rushHourBox, buttonRow);
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
-        popup.setScene(new Scene(layout, 250, 150));
+
+        popup.setScene(new Scene(layout, 300, 250));
         popup.showAndWait();
 
-        Stage popup2 = new Stage();
-        popup2.initModality(Modality.APPLICATION_MODAL);
-        popup2.initOwner(owner);
-        popup2.setTitle("Enter an Integer");
-        TextField inputField2 = new TextField();
-        inputField2.setPromptText("Enter Number of Cars");
-        Label message2 = new Label();
-        message2.setText("Enter Average Size of Car");
-        Button okButton2 = new Button("OK");
-        Button cancelButton2 = new Button("Cancel");
-        okButton2.setOnAction(e -> {
-            String input2 = inputField2.getText();
-            if (!input2.isEmpty()) {
-                try {
-                    userValue[0] = Integer.parseInt(input2);
-                } catch (NumberFormatException ex) {
-                    message.setText("Invalid input! Using default value.");
-                }
-            }
-            popup2.close();
-        });
-        cancelButton2.setOnAction(e -> {
-            popup2.close();
-        });
-        VBox layout2 = new VBox(10, inputField2, message2, okButton2, cancelButton2);
-        layout2.setStyle("-fx-padding: 20; -fx-alignment: center;");
-        popup2.setScene(new Scene(layout2, 250, 150));
-        popup2.showAndWait();
-        return userValue;  // Return final integer value
+        return userValue;
     }
 
     /**
