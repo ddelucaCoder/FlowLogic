@@ -223,9 +223,9 @@ public class Simulation {
                             //update.setStrokeWidth(2);
                             update.setWidth(((car.getWidth() * 1.0) /32) * cell_size / 2);
                             update.setHeight(((car.getLength() * 1.0) /32) * cell_size / 2);
-                            update.setFill(Color.BLUE);
-                            update.setStroke(Color.BLACK);
-                            update.setStrokeWidth(2);
+                            //update.setFill(Color.BLUE);
+                            //update.setStroke(Color.BLACK);
+                            //update.setStrokeWidth(2);
                             update.setRotate(car.getCurRotation());
                             if (!gridGroup.getChildren().contains(car.getCar())) {
                                 gridGroup.getChildren().add(car.getCar());
