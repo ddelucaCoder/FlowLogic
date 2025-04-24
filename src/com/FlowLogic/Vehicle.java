@@ -10,6 +10,8 @@ import static com.FlowLogic.CarState.*;
 import static com.FlowLogic.Direction.*;
 import static com.FlowLogic.UserInterface.GRID_SIZE;
 import static com.FlowLogic.UserInterface.grid;
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Vehicle class that handles vehicle behavior in traffic simulation.
@@ -54,6 +56,12 @@ public class Vehicle {
     private static final int ACCEL = 3;
     private Direction lastDir = RIGHT;
 
+    // statistics properties
+    private Duration tripTime;
+    private final Instant startTime;
+    private Duration totalWaitTime;
+    //private final Instant waitStartTime;
+
     /**
      * Creates a new vehicle with the specified length.
      * @param length The length of the vehicle
@@ -71,6 +79,7 @@ public class Vehicle {
         this.state = NOT_SPAWNED;
         this.direction = null;
         this.currentIntersection = null;
+        this.startTime = Instant.now();
 
         // Initialize vehicle visualization off-screen
         Rectangle newCar = new Rectangle(-100, -100, width, length);
@@ -108,6 +117,8 @@ public class Vehicle {
         this.turnPositionSet = v.turnPositionSet;
         this.roundAboutPos = v.roundAboutPos;
         this.curRoundabout = v.curRoundabout;
+        this.tripTime = v.tripTime;
+        this.startTime = v.startTime;
     }
 
     /**
@@ -774,8 +785,14 @@ public class Vehicle {
             getCurrentGridObject(g) == intersectionPath.get(intersectionPath.size() - 1)) {
             System.out.println("Destination Reached");
             state = DESTINATION_REACHED;
+            Instant endTime = Instant.now();
+            tripTime = Duration.between(startTime, endTime);
+            //System.out.println("Trip time was: " +  tripTime);
             return new Step(this, null);
         } else if (state == DESTINATION_REACHED) {
+            Instant endTime = Instant.now();
+            tripTime = Duration.between(startTime, endTime);
+            //System.out.println("Trip time was: " +  tripTime);
             return null;
         }
 
@@ -1523,4 +1540,10 @@ public class Vehicle {
     public int getCurRotation() {
         return curRotation;
     }
+
+
+    public int getTripTime() {
+        return (int) tripTime.toMillis();
+    }
+
 }

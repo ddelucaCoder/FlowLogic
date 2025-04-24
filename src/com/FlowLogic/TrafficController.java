@@ -26,6 +26,9 @@ public class TrafficController {
 
     private int[][] graph;
 
+    // stats parameters
+    private long totalTripTime;
+
     public TrafficController(int avgSize, int numCars, Grid g) {
         graph = g.gridToGraph();
        // System.out.println("Num Parking: " + Parking.getNumParking());
@@ -115,6 +118,28 @@ public class TrafficController {
             sim.addFrame(f);
         }
         return sim;
+    }
+
+
+    public ArrayList<Vehicle> getVehicles() {
+        return vehicles;
+    }
+    public long getAvgTripTime() {
+        int num = vehicles.size();
+        for (Vehicle vehicle : vehicles) {
+            totalTripTime += vehicle.getTripTime();
+            System.out.println("Vehcile trip time = " + vehicle.getTripTime());
+        }
+        System.out.println("AVGSTAT: total time = " + totalTripTime + " Num = " + num);
+        if (num != 0) {
+            return totalTripTime / num;
+        }
+        return totalTripTime;
+    }
+
+    public long getAvgIntersectionWaitTime() {
+
+        return 10;
     }
 
 }

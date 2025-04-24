@@ -24,10 +24,11 @@ public class Simulation {
     ArrayList<Vehicle> vehicles;
     ArrayList<Frame> frames;
     int avgTimeAtIntersections = 0;
-    int avgTripTime = 360;
+    long avgTripTime = 360;
     int maxTimeAtIntersections = 0;
     int minTimeAtIntersections = 0;
     int numActiveVehicles = 0;
+    int totalTime = 0;
 
     public Simulation(int numVehicles) {
         this.numVehicles = numVehicles;//This and next line may need to be changed based
@@ -305,4 +306,28 @@ public class Simulation {
         left.getChildren().addAll(avgTripTimeLabel, avgIntersectionWaitLabel,
                 maxIntersectionWaitLabel, minIntersectionWaitLabel, numActiveVehiclesLabel);
     }
+
+
+
+    public void setAvgTimeAtIntersections(int avgTimeAtIntersections) {
+        this.avgTimeAtIntersections = avgTimeAtIntersections;
+    }
+
+    public void setAvgTripTime(long avgTripTime) {
+        this.avgTripTime = avgTripTime;
+    }
+
+    public void setMaxTimeAtIntersections(int maxTimeAtIntersections) {
+        this.maxTimeAtIntersections = maxTimeAtIntersections;
+    }
+
+    public void setMinTimeAtIntersections(int minTimeAtIntersections) {
+        this.minTimeAtIntersections = minTimeAtIntersections;
+    }
+
+    public void setNumActiveVehicles(int numActiveVehicles) {
+        this.numActiveVehicles = numActiveVehicles;
+    }
+
+
 }
