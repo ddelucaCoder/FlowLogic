@@ -796,8 +796,6 @@ public class Grid {
         // special cases for in roads and parking
         if (obj instanceof OneWayRoad r && r.isInRoad()) {
             r.setInRoad(false);
-        } else if (obj instanceof Parking) { // TODO: MAKE THIS WORK WITH THE RECURSION
-            Parking.decParking();
         }
         grid[row][col] = null;
         frontGrid[row][col] = null;
@@ -1344,10 +1342,6 @@ public class Grid {
         grid[rowNum][colNum].setColNum(colNum);
         grid[rowNum][colNum].setRowNum(rowNum);
         mergeRoads(rowNum, colNum);
-
-        if (newObject instanceof Parking) {
-            Parking.incParking();
-        }
 
         if (grid[rowNum][colNum] instanceof OneWayRoad road) {
             if ((rowNum == 0 && road.getDirection() == Direction.DOWN) ||
