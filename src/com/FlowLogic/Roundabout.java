@@ -22,6 +22,8 @@ public class Roundabout extends Intersection{
 
     private Image imageFile;
 
+    public boolean is2x2 = false;
+
     /**
      * Class Definition Function
      * @param availableSpots True/False list representing the current spots in the roundabout that are open for cars
