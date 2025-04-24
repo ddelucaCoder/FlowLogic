@@ -356,7 +356,7 @@ public class UserInterface extends Application {
                 scale.setX(maxZoom);
                 int[] back = simPrompt(stage);
                 TrafficController tc = new TrafficController(back[0], back[1], grid);
-                //tc.rushHour(5,15);//Default values
+                //tc.rushHour(3,6, 3);
                 Simulation sim = tc.runSimulation();
                 long avgTripTime = tc.getAvgTripTime();
                 System.out.println("Avg trip time = " + avgTripTime);

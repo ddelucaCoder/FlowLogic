@@ -219,7 +219,6 @@ public class Simulation {
                                 image = new Image("file:Images/Semi.png");
                             }
                             update.setFill(new ImagePattern(image));
-                            System.out.println("Car image file is: " + car.getCar().getFill() );
                             //update.setStroke(Color.BLACK);
                             //update.setStrokeWidth(2);
                             update.setWidth(((car.getWidth() * 1.0) /32) * cell_size / 2);

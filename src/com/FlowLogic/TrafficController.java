@@ -81,7 +81,6 @@ public class TrafficController {
     public Simulation runSimulation() {
         Simulation sim = new Simulation(numCars);
 
-
         // generate cars and their in-roads and out-roads and time of entrance and destination
         int currentTime = 0;
         // get each car's route
@@ -123,9 +122,9 @@ public class TrafficController {
         }
         return sim;
     }
-    public void rushHour(int time_between, int dist) {
+    public void rushHour(int time_between, int dist, int accel) {
         this.time_between = time_between;
-        Vehicle.rushHour(dist);
+        Vehicle.rushHour(dist, accel);
     }
 
 

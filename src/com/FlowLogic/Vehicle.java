@@ -53,7 +53,7 @@ public class Vehicle {
     private static final int TURN_RATE = 45;
     private static int FOLLOWING_DISTANCE = 15; // Increased for safer distance
     private static final int FAST_DECEL = 6;
-    private static final int ACCEL = 3;
+    private static int ACCEL = 3;
     private Direction lastDir = RIGHT;
 
     private StopLight straight;
@@ -149,7 +149,7 @@ public class Vehicle {
             double distance = Math.sqrt(dx*dx + dy*dy);
 
             // If another vehicle is too close to our spawn point, don't spawn
-            if (distance < length + 5) {  // Added safety margin
+            if (distance < length + 3) {  // Added safety margin
                 return false; // Cannot spawn, location occupied
             }
         }
@@ -331,7 +331,7 @@ public class Vehicle {
                         currentIntersection = light;
 
                         // Position the vehicle precisely at the stop line
-                        positionAtStopLine(light);
+                        positionAtStopLine(light, otherVehicles);
 
                         // Set appropriate state based on path
                         if (light != straight && directionPath.size() > 1 && directionPath.get(1) != direction) {
@@ -395,7 +395,7 @@ public class Vehicle {
                             currentIntersection = light;
 
                             // Position vehicle precisely at stop line
-                            positionAtStopLine(light);
+                            positionAtStopLine(light, otherVehicles);
 
                             // Set appropriate state based on path
                             if (light != straight && directionPath.size() > 1 && directionPath.get(1) != direction) {
@@ -469,7 +469,7 @@ public class Vehicle {
                         currentIntersection = s; // Set current intersection to stop sign
 
                         // Position the vehicle precisely at the stop line
-                        positionAtStopLine(s);
+                        positionAtStopLine(s, otherVehicles);
 
                         // Set appropriate state based on path
                         if (directionPath.size() > 1 && directionPath.get(1) != direction) {
@@ -526,7 +526,7 @@ public class Vehicle {
      *
      * @param intersection The intersection element to stop at
      */
-    private void positionAtStopLine(GridObject intersection) {
+    private void positionAtStopLine(GridObject intersection, List<Vehicle> others) {
         int[] intersectionCoords = Grid.getRealCoords(intersection);
         int intersectionX = intersectionCoords[1];  // Column coordinate
         int intersectionY = intersectionCoords[0];  // Row coordinate
@@ -561,8 +561,22 @@ public class Vehicle {
                 return;
         }
 
-        int targetX = targetCenterX - width/2;
-        int targetY = targetCenterY - length/2;
+        int targetX = targetCenterX - width/4;
+        int targetY = targetCenterY - length/4;
+
+
+        //Check if another vehicle is already at the stop line
+        for (Vehicle v : others) {
+            if (this == v) continue; // Skip self
+
+            double dx = targetX - v.getX();
+            double dy = targetY - v.getY();
+            double distance = Math.sqrt(dx*dx + dy*dy);
+
+            if (distance < length) {  // Added safety margin
+                return;
+            }
+        }
 
         x = targetX;
         y = targetY;
@@ -1600,8 +1614,12 @@ public class Vehicle {
         return (int) tripTime.toMillis();
     }
 
-    public static void rushHour(int dist) {
+    public static void rushHour(int dist, int accel) {
         FOLLOWING_DISTANCE = dist;
+        ACCEL = accel;
     }
 
+    public int getTimeIn() {
+        return timeIn;
+    }
 }
