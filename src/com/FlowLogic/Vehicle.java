@@ -18,7 +18,7 @@ import static com.FlowLogic.UserInterface.grid;
 public class Vehicle {
     // Vehicle physical properties
     private int length;
-    private int width = ((int )(((10 * 1.0) /32) * ((720 * 1.0)/GRID_SIZE))) / 2;
+    private int width = 10;
     private Rectangle car;
 
     // Vehicle position and movement
@@ -50,7 +50,6 @@ public class Vehicle {
     // Constants for vehicle behavior
     private static final int TURN_RATE = 45;
     private static final int FOLLOWING_DISTANCE = 15; // Increased for safer distance
-    private static final int SLOW_DECEL = 2;
     private static final int FAST_DECEL = 6;
     private static final int ACCEL = 3;
     private Direction lastDir = RIGHT;
@@ -224,6 +223,30 @@ public class Vehicle {
     }
 
     /**
+     * Moves the vehicle forward slightly after completing a turn.
+     * Ensures the vehicle clears the intersection.
+     */
+    private void moveForwardAfterTurn() {
+        int moveDistance = 10; // Distance to move after turning
+
+        // Move vehicle forward in the current direction
+        switch (direction) {
+            case UP:
+                y -= moveDistance;
+                break;
+            case DOWN:
+                y += moveDistance;
+                break;
+            case LEFT:
+                x -= moveDistance;
+                break;
+            case RIGHT:
+                x += moveDistance;
+                break;
+        }
+    }
+
+    /**
      * Checks if the vehicle needs to decelerate based on obstacles ahead.
      * Handles traffic lights, stop signs, other vehicles, and destination approaches.
      *
@@ -263,18 +286,15 @@ public class Vehicle {
                         if (speed < 5 && distance > length) {
                             speed = 5;
                         }
-                    } else {
+                    } else  {
                         // Emergency stop if distance is zero or negative (collision)
                         speed = 0;
+                        return true;
                     }
 
                     needToDecelerate = true;
                 }
             }
-        }
-
-        if (speed == 0) {
-            return needToDecelerate;
         }
 
         // Check for traffic lights ahead - scan farther ahead for higher speeds
@@ -283,6 +303,7 @@ public class Vehicle {
         for (int i = 0; i < lookAheadDistance; i += 16) {  // Smaller step size for more precise detection
             if (getCurrentGridObject(g, front(i)) instanceof StopLight light) {
                 int lightState = getLightStateForDirection(light);
+                if (lastStopped == light) continue;
 
                 if (lightState == light.RED) {
                     // Original code for stopping at red light when not in intersection
@@ -310,6 +331,7 @@ public class Vehicle {
 
                             // Add the vehicle to the appropriate queue
                             light.addToQueue(this);
+                            needToDecelerate = true;
                         }
                     } else {
                         // Gradual deceleration as we approach
@@ -326,12 +348,30 @@ public class Vehicle {
                     if (!canStop) {
                         // Already committed to intersection - proceed through
                         // Maintain speed or slightly reduce if necessary
-                        if (speed > 15) {
-                            speed -= SLOW_DECEL / 2;  // Minor speed reduction for safety
-                        }
                         // Ensure minimum speed to clear intersection
                         if (speed < 10) {
                             speed = 10;
+                        }
+                        if (direction != directionPath.get(1)) {
+                            int targetSpeed = i / 3 + 5;
+                            if (targetSpeed < speed) {
+                                speed = targetSpeed;
+                            }
+                            int coords[] = Grid.getRealCoords(light);
+                            int intersectionX = coords[1];
+                            int intersectionY = coords[0];
+                            int distance =
+                                (int) Math.sqrt(Math.pow((intersectionX - x), 2) + Math.pow((intersectionY - y), 2));
+                            if (distance < 10) {
+                                intersectionPath.remove(0);
+                                lastStopped = (Intersection) intersectionPath.get(0);
+                                lastIntersectionX = intersectionPath.get(0).getColNum() * Grid.GRID_SIZE;
+                                lastIntersectionY = intersectionPath.get(0).getRowNum() * Grid.GRID_SIZE;
+                                lastDir = directionPath.remove(0);
+                                direction = directionPath.get(0);
+                                speed = 0;
+                                state = TURNING;
+                            }
                         }
                     } else {
                         // Can stop safely - gradually decelerate
@@ -371,8 +411,32 @@ public class Vehicle {
                             if (speed < 5 && i > 32) speed = 5; // Maintain minimum speed unless very close
                         }
                     }
+                } else {
+                    // light is green
+                    // if we need to turn
+                    if (direction != directionPath.get(1)) {
+                        int targetSpeed = i / 3 + 5;
+                        if (targetSpeed < speed) {
+                            speed = targetSpeed;
+                        }
+                        int coords[] = Grid.getRealCoords(light);
+                        int intersectionX = coords[1];
+                        int intersectionY = coords[0];
+                        int distance =
+                            (int) Math.sqrt(Math.pow((intersectionX - x), 2) + Math.pow((intersectionY - y), 2));
+                        if (distance < 20) {
+                            intersectionPath.remove(0);
+                            lastStopped = (Intersection) intersectionPath.get(0);
+                                lastDir = directionPath.remove(0);
+                            direction = directionPath.get(0);
+                            lastIntersectionX = intersectionPath.get(0).getColNum() * Grid.GRID_SIZE;
+                            lastIntersectionY = intersectionPath.get(0).getRowNum() * Grid.GRID_SIZE;
+                            speed = 0;
+                            state = TURNING;
+                        }
+                    }
                 }
-                // If light is green, no need to decelerate for it
+
             }
         }
 
@@ -648,6 +712,7 @@ public class Vehicle {
             // Turn completed
             state = FORWARD;
             turnPositionSet = false;
+            moveForwardAfterTurn();
         }
 
         return new Step(past, new Vehicle(this));
@@ -689,10 +754,8 @@ public class Vehicle {
             // Turn completed
             state = FORWARD;
             turnPositionSet = false;
-
-            // Update path information
-
-        } // TODO: TRAFFIC LIGHTS REMOVE EVEN IF NOT STOP.
+            moveForwardAfterTurn();
+        }
 
         return new Step(past, new Vehicle(this));
     }
@@ -734,21 +797,63 @@ public class Vehicle {
 
             // Check if we need to decelerate, otherwise accelerate if below speed limit
             if (!decelerate(g, allVehicles) &&
-                getCurrentGridObject(g) instanceof Road &&
-                ((Road) getCurrentGridObject(g)).getSpeedLimit() > speed) {
+                ((getCurrentGridObject(g) instanceof Road r &&
+                r.getSpeedLimit() > speed) || (getCurrentGridObject(g) instanceof Intersection))) {
                 accelerate();
             }
+
+            // check all cells that we'd pass through
+            int oldX = x;
+            int oldY = y;
 
             // If we're still in FORWARD state after decelerate check, move forward
             if (state == FORWARD) {
                 moveForward();
             }
 
+
+            // remove if we went through a stoplight
+            if (oldX != x) {
+                if (x > oldX) {
+                    for (int i = oldX; i <= x; i += 32) {
+                        if (getCurrentGridObject(g, new int[]{i, y}) instanceof StopLight s && s == intersectionPath.get(0)) {
+                            intersectionPath.remove(0);
+                            direction = directionPath.remove(0);
+                        }
+                    }
+                } else {
+                    for (int i = x; i <= oldX; i += 32) {
+                        if (getCurrentGridObject(g, new int[]{i, y}) instanceof StopLight s && s == intersectionPath.get(0)) {
+                            intersectionPath.remove(0);
+                            direction = directionPath.remove(0);
+                        }
+                    }
+                }
+            } else if (oldY != y) {
+                if (y > oldY) {
+                    for (int i = oldY; i <= y; i += 32) {
+                        if (getCurrentGridObject(g, new int[]{x, i}) instanceof StopLight s && s == intersectionPath.get(0)) {
+                            intersectionPath.remove(0);
+                            direction = directionPath.remove(0);
+                        }
+                    }
+                } else {
+                    for (int i = y; i <= oldY; i += 32) {
+                        if (getCurrentGridObject(g, new int[]{x, i}) instanceof StopLight s && s == intersectionPath.get(0)) {
+                            intersectionPath.remove(0);
+                            direction = directionPath.remove(0);
+                        }
+                    }
+                }
+            } else {
+                if (x > 64 && y > 64) {
+                    System.out.println("Didn't move");
+                }
+            }
+
             return new Step(before, new Vehicle(this));
         } else if (state == STOPPED_FORWARD || state == STOPPED_TURNING) {
             // Waiting at a traffic light or stop sign
-            // Simply return a step with the current state
-            // The stop sign and traffic light classes will handle releasing vehicles
             return new Step(new Vehicle(this), new Vehicle(this));
         } else if (state == TURNING) {
             // Execute turns based on current and next direction

@@ -206,6 +206,8 @@ public class Simulation {
                             Rectangle update = car.getCar();
                             update.setX(x);
                             update.setY(y);
+                            update.setWidth(((car.getWidth() * 1.0) /32) * cell_size / 2);
+                            update.setHeight(((car.getLength() * 1.0) /32) * cell_size / 2);
                             update.setFill(Color.BLUE);
                             update.setStroke(Color.BLACK);
                             update.setStrokeWidth(2);
