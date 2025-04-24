@@ -133,6 +133,7 @@ public class UserInterface extends Application {
     }
 
     public static void setupBuildMenu() {
+
         //Stops user from resizing the window
         stage.setResizable(false);
 
@@ -335,7 +336,22 @@ public class UserInterface extends Application {
         Button simulate = new Button("Simulate");
         simulate.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         simulate.setOnAction(e -> {
-            if (Road.getNumInRoads() > 0 && Parking.getNumParking() > 0) {
+            int numInRoads = 0;
+            int numParking = 0;
+            for (int i = 0; i < grid.getNumRows(); i++) {
+                for (int k = 0; k < grid.getNumColumns(); k++) {
+                    if (grid.getAtSpot(i, k) instanceof Road && ((Road) grid.getAtSpot(i, k)).isInRoad()) {
+                        numInRoads++;
+                    }
+
+                    if (grid.getAtSpot(i, k) instanceof Parking) {
+                        numParking++;
+                    }
+
+                }
+            }
+
+            if (numInRoads > 0 && numParking > 0) {
                 scale.setY(maxZoom);
                 scale.setX(maxZoom);
                 int[] back = simPrompt(stage);
@@ -346,10 +362,10 @@ public class UserInterface extends Application {
                 sim.display(stage, root, gridContainer, grid); // display the simulation
                 grid.synchronizeGrid();
             }
-            else if (Road.getNumInRoads() == 0){
+            else if (numInRoads == 0){
                 showErrorAlert("Please set an input road!");
             }
-            else if (Parking.getNumParking() == 0) {
+            else if (numParking == 0) {
                 showErrorAlert("Please place a parking lot on the map!");
             }
         });
@@ -1243,7 +1259,6 @@ public class UserInterface extends Application {
         });
 
         removeButton.setOnAction(e -> {
-            Parking.decParking();
             grid.remove(row, col);
             refreshGrid(GRID_SIZE);
             options.getChildren().clear();

@@ -107,7 +107,6 @@ public class Simulation {
         suggestion.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         left.getChildren().add(suggestion);
         suggestion.setOnAction(e -> {
-            // Confirm close with the user
             Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
             infoAlert.setResizable(true);
             infoAlert.getDialogPane().setPrefSize(700, 500); // Make wider and taller

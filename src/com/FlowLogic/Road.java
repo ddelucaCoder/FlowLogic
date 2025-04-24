@@ -150,7 +150,4 @@ public class Road implements GridObject {
         this.name = name;
     }
 
-    public static int getNumInRoads() {
-        return numInRoads;
-    }
 }
