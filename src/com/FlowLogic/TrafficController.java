@@ -28,16 +28,18 @@ public class TrafficController {
 
     public TrafficController(int avgSize, int numCars, Grid g) {
         graph = g.gridToGraph();
+        System.out.println("Num Parking: " + Parking.getNumParking());
+        System.out.println("Num In Roads: " + Road.getNumInRoads());
         System.out.println("Graph: " + Arrays.deepToString(graph));
         grid = g;
         vehicles = new ArrayList<>();
         destinations = new ArrayList<>();
         entrances = new ArrayList<>();
-        double cell_size = (720 * 1.0)/GRID_SIZE;
+
         for (int i = 0; i < numCars; i++) {
             Random ran = new Random();
             int len = ran.nextInt(6) -3 + avgSize;
-            len = ((int) (((len * 1.0) /32) * cell_size)) / 2;
+
             vehicles.add(new Vehicle(len));
         }
         intersections = g.intersections;

@@ -108,7 +108,6 @@ public class Simulation {
         suggestion.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         left.getChildren().add(suggestion);
         suggestion.setOnAction(e -> {
-            // Confirm close with the user
             Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
             infoAlert.setResizable(true);
             infoAlert.getDialogPane().setPrefSize(700, 500); // Make wider and taller
@@ -222,6 +221,11 @@ public class Simulation {
                             System.out.println("Car image file is: " + car.getCar().getFill() );
                             //update.setStroke(Color.BLACK);
                             //update.setStrokeWidth(2);
+                            update.setWidth(((car.getWidth() * 1.0) /32) * cell_size / 2);
+                            update.setHeight(((car.getLength() * 1.0) /32) * cell_size / 2);
+                            update.setFill(Color.BLUE);
+                            update.setStroke(Color.BLACK);
+                            update.setStrokeWidth(2);
                             update.setRotate(car.getCurRotation());
                             if (!gridGroup.getChildren().contains(car.getCar())) {
                                 gridGroup.getChildren().add(car.getCar());

@@ -10,7 +10,6 @@ import javafx.scene.image.Image;
  * @version February 20, 2025
  */
 public class Parking implements GridObject {
-    private static int numParking = 0;
     int rowNum;
     int colNum;
     int xLength, yLength, parkingCapacity, numCars;
@@ -98,18 +97,6 @@ public class Parking implements GridObject {
 
     public void setNumCars(int numCars) {
         this.numCars = numCars;
-    }
-
-    public static int getNumParking() {
-        return numParking;
-    }
-
-    public static void incParking() {
-        numParking++;
-    }
-
-    public static void decParking() {
-        numParking--;
     }
 
     /*
