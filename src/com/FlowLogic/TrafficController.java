@@ -31,9 +31,13 @@ public class TrafficController {
 
     public TrafficController(int avgSize, int numCars, Grid g) {
         graph = g.gridToGraph();
+
+        System.out.println("Graph: " + Arrays.deepToString(graph));
+
        // System.out.println("Num Parking: " + Parking.getNumParking());
        // System.out.println("Num In Roads: " + Road.getNumInRoads());
        // System.out.println("Graph: " + Arrays.deepToString(graph));
+
         grid = g;
         vehicles = new ArrayList<>();
         destinations = new ArrayList<>();

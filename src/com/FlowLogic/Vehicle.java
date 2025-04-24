@@ -56,6 +56,8 @@ public class Vehicle {
     private static final int ACCEL = 3;
     private Direction lastDir = RIGHT;
 
+    private StopLight straight;
+
     // statistics properties
     private Duration tripTime;
     private final Instant startTime;
@@ -319,32 +321,27 @@ public class Vehicle {
 
                 if (lightState == light.RED) {
                     // Original code for stopping at red light when not in intersection
-                    if (i < 15) { // Very close to the light
-                        // Only stop if not already in intersection and not already stopped at this light
-                        if (lastStopped != light) {
-                            // Store the intersection coordinates for future use
-                            int[] coords = Grid.getRealCoords(light);
-                            lastIntersectionX = coords[1];
-                            lastIntersectionY = coords[0];
+                    if (i < 15) {
+                        int[] coords = Grid.getRealCoords(light);
+                        lastIntersectionX = coords[1];
+                        lastIntersectionY = coords[0];
 
-                            lastStopped = light;
-                            speed = 0;
-                            currentIntersection = light;
+                        lastStopped = light;
+                        speed = 0;
+                        currentIntersection = light;
 
-                            // Position the vehicle precisely at the stop line
-                            positionAtStopLine(light);
+                        // Position the vehicle precisely at the stop line
+                        positionAtStopLine(light);
 
-                            // Set appropriate state based on path
-                            if (directionPath.size() > 1 && directionPath.get(1) != direction) {
-                                state = STOPPED_TURNING;
-                            } else {
-                                state = STOPPED_FORWARD;
-                            }
-
-                            // Add the vehicle to the appropriate queue
-                            light.addToQueue(this);
-                            needToDecelerate = true;
+                        // Set appropriate state based on path
+                        if (light != straight && directionPath.size() > 1 && directionPath.get(1) != direction) {
+                            state = STOPPED_TURNING;
+                        } else {
+                            state = STOPPED_FORWARD;
                         }
+
+                        // Add the vehicle to the appropriate queue
+                        light.addToQueue(this);
                     } else {
                         // Gradual deceleration as we approach
                         speed = i / 3;
@@ -352,29 +349,24 @@ public class Vehicle {
                     }
                     return true;
                 } else if (lightState == light.YELLOW) {
-                    // Calculate if we can stop in time based on physics
-                    int stoppingDistance = (speed * speed) / (2 * FAST_DECEL);
-                    boolean canStop = i > stoppingDistance;
 
                     // If already in intersection or too close to stop safely, proceed
-                    if (!canStop) {
+                    if (i < 30 && speed > 10) {
                         // Already committed to intersection - proceed through
-                        // Maintain speed or slightly reduce if necessary
-                        // Ensure minimum speed to clear intersection
-                        if (speed < 10) {
-                            speed = 10;
-                        }
-                        if (direction != directionPath.get(1)) {
+                        if (direction != directionPath.get(1) && light != straight) {
                             int targetSpeed = i / 3 + 5;
                             if (targetSpeed < speed) {
                                 speed = targetSpeed;
                             }
                             int coords[] = Grid.getRealCoords(light);
-                            int intersectionX = coords[1];
-                            int intersectionY = coords[0];
+                            int intersectionX = coords[1] + 16;
+                            int intersectionY = coords[0] + 16;
+                            int frontX = front()[0];
+                            int frontY = front()[1];
                             int distance =
-                                (int) Math.sqrt(Math.pow((intersectionX - x), 2) + Math.pow((intersectionY - y), 2));
-                            if (distance < 10) {
+                                (int) Math.sqrt(Math.pow((intersectionX - frontX), 2) + Math.pow((intersectionY - frontY),
+                                    2));
+                            if (distance < 36) {
                                 intersectionPath.remove(0);
                                 lastStopped = (Intersection) intersectionPath.get(0);
                                 lastIntersectionX = intersectionPath.get(0).getColNum() * Grid.GRID_SIZE;
@@ -386,69 +378,66 @@ public class Vehicle {
                             }
                         }
                     } else {
-                        // Can stop safely - gradually decelerate
-                        if (i < 96) { // Within three grid cells
-                            // More significant deceleration for yellow when closer
-                            // Gradual deceleration as we approach
-                            speed = i / 3;
-                            if (speed < 5 && i > 32) speed = 5; // Maintain minimum speed unless very close
+                        // slow down
+                        int targetSpeed = i / 3;
+                        if (targetSpeed < speed) {
+                            speed = targetSpeed;
+                            if (speed < 3) speed = 3;
+                        }
 
-                            if (i < 20 && lastStopped != light) { // Very close, just stop
-                                // Store intersection coordinates for future use
-                                int[] coords = Grid.getRealCoords(light);
-                                lastIntersectionX = coords[1];
-                                lastIntersectionY = coords[0];
+                        if (i < 15) { // close enough to just stop
+                            int[] coords = Grid.getRealCoords(light);
+                            lastIntersectionX = coords[1];
+                            lastIntersectionY = coords[0];
 
-                                lastStopped = light;
-                                speed = 0;
-                                currentIntersection = light;
+                            lastStopped = light;
+                            speed = 0;
+                            currentIntersection = light;
 
-                                // Position vehicle precisely at stop line
-                                positionAtStopLine(light);
+                            // Position vehicle precisely at stop line
+                            positionAtStopLine(light);
 
-                                // Set appropriate state based on path
-                                if (directionPath.size() > 1 && directionPath.get(1) != direction) {
-                                    state = STOPPED_TURNING;
-                                } else {
-                                    state = STOPPED_FORWARD;
-                                }
-
-                                // Add vehicle to appropriate queue
-                                light.addToQueue(this);
+                            // Set appropriate state based on path
+                            if (light != straight && directionPath.size() > 1 && directionPath.get(1) != direction) {
+                                state = STOPPED_TURNING;
+                            } else {
+                                state = STOPPED_FORWARD;
                             }
-                        } else {
-                            // More distant, moderate deceleration
-                            // Gradual deceleration as we approach
-                            speed = i / 3;
-                            if (speed < 5 && i > 32) speed = 5; // Maintain minimum speed unless very close
+
+                            // Add vehicle to appropriate queue
+                            light.addToQueue(this);
                         }
                     }
                 } else {
                     // light is green
                     // if we need to turn
-                    if (direction != directionPath.get(1)) {
-                        int targetSpeed = i / 3 + 5;
-                        if (targetSpeed < speed) {
-                            speed = targetSpeed;
-                        }
-                        int coords[] = Grid.getRealCoords(light);
-                        int intersectionX = coords[1];
-                        int intersectionY = coords[0];
-                        int distance =
-                            (int) Math.sqrt(Math.pow((intersectionX - x), 2) + Math.pow((intersectionY - y), 2));
-                        if (distance < 20) {
-                            intersectionPath.remove(0);
-                            lastStopped = (Intersection) intersectionPath.get(0);
+                    if (light != straight) {
+                        if (directionPath.size() > 1 && direction != directionPath.get(1)) {
+                            int targetSpeed = i / 3 + 5;
+                            if (targetSpeed < speed) {
+                                speed = targetSpeed;
+                            }
+                            int coords[] = Grid.getRealCoords(light);
+                            int intersectionX = coords[1] + 16;
+                            int intersectionY = coords[0] + 16;
+                            int frontX = front()[0];
+                            int frontY = front()[1];
+                            int distance =
+                                (int) Math.sqrt(Math.pow((intersectionX - frontX), 2) + Math.pow((intersectionY - frontY),
+                                    2));
+                            if (distance < 36) {
+                                intersectionPath.remove(0);
+                                lastStopped = (Intersection) intersectionPath.get(0);
                                 lastDir = directionPath.remove(0);
-                            direction = directionPath.get(0);
-                            lastIntersectionX = intersectionPath.get(0).getColNum() * Grid.GRID_SIZE;
-                            lastIntersectionY = intersectionPath.get(0).getRowNum() * Grid.GRID_SIZE;
-                            speed = 0;
-                            state = TURNING;
+                                direction = directionPath.get(0);
+                                lastIntersectionX = intersectionPath.get(0).getColNum() * Grid.GRID_SIZE;
+                                lastIntersectionY = intersectionPath.get(0).getRowNum() * Grid.GRID_SIZE;
+                                speed = 0;
+                                state = TURNING;
+                            }
                         }
                     }
                 }
-
             }
         }
 
@@ -813,12 +802,7 @@ public class Vehicle {
             Vehicle before = new Vehicle(this);
 
 
-            // Check if we need to decelerate, otherwise accelerate if below speed limit
-            if (!decelerate(g, allVehicles) &&
-                ((getCurrentGridObject(g) instanceof Road r &&
-                r.getSpeedLimit() > speed) || (getCurrentGridObject(g) instanceof Intersection))) {
-                accelerate();
-            }
+            // ADD BACK HERE
 
             // check all cells that we'd pass through
             int oldX = x;
@@ -827,46 +811,116 @@ public class Vehicle {
             // If we're still in FORWARD state after decelerate check, move forward
             if (state == FORWARD) {
                 moveForward();
+
+                // remove if we went through a stoplight
+                if (oldX != x) {
+                    if (x > oldX) {
+                        for (int i = oldX; i <= x; i += 32) {
+                            // Check for StopLight
+                            if (intersectionPath.size() > 1 && getCurrentGridObject(g, new int[]{i, y}) instanceof StopLight s && s == intersectionPath.get(1)) {
+                                if (directionPath.size() > 1 && directionPath.get(0) == directionPath.get(1)) {
+                                    System.out.println("Removed StopLight: " + intersectionPath.get(0) + " by " + this);
+                                    straight = s;
+                                    intersectionPath.remove(0);
+                                    lastDir = directionPath.remove(0);
+                                    if (!directionPath.isEmpty()) {
+                                        direction = directionPath.get(0);
+                                    }
+                                }
+                            }
+                            // Check for ONE_WAY Road
+                            if (intersectionPath.size() > 1 && getCurrentGridObject(g, new int[]{i, y}) instanceof OneWayRoad road && road == intersectionPath.get(1)) {
+                                System.out.println("Removed ONE_WAY Road: " + intersectionPath.get(0) + " by " + this);
+                                intersectionPath.remove(0);
+                                lastDir = directionPath.remove(0);
+                                if (!directionPath.isEmpty()) {
+                                    direction = directionPath.get(0);
+                                }
+                            }
+                        }
+                    } else {
+                        for (int i = x; i <= oldX; i += 32) {
+                            // Check for StopLight
+                            if (intersectionPath.size() > 1 && getCurrentGridObject(g, new int[]{i, y}) instanceof StopLight s && s == intersectionPath.get(1)) {
+                                if (directionPath.size() > 1 && directionPath.get(0) == directionPath.get(1)) {
+                                    System.out.println("Removed StopLight: " + intersectionPath.get(0) + " by " + this);
+                                    straight = s;
+                                    intersectionPath.remove(0);
+                                    lastDir = directionPath.remove(0);
+                                    if (!directionPath.isEmpty()) {
+                                        direction = directionPath.get(0);
+                                    }
+                                }
+                            }
+                            // Check for ONE_WAY Road
+                            if (intersectionPath.size() > 1 && getCurrentGridObject(g, new int[]{i, y}) instanceof OneWayRoad road && road == intersectionPath.get(1)) {
+                                System.out.println("Removed ONE_WAY Road: " + intersectionPath.get(0) + " by " + this);
+                                intersectionPath.remove(0);
+                                lastDir = directionPath.remove(0);
+                                if (!directionPath.isEmpty()) {
+                                    direction = directionPath.get(0);
+                                }
+                            }
+                        }
+                    }
+                } else if (oldY != y) {
+                    if (y > oldY) {
+                        for (int i = oldY; i <= y; i += 32) {
+                            // Check for StopLight
+                            if (intersectionPath.size() > 1 && getCurrentGridObject(g, new int[]{x, i}) instanceof StopLight s && s == intersectionPath.get(1)) {
+                                if (directionPath.size() > 1 && directionPath.get(0) == directionPath.get(1)) {
+                                    System.out.println("Removed StopLight: " + intersectionPath.get(0) + " by " + this);
+                                    straight = s;
+                                    intersectionPath.remove(0);
+                                    lastDir = directionPath.remove(0);
+                                    if (!directionPath.isEmpty()) {
+                                        direction = directionPath.get(0);
+                                    }
+                                }
+                            }
+                            // Check for ONE_WAY Road
+                            if (intersectionPath.size() > 1 && getCurrentGridObject(g, new int[]{x, i}) instanceof OneWayRoad road && road == intersectionPath.get(1)) {
+                                System.out.println("Removed ONE_WAY Road: " + intersectionPath.get(0) + " by " + this);
+                                intersectionPath.remove(0);
+                                lastDir = directionPath.remove(0);
+                                if (!directionPath.isEmpty()) {
+                                    direction = directionPath.get(0);
+                                }
+                            }
+                        }
+                    } else {
+                        for (int i = y; i <= oldY; i += 32) {
+                            // Check for StopLight
+                            if (intersectionPath.size() > 1 && getCurrentGridObject(g, new int[]{x, i}) instanceof StopLight s && s == intersectionPath.get(1)) {
+                                if (directionPath.size() > 1 && directionPath.get(0) == directionPath.get(1)) {
+                                    System.out.println("Removed StopLight: " + intersectionPath.get(0) + " by " + this);
+                                    straight = s;
+                                    intersectionPath.remove(0);
+                                    lastDir = directionPath.remove(0);
+                                    if (!directionPath.isEmpty()) {
+                                        direction = directionPath.get(0);
+                                    }
+                                }
+                            }
+                            // Check for ONE_WAY Road
+                            if (intersectionPath.size() > 1 && getCurrentGridObject(g, new int[]{x, i}) instanceof OneWayRoad road && road == intersectionPath.get(1)) {
+                                System.out.println("Removed ONE_WAY Road: " + intersectionPath.get(0) + " by " + this);
+                                intersectionPath.remove(0);
+                                lastDir = directionPath.remove(0);
+                                if (!directionPath.isEmpty()) {
+                                    direction = directionPath.get(0);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-
-            // remove if we went through a stoplight
-            if (oldX != x) {
-                if (x > oldX) {
-                    for (int i = oldX; i <= x; i += 32) {
-                        if (getCurrentGridObject(g, new int[]{i, y}) instanceof StopLight s && s == intersectionPath.get(0)) {
-                            intersectionPath.remove(0);
-                            direction = directionPath.remove(0);
-                        }
-                    }
-                } else {
-                    for (int i = x; i <= oldX; i += 32) {
-                        if (getCurrentGridObject(g, new int[]{i, y}) instanceof StopLight s && s == intersectionPath.get(0)) {
-                            intersectionPath.remove(0);
-                            direction = directionPath.remove(0);
-                        }
-                    }
-                }
-            } else if (oldY != y) {
-                if (y > oldY) {
-                    for (int i = oldY; i <= y; i += 32) {
-                        if (getCurrentGridObject(g, new int[]{x, i}) instanceof StopLight s && s == intersectionPath.get(0)) {
-                            intersectionPath.remove(0);
-                            direction = directionPath.remove(0);
-                        }
-                    }
-                } else {
-                    for (int i = y; i <= oldY; i += 32) {
-                        if (getCurrentGridObject(g, new int[]{x, i}) instanceof StopLight s && s == intersectionPath.get(0)) {
-                            intersectionPath.remove(0);
-                            direction = directionPath.remove(0);
-                        }
-                    }
-                }
-            } else {
-                if (x > 64 && y > 64) {
-                    System.out.println("Didn't move");
-                }
+            // Check if we need to decelerate, otherwise accelerate if below speed limit
+            if (!decelerate(g, allVehicles) &&
+                ((getCurrentGridObject(g) instanceof Road r &&
+                    r.getSpeedLimit() > speed) || (getCurrentGridObject(g) instanceof Intersection))) {
+                accelerate();
             }
 
             return new Step(before, new Vehicle(this));
@@ -886,7 +940,12 @@ public class Vehicle {
                     || (lastDir == UP && direction == LEFT) // correct
                     || (lastDir == LEFT && direction == DOWN)) { // correct
                     return this.turnLeft();
+                } else {
+                    System.out.println("Turning but directions don't match");
+                    System.out.println("Cur Dir: " + this.direction + " Last Dir: " + this.lastDir);
                 }
+            } else {
+                System.out.println("Turning but doesn't work");
             }
         } else if (state == ROUND_ABOUT_GO) {
             // Handle roundabout movement
@@ -1001,6 +1060,7 @@ public class Vehicle {
 
         // Update path information
         if (!intersectionPath.isEmpty()) {
+            System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
             intersectionPath.remove(0);
         }
         if (!directionPath.isEmpty()) {
@@ -1072,17 +1132,9 @@ public class Vehicle {
         }
 
         // Check if we need to turn based on the next direction in our path
-        boolean shouldTurn = false;
         Direction nextDirection = null;
 
-        if (directionPath.size() > 1) {
-            nextDirection = directionPath.get(1);
-            shouldTurn = nextDirection != direction;
-            System.out.println("Path has next direction: " + nextDirection +
-                ", shouldTurn: " + shouldTurn);
-        }
-
-        if (state == STOPPED_FORWARD || (state == STOPPED_TURNING && !shouldTurn)) {
+        if (state == STOPPED_FORWARD) {
             // Change state to ensure the vehicle starts moving
             CarState oldState = this.state;
             this.state = FORWARD;
@@ -1092,8 +1144,10 @@ public class Vehicle {
             int oldX = x;
             int oldY = y;
             moveForwardAfterStop();
+            speed = 5;
             System.out.println("Position change: [" + oldX + "," + oldY + "] -> [" + x + "," + y + "]");
-        } else if (state == STOPPED_TURNING || shouldTurn) {
+            return;
+        } else if (state == STOPPED_TURNING) {
             // For turns, set the turning state and let the turn handler take over
             CarState oldState = this.state;
             this.state = TURNING;
@@ -1101,11 +1155,6 @@ public class Vehicle {
 
             turnPositionSet = false; // Will be set in turnLeft/turnRight methods
 
-            // Ensure we're using the correct direction for determining turn direction
-            if (shouldTurn && nextDirection != null) {
-                // The vehicle needs to know it's turning
-                System.out.println("Vehicle turning at stop sign from " + direction + " to " + nextDirection);
-            }
         } else {
             System.out.println("WARNING: Unexpected vehicle state: " + state);
             // Try to recover by setting to FORWARD state
@@ -1121,9 +1170,13 @@ public class Vehicle {
         speed = 5;
         System.out.println("Vehicle speed set to: " + speed);
 
+
+
         // Update path information
         if (!intersectionPath.isEmpty()) {
-            intersectionPath.remove(0);
+                System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
+                intersectionPath.remove(0);
+
         }
         if (!directionPath.isEmpty()) {
             lastDir = directionPath.remove(0);
@@ -1155,6 +1208,7 @@ public class Vehicle {
             roundAboutPos = entryPoint;
             state = ROUND_ABOUT_GO;
             if (!intersectionPath.isEmpty()) {
+                System.out.println("Removed: " + intersectionPath.get(0) + " by " + this);
                 intersectionPath.remove(0);
             }
             if (!directionPath.isEmpty()) {
