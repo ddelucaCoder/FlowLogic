@@ -76,8 +76,8 @@ public class Vehicle {
         Rectangle newCar = new Rectangle(-100, -100, width, length);
         newCar.setRotate(curRotation);
         newCar.setVisible(true);
-        //Image image = new Image("file:Images/BlueCar.png");
-        //newCar.setFill(new ImagePattern(image));
+        Image image = new Image("file:Images/BlueCar.png");
+        newCar.setFill(new ImagePattern(image));
         this.car = newCar;
     }
 
@@ -100,6 +100,7 @@ public class Vehicle {
         this.state = v.state;
         this.direction = v.direction;
         this.car = v.car;
+        this.car.setFill(v.car.getFill());
         this.currentIntersection = v.currentIntersection;
         this.lastStopped = v.lastStopped;
         this.lastIntersectionX = v.lastIntersectionX;
