@@ -123,6 +123,10 @@ public class TrafficController {
         }
         return sim;
     }
+    public void rushHour(int time_between, int dist) {
+        this.time_between = time_between;
+        Vehicle.rushHour(dist);
+    }
 
 
     public ArrayList<Vehicle> getVehicles() {

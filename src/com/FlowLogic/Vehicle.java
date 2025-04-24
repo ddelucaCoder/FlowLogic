@@ -51,7 +51,7 @@ public class Vehicle {
 
     // Constants for vehicle behavior
     private static final int TURN_RATE = 45;
-    private static final int FOLLOWING_DISTANCE = 15; // Increased for safer distance
+    private static int FOLLOWING_DISTANCE = 15; // Increased for safer distance
     private static final int FAST_DECEL = 6;
     private static final int ACCEL = 3;
     private Direction lastDir = RIGHT;
@@ -1598,6 +1598,10 @@ public class Vehicle {
 
     public int getTripTime() {
         return (int) tripTime.toMillis();
+    }
+
+    public static void rushHour(int dist) {
+        FOLLOWING_DISTANCE = dist;
     }
 
 }
