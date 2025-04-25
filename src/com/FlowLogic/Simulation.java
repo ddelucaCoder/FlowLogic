@@ -23,17 +23,19 @@ public class Simulation {
     int numVehicles;
     ArrayList<Vehicle> vehicles;
     ArrayList<Frame> frames;
-    int avgTimeAtIntersections = 0;
+    long avgTimeAtIntersections = 0;
     long avgTripTime = 360;
-    int maxTimeAtIntersections = 0;
-    int minTimeAtIntersections = 0;
+    long maxTimeAtIntersections = 0;
+    long minTimeAtIntersections = 0;
     int numActiveVehicles = 0;
     int totalTime = 0;
+    VBox left;
 
     public Simulation(int numVehicles) {
         this.numVehicles = numVehicles;//This and next line may need to be changed based
         vehicles = new ArrayList<Vehicle>();//on how users decide on vehicles in simulation
         frames = new ArrayList<Frame>();
+        left = new VBox();
     }
 
     public void addFrame(Frame f) {
@@ -95,7 +97,7 @@ public class Simulation {
             }
         });
 
-        VBox left = new VBox();
+        //VBox left = new VBox();
         left.setStyle("-fx-border-color: black; -fx-border-width: 2px;");
         left.setPrefWidth((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2);
         left.setStyle("-fx-background-color: #D3D3D3;");
@@ -134,27 +136,34 @@ public class Simulation {
             infoAlert.showAndWait();
         });
 
-        Label statisticsTitle = new Label("Simulation Statistics:");
-        statisticsTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+        Button viewStatistics = new Button("View Statistics");
+        suggestion.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+        left.getChildren().add(viewStatistics);
+        viewStatistics.setOnAction(e -> {
+            Label statisticsTitle = new Label("Simulation Statistics:");
+            statisticsTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
-        Label avgTripTimeLabel = new Label("Average Trip Time: " + avgTripTime);
-        avgTripTimeLabel.setStyle("-fx-font-size: 16px;");
+            Label avgTripTimeLabel = new Label("Average Trip Time: " + avgTripTime);
+            avgTripTimeLabel.setStyle("-fx-font-size: 16px;");
 
-        Label avgIntersectionWaitLabel = new Label("Average Intersection Wait Time: " + avgTimeAtIntersections);
-        avgIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+            Label avgIntersectionWaitLabel = new Label("Average Intersection Wait Time: " + avgTimeAtIntersections);
+            avgIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
 
-        Label maxIntersectionWaitLabel = new Label("Max Intersection Wait Time: " + maxTimeAtIntersections);
-        maxIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+            Label maxIntersectionWaitLabel = new Label("Max Intersection Wait Time: " + maxTimeAtIntersections);
+            maxIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
 
-        Label minIntersectionWaitLabel = new Label("Min Intersection Wait Time: " + minTimeAtIntersections);
-        minIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
+            Label minIntersectionWaitLabel = new Label("Min Intersection Wait Time: " + minTimeAtIntersections);
+            minIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
 
-        Label numActiveVehiclesLabel = new Label("Min Intersection Wait Time: " + numActiveVehicles);
-        numActiveVehiclesLabel.setStyle("-fx-font-size: 16px;");
+            //Label numActiveVehiclesLabel = new Label("Number of Active Vehicles: " + UserInterface.activeVehicles);
+            //numActiveVehiclesLabel.setStyle("-fx-font-size: 16px;");
 
 
-        left.getChildren().addAll(statisticsTitle, avgTripTimeLabel, avgIntersectionWaitLabel, maxIntersectionWaitLabel,
-                minIntersectionWaitLabel, numActiveVehiclesLabel);
+            left.getChildren().addAll(statisticsTitle, avgTripTimeLabel, avgIntersectionWaitLabel, maxIntersectionWaitLabel,
+                    minIntersectionWaitLabel/*, numActiveVehiclesLabel*/);
+
+        });
+
 
         AtomicInteger delay = new AtomicInteger(500); // starting delay in ms
 
@@ -185,7 +194,7 @@ public class Simulation {
                 }
                 Platform.runLater(() -> { // Ensures UI updates happen on JavaFX thread
                     System.out.println("Rendering frame");
-                    updateStatisticsLabels(left);
+                    //updateStatisticsLabels(left);
                     for (Step s : f.getSteps()) {
                         Object oldObj = s.oldObject;
                         Object newObj = s.newObject;
@@ -299,17 +308,17 @@ public class Simulation {
         Label minIntersectionWaitLabel = new Label("Min Intersection Wait Time: " + minTimeAtIntersections);
         minIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
 
-        Label numActiveVehiclesLabel = new Label("Active Vehicles: " + numActiveVehicles);
-        numActiveVehiclesLabel.setStyle("-fx-font-size: 16px;");
+        //Label numActiveVehiclesLabel = new Label("Active Vehicles: " + UserInterface.activeVehicles);
+       // numActiveVehiclesLabel.setStyle("-fx-font-size: 16px;");
 
         // Add all the statistics labels to the VBox
         left.getChildren().addAll(avgTripTimeLabel, avgIntersectionWaitLabel,
-                maxIntersectionWaitLabel, minIntersectionWaitLabel, numActiveVehiclesLabel);
+                maxIntersectionWaitLabel, minIntersectionWaitLabel/*, numActiveVehiclesLabel*/);
     }
 
 
 
-    public void setAvgTimeAtIntersections(int avgTimeAtIntersections) {
+    public void setAvgTimeAtIntersections(long avgTimeAtIntersections) {
         this.avgTimeAtIntersections = avgTimeAtIntersections;
     }
 
@@ -317,11 +326,11 @@ public class Simulation {
         this.avgTripTime = avgTripTime;
     }
 
-    public void setMaxTimeAtIntersections(int maxTimeAtIntersections) {
+    public void setMaxTimeAtIntersections(long maxTimeAtIntersections) {
         this.maxTimeAtIntersections = maxTimeAtIntersections;
     }
 
-    public void setMinTimeAtIntersections(int minTimeAtIntersections) {
+    public void setMinTimeAtIntersections(long minTimeAtIntersections) {
         this.minTimeAtIntersections = minTimeAtIntersections;
     }
 
@@ -329,5 +338,7 @@ public class Simulation {
         this.numActiveVehicles = numActiveVehicles;
     }
 
-
+    public VBox getLeft() {
+        return left;
+    }
 }

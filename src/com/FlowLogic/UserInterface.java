@@ -73,6 +73,8 @@ public class UserInterface extends Application {
     private static final String SAVE_DIRECTORY = "saves";
     private static VBox options = new VBox();
 
+    public static int activeVehicles;
+
     @Override
     public void start(Stage primaryStage) throws Error {
         mainMenu(primaryStage);
@@ -358,8 +360,16 @@ public class UserInterface extends Application {
                 TrafficController tc = new TrafficController(back[0], back[1], grid);
                 Simulation sim = tc.runSimulation();
                 long avgTripTime = tc.getAvgTripTime();
+                long avgWaitTime = tc.getAvgIntersectionWaitTime();
+                long maxWaitTime = tc.getMaxWaitTime();
+                long minWaitTime = tc.getMinWaitTime();
                 System.out.println("Avg trip time = " + avgTripTime);
+                System.out.println("Avg wait time = " + avgWaitTime);
                 sim.setAvgTripTime(avgTripTime);
+                sim.setAvgTimeAtIntersections(avgWaitTime);
+                sim.setMaxTimeAtIntersections(maxWaitTime);
+                sim.setMinTimeAtIntersections(minWaitTime);
+                sim.setNumActiveVehicles(activeVehicles);
                 root.getChildren().remove(right);
                 root.getChildren().remove(left);
 

@@ -1,6 +1,7 @@
 package com.FlowLogic;
 
 import java.lang.reflect.Array;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -114,6 +115,9 @@ public class TrafficController {
             for (Vehicle v : vehicles) {
                 // update each vehicle
                 Step s = v.tick(grid, vehicles);
+                calcActiveVehicles();
+                //System.out.println("Active vehicles = " + UserInterface.activeVehicles);
+                //sim.updateStatisticsLabels(sim.getLeft());
                 // add old / new vehicles to the sim
                 if (s != null && (s.getNewObject() == null || !s.getNewObject().equals(s.getOldObject()))) {
                     f.addStep(s);
@@ -142,8 +146,47 @@ public class TrafficController {
     }
 
     public long getAvgIntersectionWaitTime() {
-
-        return 10;
+        int totalStops = 0;
+        long totalWaitTime = 0;
+        for (Vehicle vehicle : vehicles) {
+            totalWaitTime += vehicle.getTotalWaitTime();
+            totalStops += vehicle.getTotalStops();
+        }
+        if (totalStops != 0) {
+            return totalWaitTime / totalStops;
+        }
+        return totalWaitTime;
     }
+
+    public long getMaxWaitTime() {
+        long max = 0;
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle.getMaxWaitTime() > max) {
+                max = vehicle.getMaxWaitTime();
+            }
+        }
+        return max;
+    }
+    public long getMinWaitTime() {
+        long min = Integer.MAX_VALUE;
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle.getMinWaitTime() < min) {
+                min = vehicle.getMinWaitTime();
+                //System.out.println("Final min wait is now: " + min);
+            }
+        }
+        return min;
+    }
+
+    public void calcActiveVehicles() {
+        int totalCars = 0;
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle.isSpawned()) {
+                totalCars++;
+            }
+        }
+        UserInterface.activeVehicles = totalCars;
+    }
+
 
 }

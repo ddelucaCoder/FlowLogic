@@ -59,10 +59,15 @@ public class Vehicle {
     private StopLight straight;
 
     // statistics properties
-    private Duration tripTime;
-    private final Instant startTime;
-    private Duration totalWaitTime;
-    //private final Instant waitStartTime;
+    private boolean isSpawned;
+    private boolean isWaiting;
+    private int tripTime;
+    private long totalWaitTime;
+    private long tempWaitTime;
+
+    private long minWaitTime;
+    private long maxWaitTime;
+    private int totalStops;
 
     /**
      * Creates a new vehicle with the specified length.
@@ -81,7 +86,13 @@ public class Vehicle {
         this.state = NOT_SPAWNED;
         this.direction = null;
         this.currentIntersection = null;
-        this.startTime = Instant.now();
+        //this.startTime = Instant.now();
+        this.minWaitTime = Integer.MAX_VALUE;
+        this.maxWaitTime = 0;
+        this.totalStops = 0;
+        this.totalWaitTime = 0;
+        this.isSpawned = false;
+        this.isWaiting = false;
 
         // Initialize vehicle visualization off-screen
         Rectangle newCar = new Rectangle(-100, -100, width, length);
@@ -120,7 +131,12 @@ public class Vehicle {
         this.roundAboutPos = v.roundAboutPos;
         this.curRoundabout = v.curRoundabout;
         this.tripTime = v.tripTime;
-        this.startTime = v.startTime;
+        this.minWaitTime = v.minWaitTime;
+        this.maxWaitTime = v.maxWaitTime;
+        this.totalStops = v.totalStops;
+        this.totalWaitTime = v.totalWaitTime;
+        this.isSpawned = v.isSpawned;
+        this.isWaiting = v.isWaiting;
     }
 
     /**
@@ -160,7 +176,7 @@ public class Vehicle {
         speed = 0;
         direction = directionPath.get(0);
         state = FORWARD;
-
+        this.isSpawned = true;
         // Set initial rotation based on direction
         switch (direction) {
             case UP -> curRotation = 0;
@@ -405,6 +421,7 @@ public class Vehicle {
                             }
 
                             // Add vehicle to appropriate queue
+                            //startWaitTime();
                             light.addToQueue(this);
                         }
                     }
@@ -527,6 +544,7 @@ public class Vehicle {
      * @param intersection The intersection element to stop at
      */
     private void positionAtStopLine(GridObject intersection) {
+        startWaitTime();
         int[] intersectionCoords = Grid.getRealCoords(intersection);
         int intersectionX = intersectionCoords[1];  // Column coordinate
         int intersectionY = intersectionCoords[0];  // Row coordinate
@@ -769,19 +787,26 @@ public class Vehicle {
      * @return A Step object containing the previous and current state
      */
     public Step tick(Grid g, List<Vehicle> allVehicles) {
+
+        if (isSpawned) {
+            tripTime++;
+        }
+
+        if (isWaiting) {
+            tempWaitTime++;
+        }
+
         // Check if destination reached
         if (state != DESTINATION_REACHED &&
             getCurrentGridObject(g) == intersectionPath.get(intersectionPath.size() - 1)) {
             System.out.println("Destination Reached");
             state = DESTINATION_REACHED;
-            Instant endTime = Instant.now();
-            tripTime = Duration.between(startTime, endTime);
+            isSpawned = false;
             //System.out.println("Trip time was: " +  tripTime);
             return new Step(this, null);
         } else if (state == DESTINATION_REACHED) {
             Instant endTime = Instant.now();
-            tripTime = Duration.between(startTime, endTime);
-            //System.out.println("Trip time was: " +  tripTime);
+            isSpawned = false;
             return null;
         }
 
@@ -1081,6 +1106,7 @@ public class Vehicle {
      * Fixed to handle coordinate system correctly and ensure smooth movement.
      */
     private void moveForwardAfterStop() {
+        totalWaitTime += endWaitTime();
         int moveDistance = 12; // Distance to move after stopping
 
         // Move vehicle forward in the current direction
@@ -1512,8 +1538,49 @@ public class Vehicle {
         }
     }
 
+
+    private void startWaitTime() {
+        isWaiting = true;
+        //System.out.println("Car stopped, timer starting");
+    }
+
+    private long endWaitTime() {
+        totalStops += 1;
+        isWaiting = false;
+        long wait = tempWaitTime;
+        tempWaitTime = 0;
+        //System.out.println("Car moving again after " + wait + " ticks");
+        //System.out.println("Total stops = " + totalStops);
+        if (wait > maxWaitTime) {
+            maxWaitTime = wait;
+        } else if (wait < minWaitTime) {
+            minWaitTime = wait;
+            //System.out.println("MinWait is now: " + minWaitTime);
+        }
+        return wait;
+    }
+
     // Getters and setters
 
+
+
+    public long getTotalWaitTime() {
+        return totalWaitTime;
+    }
+
+
+
+    public long getMinWaitTime() {
+        return minWaitTime;
+    }
+
+    public long getMaxWaitTime() {
+        return maxWaitTime;
+    }
+
+    public int getTotalStops() {
+        return totalStops;
+    }
     /**
      * Gets the vehicle's direction.
      *
@@ -1597,7 +1664,10 @@ public class Vehicle {
 
 
     public int getTripTime() {
-        return (int) tripTime.toMillis();
+        return tripTime;
     }
 
+    public boolean isSpawned() {
+        return isSpawned;
+    }
 }
