@@ -330,9 +330,19 @@ public class UserInterface extends Application {
         hideResizeBox(right, grid);
         Button menu = new Button("Menu");
         menu.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+
         menu.setOnAction(e -> {
-            mainMenu(stage);
+            // Confirm close with the user
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Confirm Simulation Exit");
+            confirmAlert.setHeaderText("Are you sure you want to exit without saving?");
+
+            if (confirmAlert.showAndWait().get() == ButtonType.OK) {
+                // User confirmed the close, so return to build menu
+                mainMenu(stage);
+            }
         });
+
         right.getChildren().add(menu);
 
         Button simulate = new Button("Simulate");
