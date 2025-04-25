@@ -137,9 +137,11 @@ public class Simulation {
         });
 
         Button viewStatistics = new Button("View Statistics");
-        suggestion.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
+        viewStatistics.setPrefSize((SCREEN_WIDTH - SCREEN_HEIGHT * 1.0) / 2, 30);
         left.getChildren().add(viewStatistics);
         viewStatistics.setOnAction(e -> {
+            left.getChildren().clear();
+
             Label statisticsTitle = new Label("Simulation Statistics:");
             statisticsTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
@@ -158,8 +160,7 @@ public class Simulation {
             //Label numActiveVehiclesLabel = new Label("Number of Active Vehicles: " + UserInterface.activeVehicles);
             //numActiveVehiclesLabel.setStyle("-fx-font-size: 16px;");
 
-
-            left.getChildren().addAll(statisticsTitle, avgTripTimeLabel, avgIntersectionWaitLabel, maxIntersectionWaitLabel,
+            left.getChildren().addAll(suggestion, viewStatistics, statisticsTitle, avgTripTimeLabel, avgIntersectionWaitLabel, maxIntersectionWaitLabel,
                     minIntersectionWaitLabel/*, numActiveVehiclesLabel*/);
 
         });
