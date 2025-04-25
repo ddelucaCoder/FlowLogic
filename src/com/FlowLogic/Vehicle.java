@@ -521,7 +521,8 @@ public class Vehicle {
         for (int i = 0; i < ((speed / 10) + 1) * 32; i += 32) {
             if (getCurrentGridObject(g, front(i)) instanceof Road r && r.getIntersectionID() == endRoadID ||
                 getCurrentGridObject(g, front(i)) instanceof StopSign j ||
-                getCurrentGridObject(g, front(i)) instanceof Roundabout round) {
+                getCurrentGridObject(g, front(i)) instanceof Roundabout round ||
+                getCurrentGridObject(g, front(i)) instanceof Crosswalk cross) {
                 if (speed > i / 3) speed = i / 3;
                 if (speed < 5) speed = 5;
                 return true;
@@ -1181,6 +1182,7 @@ public class Vehicle {
 
         // Set a moderate starting speed
         speed = 5;
+        totalWaitTime += endWaitTime();
     }
 
     /**
@@ -1188,7 +1190,6 @@ public class Vehicle {
      * Fixed to handle coordinate system correctly and ensure smooth movement.
      */
     private void moveForwardAfterStop() {
-        totalWaitTime += endWaitTime();
         int moveDistance = 12; // Distance to move after stopping
 
         // Move vehicle forward in the current direction
@@ -1220,6 +1221,7 @@ public class Vehicle {
      * Enhanced to ensure proper state transitions and prevent getting stuck.
      */
     public void stopLightLetGo() {
+        totalWaitTime += endWaitTime();
         System.out.println("stopSignLetGo called on vehicle at [" + x + "," + y +
             "], state: " + state + ", direction: " + direction);
 
@@ -1367,7 +1369,7 @@ public class Vehicle {
         int current = target;
 
         // Trace back from target to start
-        while (current != start) {
+        while (current != start && current > 0) {
             tempPath.push(intersections.get(current));
             current = previous[current];
         }
@@ -1639,7 +1641,7 @@ public class Vehicle {
 
     private void startWaitTime() {
         isWaiting = true;
-        //System.out.println("Car stopped, timer starting");
+        System.out.println("Car stopped, timer starting");
     }
 
     private long endWaitTime() {
@@ -1647,13 +1649,16 @@ public class Vehicle {
         isWaiting = false;
         long wait = tempWaitTime;
         tempWaitTime = 0;
-        //System.out.println("Car moving again after " + wait + " ticks");
-        //System.out.println("Total stops = " + totalStops);
+        System.out.println("Car moving again after " + wait + " ticks");
+        System.out.println("Total stops = " + totalStops);
+        System.out.println("MinWait = " + minWaitTime);
+        System.out.println("MaxWait = " + maxWaitTime);
         if (wait > maxWaitTime) {
             maxWaitTime = wait;
-        } else if (wait < minWaitTime) {
+        }
+        if (wait < minWaitTime) {
             minWaitTime = wait;
-            //System.out.println("MinWait is now: " + minWaitTime);
+            System.out.println("MinWait is now: " + minWaitTime);
         }
         return wait;
     }
