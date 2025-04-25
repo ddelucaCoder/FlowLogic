@@ -165,23 +165,23 @@ public class Simulation {
         });
 
 
-        AtomicInteger delay = new AtomicInteger(500); // starting delay in ms
+        AtomicReference<Double> delay = new AtomicReference<>(1.0);
 
         // Create the slider and label
-        Slider delaySlider = new Slider(0, 2000, delay.get());
+        Slider delaySlider = new Slider(0.5, 2.0, delay.get());
         delaySlider.setShowTickLabels(true);
         delaySlider.setShowTickMarks(true);
-        delaySlider.setMajorTickUnit(500);
-        delaySlider.setBlockIncrement(100);
+        delaySlider.setMajorTickUnit(0.5);
+        delaySlider.setBlockIncrement(0.1);
 
-        Label delayLabel = new Label("Delay: " + delay.get() + " ms");
+        Label delayLabel = new Label("Speed: " + delay.get());
 
         // Add listener to update the delay variable and label
         delaySlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            int newDelay = newVal.intValue();
-            delay.set(newDelay);
-            delayLabel.setText("Delay: " + newDelay + " ms");
-            System.out.println("Slider updated, new delay: " + newDelay);
+            double snappedValue = Math.round(newVal.doubleValue() * 10) / 10.0;
+            delaySlider.setValue(snappedValue); // Force slider to snap to nearest 0.1
+            delay.set(snappedValue);
+            delayLabel.setText(String.format("Speed: %.1f", snappedValue));
         });
 
         right.getChildren().addAll(delayLabel, delaySlider);
@@ -228,7 +228,6 @@ public class Simulation {
                                 image = new Image("file:Images/Semi.png");
                             }
                             update.setFill(new ImagePattern(image));
-                            System.out.println("Car image file is: " + car.getCar().getFill() );
                             //update.setStroke(Color.BLACK);
                             //update.setStrokeWidth(2);
                             update.setWidth(((car.getWidth() * 1.0) /32) * cell_size / 2);
@@ -263,7 +262,7 @@ public class Simulation {
                 });
 
                 try {
-                    Thread.sleep(delay.get()); // Simulate delay, but UI won't freeze
+                    Thread.sleep((long)(500 / delay.get())); // Simulate delay, but UI won't freeze
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
