@@ -152,8 +152,8 @@ public class Vehicle {
         int spawnY = coords[0];
 
         // Create a temporary position for collision check
-        int tempX = spawnX + 16;
-        int tempY = spawnY + 16 - (width / 2);
+        int tempX = spawnX + 16 - (width / 4);
+        int tempY = spawnY + 16 - (length / 4);
 
         // Check if any existing vehicle is occupying the spawn location
         for (Vehicle other : allVehicles) {
