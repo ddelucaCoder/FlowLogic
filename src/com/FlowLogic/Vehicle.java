@@ -462,43 +462,24 @@ public class Vehicle {
         for (int i = 0; i < lookAheadDistance; i += 16) {
             if (getCurrentGridObject(g, front(i)) instanceof StopSign s) {
                 if (lastStopped != s) {
-                    // Begin deceleration earlier - gradual approach
-                    if (i > 64) {
-                        // Far from stop sign, start gradual deceleration
-                        speed = i / 3;
-                        if (speed < 5) speed = 5; // Maintain minimum speed unless very close
-                        return true;
-                    } else if (i <= 64 && i > 20) {
-                        // Getting closer, more significant deceleration
-                        speed = i / 4;
-                        if (speed < 3) speed = 3;
-                        return true;
-                    } else if (i <= length + 5) {
-                        // Very close to the stop sign
-
-                        // Store the intersection coordinates for future use
+                    if (i <= 10) {
                         int[] coords = Grid.getRealCoords(s);
                         lastIntersectionX = coords[1];
                         lastIntersectionY = coords[0];
 
                         lastStopped = s;
                         speed = 0;
-                        currentIntersection = s; // Set current intersection to stop sign
+                        currentIntersection = s;
 
-                        // Position the vehicle precisely at the stop line
                         positionAtStopLine(s, otherVehicles);
 
-                        // Set appropriate state based on path
                         if (directionPath.size() > 1 && directionPath.get(1) != direction) {
                             state = STOPPED_TURNING;
                         } else {
                             state = STOPPED_FORWARD;
                         }
 
-                        // Use the StopSign's existing method to add to queue
                         s.addToIntersection(this);
-
-                        return true;
                     }
                 }
             }
@@ -520,9 +501,9 @@ public class Vehicle {
         // Check if nearing destination or stop sign
         for (int i = 0; i < ((speed / 10) + 1) * 32; i += 32) {
             if (getCurrentGridObject(g, front(i)) instanceof Road r && r.getIntersectionID() == endRoadID ||
-                getCurrentGridObject(g, front(i)) instanceof StopSign j ||
-                getCurrentGridObject(g, front(i)) instanceof Roundabout round ||
-                getCurrentGridObject(g, front(i)) instanceof Crosswalk cross) {
+                getCurrentGridObject(g, front(i)) instanceof StopSign ||
+                getCurrentGridObject(g, front(i)) instanceof Roundabout ||
+                getCurrentGridObject(g, front(i)) instanceof Crosswalk) {
                 if (speed > i / 3) speed = i / 3;
                 if (speed < 5) speed = 5;
                 return true;
@@ -669,28 +650,28 @@ public class Vehicle {
         // Calculate centers
         switch (direction) {
             case UP:
-                myCenterX = x + width/2;
-                myCenterY = y + length/2;
+                myCenterX = x + width/4;
+                myCenterY = y + length/4;
                 otherCenterX = other.x + other.width/2;
                 otherCenterY = other.y + other.length/2;
                 break;
             case DOWN:
-                myCenterX = x + width/2;
-                myCenterY = y + length/2;
-                otherCenterX = other.x + other.width/2;
-                otherCenterY = other.y + other.length/2;
+                myCenterX = x + width/4;
+                myCenterY = y + length/4;
+                otherCenterX = other.x + other.width/4;
+                otherCenterY = other.y + other.length/4;
                 break;
             case LEFT:
-                myCenterX = x + length/2;
-                myCenterY = y + width/2;
-                otherCenterX = other.x + other.length/2;
-                otherCenterY = other.y + other.width/2;
+                myCenterX = x + length/4;
+                myCenterY = y + width/4;
+                otherCenterX = other.x + other.length/4;
+                otherCenterY = other.y + other.width/4;
                 break;
             case RIGHT:
-                myCenterX = x + length/2;
-                myCenterY = y + width/2;
-                otherCenterX = other.x + other.length/2;
-                otherCenterY = other.y + other.width/2;
+                myCenterX = x + length/4;
+                myCenterY = y + width/4;
+                otherCenterX = other.x + other.length/4;
+                otherCenterY = other.y + other.width/4;
                 break;
         }
 
@@ -727,8 +708,8 @@ public class Vehicle {
             // Position car to turn around the center of the intersection
             // Offset by half the smaller dimension (width) to ensure turning radius is consistent
             // Use center positions instead of top-left for proper pivoting
-            this.x = centerX - width/2;
-            this.y = centerY - width/2;
+            this.x = centerX - width/4;
+            this.y = centerY - length/4;
             turnPositionSet = true;
         }
 
@@ -769,8 +750,8 @@ public class Vehicle {
 
             // Position car to turn around the center of the intersection
             // Offset by half the smaller dimension (width) to ensure turning radius is consistent
-            this.x = centerX - width/2;
-            this.y = centerY - width/2;
+            this.x = centerX - width/4;
+            this.y = centerY - length/4;
             turnPositionSet = true;
 
         }
@@ -1006,8 +987,8 @@ public class Vehicle {
                 int centerY = roundY + Grid.GRID_SIZE;
 
                 // Convert to top-left position for rectangle
-                x = centerX - (width / 2);
-                y = centerY - (length / 2);
+                x = centerX - (width / 4);
+                y = centerY - (length / 4);
 
                 // Set rotation and direction based on position
                 switch (roundAboutPos) {
@@ -1072,8 +1053,8 @@ public class Vehicle {
                 int centerY = roundY + (Grid.GRID_SIZE / 2);
 
                 // Convert to top-left position for rectangle
-                x = centerX - (width / 2);
-                y = centerY - (length / 2);
+                x = centerX - (width / 4);
+                y = centerY - (length / 4);
 
                 // Set rotation and direction based on position
                 switch (roundAboutPos) {
@@ -1369,7 +1350,7 @@ public class Vehicle {
         int current = target;
 
         // Trace back from target to start
-        while (current != start && current > 0) {
+        while (current != start && current >= 0) {
             tempPath.push(intersections.get(current));
             current = previous[current];
         }
