@@ -158,6 +158,7 @@ public class Vehicle {
         // Check if any existing vehicle is occupying the spawn location
         for (Vehicle other : allVehicles) {
             if (this == other) continue; // Skip self
+            if (other.getState() == DESTINATION_REACHED) continue; // skip cars already finished
 
             // Calculate distance between spawn point and other vehicle center
             double dx = tempX - other.getX();
@@ -186,6 +187,7 @@ public class Vehicle {
         }
 
         car = new Rectangle(x, y, width, length);
+        System.out.println("Spawned Car!");
         return true; // Successfully spawned
     }
 
@@ -797,6 +799,8 @@ public class Vehicle {
             getCurrentGridObject(g) == intersectionPath.get(intersectionPath.size() - 1)) {
             System.out.println("Destination Reached");
             state = DESTINATION_REACHED;
+            // for ending at right time
+            TrafficController.numCarsLeft--;
             isSpawned = false;
             //System.out.println("Trip time was: " +  tripTime);
             return new Step(this, null);

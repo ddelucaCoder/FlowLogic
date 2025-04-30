@@ -845,8 +845,6 @@ public class Grid {
         int row = g.getRowNum();
         int col = g.getColNum();
 
-        System.out.println("Row: " + row + " Col: " + col);
-
         return new int[]{row * GRID_SIZE, col * GRID_SIZE};
     }
 
