@@ -10,11 +10,11 @@ import static com.FlowLogic.UserInterface.GRID_SIZE;
 
 public class TrafficController {
 
-    private int numCars;
+    public static int numCarsLeft;
     private ArrayList<Vehicle> vehicles;
     private ArrayList<GridObject> intersections;
 
-    private int totalTime = 1000;
+    private int totalTime = 20000;
 
     private ArrayList<Road> destinations;
     private ArrayList<Road> entrances;
@@ -32,24 +32,21 @@ public class TrafficController {
 
     public TrafficController(int avgSize, int numCars, Grid g) {
         graph = g.gridToGraph();
+        this.numCarsLeft = numCars;
 
         System.out.println("Graph: " + Arrays.deepToString(graph));
-
-       // System.out.println("Num Parking: " + Parking.getNumParking());
-       // System.out.println("Num In Roads: " + Road.getNumInRoads());
-       // System.out.println("Graph: " + Arrays.deepToString(graph));
 
         grid = g;
         vehicles = new ArrayList<>();
         destinations = new ArrayList<>();
         entrances = new ArrayList<>();
 
+        Random ran = new Random();
         for (int i = 0; i < numCars; i++) {
-            Random ran = new Random();
             int len = ran.nextInt(6) -3 + avgSize;
-
             vehicles.add(new Vehicle(len));
         }
+        System.out.println("Num cars: " + vehicles.size());
         intersections = g.intersections;
         System.out.println("Num intersections: " + intersections.size());
         for (GridObject obj : grid.intersections) {
@@ -80,7 +77,7 @@ public class TrafficController {
     }
 
     public Simulation runSimulation() {
-        Simulation sim = new Simulation(numCars);
+        Simulation sim = new Simulation(numCarsLeft);
 
         // generate cars and their in-roads and out-roads and time of entrance and destination
         int currentTime = 0;
@@ -96,7 +93,7 @@ public class TrafficController {
         while (running) {
             Frame f = new Frame();
             totalTime--;
-            if (totalTime <= 0) {
+            if (totalTime <= 0 || numCarsLeft <= 0) {
                 running = false;
             }
             for (GridObject g : intersections) {
