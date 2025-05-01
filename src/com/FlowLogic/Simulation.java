@@ -118,12 +118,15 @@ public class Simulation {
             infoAlert.setTitle("Suggestions Menu");
             String suggestionText = "";
             int numSuggestions = 0;
-            if (avgTimeAtIntersections > 60) {
+            if (maxTimeAtIntersections > 30) {
                 numSuggestions++;
-                suggestionText = suggestionText + numSuggestions + ". Cars appear to spend a long time at intersections. Consider expanding the road to allow more cars through!\n";
+                suggestionText = suggestionText + numSuggestions + ". You have cars that appear to be waiting a long " +
+                        "time at intersections" +
+                        ". Consider changing your light timing or expanding the " +
+                        "road to allow more cars through!\n";
             }
 
-            if (avgTripTime > 120) {
+            if (avgTripTime > 60) {
                 numSuggestions++;
                 suggestionText = suggestionText + numSuggestions + ". Cars appear to be taking quite some time to reach their destination from certain entry points. Consider creating a shorter path.\n";
             }
