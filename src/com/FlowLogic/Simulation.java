@@ -154,6 +154,9 @@ public class Simulation {
             Label maxIntersectionWaitLabel = new Label("Max Intersection Wait Time: " + maxTimeAtIntersections);
             maxIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
 
+            if (minTimeAtIntersections == Integer.MAX_VALUE) {
+                minTimeAtIntersections = 0;
+            }
             Label minIntersectionWaitLabel = new Label("Min Intersection Wait Time: " + minTimeAtIntersections);
             minIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
 
@@ -305,6 +308,9 @@ public class Simulation {
         Label maxIntersectionWaitLabel = new Label("Max Intersection Wait Time: " + maxTimeAtIntersections);
         maxIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
 
+        if (minTimeAtIntersections == Integer.MAX_VALUE) {
+            minTimeAtIntersections = 0;
+        }
         Label minIntersectionWaitLabel = new Label("Min Intersection Wait Time: " + minTimeAtIntersections);
         minIntersectionWaitLabel.setStyle("-fx-font-size: 16px;");
 
