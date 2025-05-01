@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.FlowLogic.UserInterface.GRID_SIZE;
+import static com.FlowLogic.UserInterface.canZoom;
 
 public class Simulation {
     int numVehicles;
@@ -188,7 +189,7 @@ public class Simulation {
         right.getChildren().addAll(delayLabel, delaySlider);
 
         new Thread(() -> {
-            System.out.println(frames.size());
+            canZoom = false;
             for (Frame f : frames) {
                 if (exit.get() == true) {
                     break;
@@ -268,6 +269,7 @@ public class Simulation {
                     e.printStackTrace();
                 }
             }
+            canZoom = true;
         }).start();
 
         //Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);

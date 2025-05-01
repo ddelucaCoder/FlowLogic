@@ -55,6 +55,7 @@ public class UserInterface extends Application {
 
     // Tracks if the User is Panning the screen disables clicking events
     private static boolean pan = false;
+    public static boolean canZoom = true;
 
 
     public static Group gridGroup = new Group();
@@ -172,22 +173,25 @@ public class UserInterface extends Application {
 
         // Zoom in/out using mouse wheel
         gridContainer.setOnScroll(event -> {
-            if (event.getDeltaY() > 0) {
-                scale.setX(scale.getX() * 1.1);
-                scale.setY(scale.getY() * 1.1);
-            } else {
-                scale.setX(scale.getX() / 1.1);
-                scale.setY(scale.getY() / 1.1);
-            }
-            if (scale.getX() < maxZoom || scale.getY() < maxZoom) {
-                scale.setX(maxZoom);
-                scale.setY(maxZoom);
-            }
+            if (canZoom) {
+                System.out.println(canZoom);
+                if (event.getDeltaY() > 0) {
+                    scale.setX(scale.getX() * 1.1);
+                    scale.setY(scale.getY() * 1.1);
+                } else {
+                    scale.setX(scale.getX() / 1.1);
+                    scale.setY(scale.getY() / 1.1);
+                }
+                if (scale.getX() < maxZoom || scale.getY() < maxZoom) {
+                    scale.setX(maxZoom);
+                    scale.setY(maxZoom);
+                }
 
-            ensureXY(gridContainer, scale);
+                ensureXY(gridContainer, scale);
 
-            gridGroup.setTranslateX(offsetX);
-            gridGroup.setTranslateY(offsetY);
+                gridGroup.setTranslateX(offsetX);
+                gridGroup.setTranslateY(offsetY);
+            }
         });
 
         // Panning functionality (dragging the grid)
@@ -198,18 +202,20 @@ public class UserInterface extends Application {
         });
 
         gridContainer.setOnMouseDragged(event -> {
-            double deltaX = event.getSceneX() - mousePos[0];
-            double deltaY = event.getSceneY() - mousePos[1];
-            offsetX += deltaX;
-            offsetY += deltaY;
+            if (canZoom) {
+                double deltaX = event.getSceneX() - mousePos[0];
+                double deltaY = event.getSceneY() - mousePos[1];
+                offsetX += deltaX;
+                offsetY += deltaY;
 
-            ensureXY(gridContainer, scale);
+                ensureXY(gridContainer, scale);
 
-            gridGroup.setTranslateX(offsetX);
-            gridGroup.setTranslateY(offsetY);
-            mousePos[0] = event.getSceneX();
-            mousePos[1] = event.getSceneY();
-            pan = true;
+                gridGroup.setTranslateX(offsetX);
+                gridGroup.setTranslateY(offsetY);
+                mousePos[0] = event.getSceneX();
+                mousePos[1] = event.getSceneY();
+                pan = true;
+            }
         });
 
 
@@ -388,7 +394,6 @@ public class UserInterface extends Application {
                 sim.setNumActiveVehicles(activeVehicles);
                 root.getChildren().remove(right);
                 root.getChildren().remove(left);
-
                 sim.display(stage, root, gridContainer, grid); // display the simulation
                 grid.synchronizeGrid();
             }
