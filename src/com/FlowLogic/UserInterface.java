@@ -691,11 +691,26 @@ public class UserInterface extends Application {
             offsetY = minY; // Prevent panning up
         }
     }
+    /*
+file:/C:/Users/colin/IdeaProjects/FlowLogic/Images/BlueCar.png
+file:/C:/Users/colin/IdeaProjects/FlowLogic/Images/BusTaxi.png
+file:/C:/Users/colin/IdeaProjects/FlowLogic/Images/Prius.png
+file:/C:/Users/colin/IdeaProjects/FlowLogic/Images/Semi.png
+
+     */
     private static void addDraggableImages(GridPane left, int numColumns) {
         File dir = new File("Images");
         int count = 0;
         if (dir.exists() && dir.isDirectory()) {
             for (File file : dir.listFiles()) {
+                if (file.toURI().toString().contains("FlowLogic/Images/BlueCar.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/BusTaxi.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/Prius.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/Semi.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/AllRed4WayStopLight.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/RedGreen4WayStopLight.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/RedYellow4WayStopLight.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/YellowRed4WayStopLight.png")) continue;
                 Image img = new Image(file.toURI().toString());
                 ImageView imageView = new ImageView(img);
                 imageView.setUserData(file.getName());
