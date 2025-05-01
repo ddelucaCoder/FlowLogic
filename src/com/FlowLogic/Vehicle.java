@@ -70,6 +70,9 @@ public class Vehicle {
     private long maxWaitTime;
     private int totalStops;
 
+    private int holdWindDown;
+    private StopLight holding;
+
     /**
      * Creates a new vehicle with the specified length.
      * @param length The length of the vehicle
@@ -206,6 +209,13 @@ public class Vehicle {
             case LEFT -> xVel = -speed;
         }
 
+        if (holdWindDown > 0) {
+            holdWindDown -= speed;
+        } else if (this.holding != null) {
+            this.holding.isHolding = null;
+            this.holdWindDown = 0;
+            this.holding = null;
+        }
         x += xVel;
         y += yVel;
     }
@@ -707,6 +717,8 @@ public class Vehicle {
             return new Step(past, past);
         } else if (gO instanceof StopLight s) {
             s.isHolding = this;
+            this.holding = s;
+            holdWindDown = 5;
         }
 
         // If turn position hasn't been set yet, set it
@@ -738,9 +750,6 @@ public class Vehicle {
             state = FORWARD;
             turnPositionSet = false;
             moveForwardAfterTurn();
-            if (gO instanceof StopLight s) {
-                s.isHolding = null;
-            }
         }
 
         return new Step(past, new Vehicle(this));
@@ -760,6 +769,8 @@ public class Vehicle {
             return new Step(past, past);
         } else if (gO instanceof StopLight s) {
             s.isHolding = this;
+            this.holding = s;
+            holdWindDown = 5;
         }
 
         // If turn position hasn't been set yet, set it
@@ -790,9 +801,6 @@ public class Vehicle {
             state = FORWARD;
             turnPositionSet = false;
             moveForwardAfterTurn();
-            if (gO instanceof StopLight s) {
-                s.isHolding = null;
-            }
         }
 
         return new Step(past, new Vehicle(this));
