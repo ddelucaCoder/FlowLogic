@@ -11,7 +11,7 @@ public class CappedStack<E> extends Stack<E> {
 
     @Override
     public E push(E item) {
-        if (size() >= maxSize) {
+        if (size() > maxSize) {
             // Remove the bottom element (index 0)
             removeElementAt(0);
         }

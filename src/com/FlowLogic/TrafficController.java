@@ -125,7 +125,7 @@ public class TrafficController {
     }
     public void rushHour() {
         this.time_between = 3;
-        Vehicle.rushHour(3, 3);
+        Vehicle.rushHour(5, 3);
     }
 
 
