@@ -1,5 +1,6 @@
 package com.FlowLogic;
 
+import com.sun.prism.paint.Stop;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
@@ -701,6 +702,13 @@ public class Vehicle {
     private Step turnRight(Grid g) {
         Vehicle past = new Vehicle(this);
 
+        GridObject gO = getCurrentGridObject(g,new int[]{lastIntersectionX, lastIntersectionY});
+        if (gO instanceof StopLight s && s.isHolding != null && s.isHolding != this) {
+            return new Step(past, past);
+        } else if (gO instanceof StopLight s) {
+            s.isHolding = this;
+        }
+
         // If turn position hasn't been set yet, set it
         if (!turnPositionSet) {
             // Position the vehicle properly at the center of the intersection
@@ -730,6 +738,9 @@ public class Vehicle {
             state = FORWARD;
             turnPositionSet = false;
             moveForwardAfterTurn();
+            if (gO instanceof StopLight s) {
+                s.isHolding = null;
+            }
         }
 
         return new Step(past, new Vehicle(this));
@@ -741,8 +752,15 @@ public class Vehicle {
      *
      * @return A Step object containing the previous and current state
      */
-    private Step turnLeft() {
+    private Step turnLeft(Grid g) {
         Vehicle past = new Vehicle(this);
+
+        GridObject gO = getCurrentGridObject(g,new int[]{lastIntersectionX, lastIntersectionY});
+        if (gO instanceof StopLight s && s.isHolding != null && s.isHolding != this) {
+            return new Step(past, past);
+        } else if (gO instanceof StopLight s) {
+            s.isHolding = this;
+        }
 
         // If turn position hasn't been set yet, set it
         if (!turnPositionSet) {
@@ -772,6 +790,9 @@ public class Vehicle {
             state = FORWARD;
             turnPositionSet = false;
             moveForwardAfterTurn();
+            if (gO instanceof StopLight s) {
+                s.isHolding = null;
+            }
         }
 
         return new Step(past, new Vehicle(this));
@@ -964,7 +985,7 @@ public class Vehicle {
                     || (lastDir == DOWN && direction == RIGHT) // correct
                     || (lastDir == UP && direction == LEFT) // correct
                     || (lastDir == LEFT && direction == DOWN)) { // correct
-                    return this.turnLeft();
+                    return this.turnLeft(g);
                 } else {
                     System.out.println("Turning but directions don't match");
                     System.out.println("Cur Dir: " + this.direction + " Last Dir: " + this.lastDir);
