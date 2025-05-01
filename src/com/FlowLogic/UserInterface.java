@@ -376,7 +376,7 @@ public class UserInterface extends Application {
                 if (back[0] == -1) {
                     return;
                 }
-                TrafficController tc = new TrafficController(back[0], back[1], grid);
+                TrafficController tc = new TrafficController(back[1], back[0], grid);
                 if (back[2] != 0) {
                     tc.rushHour();
                 }
@@ -471,7 +471,7 @@ public class UserInterface extends Application {
         CheckBox rushHourBox = new CheckBox("Rush Hour Mode");
 
         Label message = new Label("Enter simulation settings:");
-        final int[] userValue = {25, 10, 0};  // Default values
+        final int[] userValue = {10, 25, 0};  // Default values
 
         Button runButton = new Button("Run");
         runButton.setOnAction(e -> {
