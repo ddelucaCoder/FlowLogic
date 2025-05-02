@@ -55,6 +55,7 @@ public class UserInterface extends Application {
 
     // Tracks if the User is Panning the screen disables clicking events
     private static boolean pan = false;
+    public static boolean canZoom = true;
 
 
     public static Group gridGroup = new Group();
@@ -172,22 +173,25 @@ public class UserInterface extends Application {
 
         // Zoom in/out using mouse wheel
         gridContainer.setOnScroll(event -> {
-            if (event.getDeltaY() > 0) {
-                scale.setX(scale.getX() * 1.1);
-                scale.setY(scale.getY() * 1.1);
-            } else {
-                scale.setX(scale.getX() / 1.1);
-                scale.setY(scale.getY() / 1.1);
-            }
-            if (scale.getX() < maxZoom || scale.getY() < maxZoom) {
-                scale.setX(maxZoom);
-                scale.setY(maxZoom);
-            }
+            if (canZoom) {
+                System.out.println(canZoom);
+                if (event.getDeltaY() > 0) {
+                    scale.setX(scale.getX() * 1.1);
+                    scale.setY(scale.getY() * 1.1);
+                } else {
+                    scale.setX(scale.getX() / 1.1);
+                    scale.setY(scale.getY() / 1.1);
+                }
+                if (scale.getX() < maxZoom || scale.getY() < maxZoom) {
+                    scale.setX(maxZoom);
+                    scale.setY(maxZoom);
+                }
 
-            ensureXY(gridContainer, scale);
+                ensureXY(gridContainer, scale);
 
-            gridGroup.setTranslateX(offsetX);
-            gridGroup.setTranslateY(offsetY);
+                gridGroup.setTranslateX(offsetX);
+                gridGroup.setTranslateY(offsetY);
+            }
         });
 
         // Panning functionality (dragging the grid)
@@ -198,18 +202,20 @@ public class UserInterface extends Application {
         });
 
         gridContainer.setOnMouseDragged(event -> {
-            double deltaX = event.getSceneX() - mousePos[0];
-            double deltaY = event.getSceneY() - mousePos[1];
-            offsetX += deltaX;
-            offsetY += deltaY;
+            if (canZoom) {
+                double deltaX = event.getSceneX() - mousePos[0];
+                double deltaY = event.getSceneY() - mousePos[1];
+                offsetX += deltaX;
+                offsetY += deltaY;
 
-            ensureXY(gridContainer, scale);
+                ensureXY(gridContainer, scale);
 
-            gridGroup.setTranslateX(offsetX);
-            gridGroup.setTranslateY(offsetY);
-            mousePos[0] = event.getSceneX();
-            mousePos[1] = event.getSceneY();
-            pan = true;
+                gridGroup.setTranslateX(offsetX);
+                gridGroup.setTranslateY(offsetY);
+                mousePos[0] = event.getSceneX();
+                mousePos[1] = event.getSceneY();
+                pan = true;
+            }
         });
 
 
@@ -370,7 +376,7 @@ public class UserInterface extends Application {
                 if (back[0] == -1) {
                     return;
                 }
-                TrafficController tc = new TrafficController(back[0], back[1], grid);
+                TrafficController tc = new TrafficController(back[1], back[0], grid);
                 if (back[2] != 0) {
                     tc.rushHour();
                 }
@@ -388,7 +394,6 @@ public class UserInterface extends Application {
                 sim.setNumActiveVehicles(activeVehicles);
                 root.getChildren().remove(right);
                 root.getChildren().remove(left);
-
                 sim.display(stage, root, gridContainer, grid); // display the simulation
                 grid.synchronizeGrid();
             }
@@ -466,7 +471,7 @@ public class UserInterface extends Application {
         CheckBox rushHourBox = new CheckBox("Rush Hour Mode");
 
         Label message = new Label("Enter simulation settings:");
-        final int[] userValue = {25, 10, 0};  // Default values
+        final int[] userValue = {10, 25, 0};  // Default values
 
         Button runButton = new Button("Run");
         runButton.setOnAction(e -> {
@@ -686,11 +691,26 @@ public class UserInterface extends Application {
             offsetY = minY; // Prevent panning up
         }
     }
+    /*
+file:/C:/Users/colin/IdeaProjects/FlowLogic/Images/BlueCar.png
+file:/C:/Users/colin/IdeaProjects/FlowLogic/Images/BusTaxi.png
+file:/C:/Users/colin/IdeaProjects/FlowLogic/Images/Prius.png
+file:/C:/Users/colin/IdeaProjects/FlowLogic/Images/Semi.png
+
+     */
     private static void addDraggableImages(GridPane left, int numColumns) {
         File dir = new File("Images");
         int count = 0;
         if (dir.exists() && dir.isDirectory()) {
             for (File file : dir.listFiles()) {
+                if (file.toURI().toString().contains("FlowLogic/Images/BlueCar.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/BusTaxi.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/Prius.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/Semi.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/AllRed4WayStopLight.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/RedGreen4WayStopLight.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/RedYellow4WayStopLight.png")) continue;
+                if (file.toURI().toString().contains("FlowLogic/Images/YellowRed4WayStopLight.png")) continue;
                 Image img = new Image(file.toURI().toString());
                 ImageView imageView = new ImageView(img);
                 imageView.setUserData(file.getName());

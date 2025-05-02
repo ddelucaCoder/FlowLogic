@@ -29,6 +29,8 @@ public class StopLight extends Intersection implements GridObject {
     private Queue<Vehicle> verticalQueue; // For UP/DOWN traffic
     private Queue<Vehicle> horizontalQueue; // For LEFT/RIGHT traffic
 
+    public Vehicle isHolding = null;
+
     public StopLight(Road roadOne, Road roadTwo, int timingOne, int timingTwo, int lightOneColor, int lightTwoColor, Road[] roadList, int rowNum, int colNum) {
         super(rowNum, colNum, roadList);
         this.lightOneColor = lightOneColor; // Vertical Light

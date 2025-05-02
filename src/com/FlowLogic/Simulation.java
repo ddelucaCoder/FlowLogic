@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.FlowLogic.UserInterface.GRID_SIZE;
+import static com.FlowLogic.UserInterface.canZoom;
 
 public class Simulation {
     int numVehicles;
@@ -117,12 +118,15 @@ public class Simulation {
             infoAlert.setTitle("Suggestions Menu");
             String suggestionText = "";
             int numSuggestions = 0;
-            if (avgTimeAtIntersections > 60) {
+            if (maxTimeAtIntersections > 30) {
                 numSuggestions++;
-                suggestionText = suggestionText + numSuggestions + ". Cars appear to spend a long time at intersections. Consider expanding the road to allow more cars through!\n";
+                suggestionText = suggestionText + numSuggestions + ". You have cars that appear to be waiting a long " +
+                        "time at intersections" +
+                        ". Consider changing your light timing or expanding the " +
+                        "road to allow more cars through!\n";
             }
 
-            if (avgTripTime > 120) {
+            if (avgTripTime > 60) {
                 numSuggestions++;
                 suggestionText = suggestionText + numSuggestions + ". Cars appear to be taking quite some time to reach their destination from certain entry points. Consider creating a shorter path.\n";
             }
@@ -191,7 +195,7 @@ public class Simulation {
         right.getChildren().addAll(delayLabel, delaySlider);
 
         new Thread(() -> {
-            System.out.println(frames.size());
+            canZoom = false;
             for (Frame f : frames) {
                 if (exit.get() == true) {
                     break;
@@ -271,6 +275,7 @@ public class Simulation {
                     e.printStackTrace();
                 }
             }
+            canZoom = true;
         }).start();
 
         //Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
